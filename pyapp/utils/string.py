@@ -29,7 +29,7 @@ def ensure_bytes(x: str | bytes, encoding: str = 'utf-8'):
             See Python `codecs` documentation for list of valid options
             for [standard encodings](https://docs.python.org/3/library/codecs.html#standard-encodings)
             or [Python-specific encodings](https://docs.python.org/3/library/codecs.html#python-specific-encodings).
-            For WinAPI calls, use 'utf-16-le' (see `pyapp.utils.windows.WIN_WCHAR_ENCODING` for details).
+            For WinAPI calls, use 'utf-16-le' (see `pyapp.utils.constants.windows.WIN_WCHAR_ENCODING` for details).
             Defaults to 'utf-8'.
 
     Returns:

@@ -7,7 +7,7 @@ from os import environ
 
 from ..logging import log_func_call
 from .cfgdict import config_dict_get
-from .windows import IS_WIN32
+from .constants import IS_WIN32
 from .casesafe import casesafe_is_equal, casesafe_value, casesafe_key_in_dict
 
 _VARPROG = compile(r'\$(\w+|\{[^}]*\})', ASCII)

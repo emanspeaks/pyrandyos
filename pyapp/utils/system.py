@@ -13,9 +13,8 @@ from importlib import import_module
 from ..logging import get_logger
 
 from .constants import (
-    DEFAULT_GROUP, DEFAULT_DIR_MODE, DEFAULT_FILE_MODE,
+    DEFAULT_GROUP, DEFAULT_DIR_MODE, DEFAULT_FILE_MODE, IS_WIN32,
 )
-from .windows import IS_WIN32
 from .notebook import is_notebook
 from .paths import expand_and_check_var_path
 from .nolog_system import (

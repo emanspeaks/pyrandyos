@@ -2,7 +2,7 @@
 This module is intended for internal use only.  No user documentation is
 provided at this time.  Use at your own discretion.
 """
-import sys
+
 from pathlib import Path
 from ctypes import POINTER, c_ssize_t, c_ulonglong, c_ubyte
 
@@ -11,7 +11,6 @@ FuncErrMsgDict = dict[str, str]
 DllErrMsgDict = dict[str, FuncErrMsgDict]
 DriveList = list[tuple[Path, Path]]
 
-IS_WIN32 = sys.platform == "win32"
 c_ssize_p = POINTER(c_ssize_t)
 UCHAR = c_ubyte
 PUCHAR = POINTER(UCHAR)

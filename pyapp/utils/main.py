@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 from ..logging import log_func_call, get_logger
 from .._testing.debug import is_debug_enabled
-from .logging import setup_memory_logging
+from .log import setup_memory_logging
 
 
 @contextmanager

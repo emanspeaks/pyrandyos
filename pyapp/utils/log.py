@@ -17,7 +17,7 @@ from ..logging import (
     APP_LOG_LEVEL_NAMES,
 )
 from .constants import DEFAULT_GROUP, DEFAULT_DIR_MODE
-from .cli import ConsoleText
+from .constants.cli import ConsoleText
 
 _LOGCACHE: MemoryHandler = None
 

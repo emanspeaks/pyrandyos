@@ -2,8 +2,7 @@ from typing import TypeVar
 from collections.abc import Container, Sequence
 
 from ..logging import DEBUGLOW2, log_func_call
-from .windows import IS_WIN32
-from .constants import NODEFAULT
+from .constants import NODEFAULT, IS_WIN32
 
 ContainerType = TypeVar('T', bound=Container)
 

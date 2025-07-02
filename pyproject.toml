@@ -21,6 +21,9 @@ dependencies = [
   "types-pyside2",
 ]
 
+[tool.hatch.version]
+path = "pyapp/version.py"
+
 [project.urls]
 Homepage = "https://github.com/emanspeaks/pyapp"
 

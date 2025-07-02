@@ -1,6 +1,5 @@
 from ..logging import DEBUGLOW2, log_func_call
-from .windows import IS_WIN32
-from .constants import NODEFAULT
+from .constants import NODEFAULT, IS_WIN32
 from .casesafe import (
     casesafe_dict_get, casesafe_dict_set, casesafe_key_in_dict,
 )

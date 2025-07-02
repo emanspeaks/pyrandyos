@@ -10,7 +10,7 @@ from .config.defaults import (
 from .config.local import process_local_config
 
 from .utils.constants import DEFAULT_GROUP, DEFAULT_DIR_MODE
-from .utils.logging import setup_logging, create_log_file
+from .utils.log import setup_logging, create_log_file
 from .utils.main import main_context
 from .utils.system import (
     mkdir_chgrp, get_top_package_dir_for_obj

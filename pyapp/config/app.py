@@ -11,9 +11,8 @@ from ..utils.json import load_jsonc
 from ..utils.cfgdict import (
     config_dict_get, config_dict_set, config_dict_update,
 )
-from ..utils.constants import NODEFAULT
+from ..utils.constants import NODEFAULT, IS_WIN32
 from ..utils.nolog_system import nolog_build_cmd_arg_list
-from ..utils.windows import IS_WIN32
 from ..utils.casesafe import casesafe_is_equal, casesafe_value_in_container
 
 from .defaults import (

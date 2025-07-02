@@ -1,6 +1,7 @@
+import sys
 from getpass import getuser
 
-from ..windows import IS_WIN32
+IS_WIN32 = sys.platform == "win32"
 
 NODEFAULT = object()
 """

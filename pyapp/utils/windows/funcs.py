@@ -9,8 +9,9 @@ from pathlib import Path
 from ctypes import c_ulong, byref, create_string_buffer
 
 from ...logging import log_func_call
-from .constants import (
-    IS_WIN32, ErrCodeLookup, DllErrMsgDict, DriveList, ERROR_INVALID_HANDLE,
+from ..constants import IS_WIN32
+from ..constants.windows import (
+    ErrCodeLookup, DllErrMsgDict, DriveList, ERROR_INVALID_HANDLE,
     PROCESS_SYSTEM_DPI_AWARE, MAX_PREFERRED_LENGTH,
 )
 from .ctypes import IS_WIN_CTYPES

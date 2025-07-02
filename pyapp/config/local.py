@@ -5,7 +5,7 @@ from ..utils.json import load_jsonc, save_json
 from ..utils.cfgdict import (
     config_dict_update, config_dict_get, config_dict_set,
 )
-from ..utils.windows import IS_WIN32
+from ..utils.constants import IS_WIN32
 from ..utils.casesafe import casesafe_value_in_container, casesafe_is_equal
 
 from ..logging import log_func_call

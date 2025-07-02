@@ -2,7 +2,7 @@ import sys
 from pathlib import Path, PurePosixPath, PureWindowsPath, PurePath
 
 from .expandvars import expandvars, is_key_resolved
-from .windows import IS_WIN32
+from .constants import IS_WIN32
 
 
 def get_equiv_pureposixpath(x: str | Path):
