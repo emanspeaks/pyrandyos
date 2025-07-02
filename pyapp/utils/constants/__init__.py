@@ -1,0 +1,14 @@
+from getpass import getuser
+
+from ..windows import IS_WIN32
+
+NODEFAULT = object()
+"""
+Sentinel constant to indicate no default value was given to a
+`get()`-like function, such as `config_dict_get()`
+"""
+
+USER = getuser()
+DEFAULT_GROUP = None if IS_WIN32 else USER
+DEFAULT_DIR_MODE = 0o2750
+DEFAULT_FILE_MODE = 0o640

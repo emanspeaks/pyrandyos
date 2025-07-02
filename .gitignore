@@ -1,0 +1,15 @@
+build/
+dist/
+*.egg-info/
+*.egg
+*.py[cod]
+__pycache__/
+*.so
+*~
+~$*
+
+docs/
+.vscode/settings.json
+.coverage
+.conda
+logs/

@@ -1,0 +1,31 @@
+{
+    "version": "0.2",
+    "ignorePaths": [
+        ".cspell.json*",
+        ".cspell/**",
+        ".git/**",
+        "*.code-workspace",
+        ".gitignore",
+        ".local-gitignore"
+    ],
+    "dictionaryDefinitions": [
+        {
+            "name": "pyapp",
+            "path": ".vscode/ltex.dictionary.en-US.txt",
+            "addWords": true
+        }
+    ],
+    "dictionaries": [
+        "bash",
+        "win32",
+        "scientific-terms-us",
+        "pyapp"
+    ],
+    "allowCompoundWords": true,
+    "ignoreWords": [
+        "cfgfile"
+    ],
+    "words": [
+        "jloads"
+    ]
+}

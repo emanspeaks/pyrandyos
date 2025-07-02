@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyapp"
+# version = "0.1.0"
+dynamic = ["version"]
+description = "Library of common functions for Python applications"
+readme = "readme.md"
+authors = [
+  {name = "Randy Eckman", email = "emanspeaks@gmail.com"},
+]
+maintainers = [
+  {name = "Randy Eckman", email = "emanspeaks@gmail.com"},
+]
+dependencies = [
+  "pywin32",
+  "tqdm",
+  "pyside2",
+  "types-pyside2",
+]
+
+[project.urls]
+Homepage = "https://github.com/emanspeaks/pyapp"
+
+[tool.coverage.report]
+# ignore_errors = true
+
+# Regexes for lines to exclude from consideration
+exclude_also = [
+  # Don't complain about missing debug-only code:
+  # "def __repr__",
+  # "if self\\.debug",
+
+  # Don't complain if tests don't hit defensive assertion code:
+  "raise AssertionError",
+  "raise NotImplementedError",
+
+  # Don't complain if non-runnable code isn't run:
+  # "if 0:",
+  "if __name__ == .__main__.:",
+
+  # Don't complain about abstract methods, they aren't run:
+  "@(abc\\.)?abstractmethod",
+
+  'if TYPE_CHECKING:',
+  'if IS_WIN_CTYPES:'
+]
+
+[tool.coverage.run]
+branch = true
+# https://github.com/nedbat/coveragepy/issues/1392#issuecomment-1149310741
+omit = [
+    "shibokensupport/*",
+    "pyscript",
+    "signature_bootstrap.py",
+    "tests/*",
+]
