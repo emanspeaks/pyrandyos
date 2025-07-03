@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from .logging import get_logger, Logger, log_func_call
+from .logging import get_logger, Logger, log_func_call, DEBUGLOW2
 from .config import AppConfig
 from .config.defaults import (
     BASE_LOG_PATH_KEY, APP_NAME_KEY, get_log_dir_keys, APP_PKG_DIR_KEY,
@@ -141,3 +141,8 @@ class PyApp(AppConfig):
     @log_func_call
     def get_assets_dir(cls):
         return cls.APP_ASSETS_DIR
+
+    @classmethod
+    @log_func_call(DEBUGLOW2)
+    def get_default_win_size(cls):
+        return cls['local.default_width'], cls['local.default_height']

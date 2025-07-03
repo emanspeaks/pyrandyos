@@ -34,9 +34,11 @@ ppath
 PYAPP
 pycache
 pyfile
+pyrcc
 pyscript
 pyside
 pywin
+qresource
 qtbasewidget
 qtroot
 qtwin

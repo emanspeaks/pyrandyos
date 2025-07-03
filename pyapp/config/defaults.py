@@ -17,6 +17,7 @@ CLI_LOG_LEVEL_KEY = 'cli_log_level'
 FILE_LOG_LEVEL_KEY = 'file_log_level'
 # not included in PATH_KEYS since this is internal only
 BASE_LOG_PATH_KEY = '__log_path'
+QT_ICON_PYFILE_KEY = '__qt_icon_pyfile'
 
 # other fixed keys
 APP_NAME_KEY = 'app_name'
@@ -29,6 +30,7 @@ PATH_KEYS = (
     # "output_dir",
     "package_dir",
     "assets_dir",
+    QT_ICON_PYFILE_KEY,
 
     # "local.delivery_config_dir",
     "local_config_file",

@@ -21,6 +21,12 @@ dependencies = [
   "types-pyside2",
 ]
 
+[tool.hatch.build]
+include = [
+  "pyapp/qt_gui/icons/*.svg",
+  "pyapp/qt_gui/icons/*.qrc",
+]
+
 [tool.hatch.version]
 path = "pyapp/version.py"
 

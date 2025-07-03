@@ -1,3 +1,4 @@
+import sys
 from typing import TypeVar, cast, overload, Any
 from collections.abc import Callable
 from logging import (  # noqa: F401
@@ -71,3 +72,10 @@ def log_func_call(arg):
         # Used as @log_func_call(level)
         level = arg
         return decorator
+
+
+def log_exc(type=None, value=None, traceback=None):
+    get_logger().exception('Unhandled exception', exc_info=value)
+
+
+sys.excepthook = log_exc

@@ -1,7 +1,7 @@
 import sys
 from contextlib import contextmanager
 
-from ..logging import log_func_call, get_logger
+from ..logging import log_func_call, get_logger, log_exc
 from .._testing.debug import is_debug_enabled
 from .log import setup_memory_logging
 
@@ -25,7 +25,7 @@ def main_context(appname: str):
     except BaseException:
         status_ok = False
         exit_code = 1
-        log.exception('Unhandled exception')
+        log_exc()
         if is_debug_enabled():
             raise
 
