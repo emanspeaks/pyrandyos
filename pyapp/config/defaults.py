@@ -22,6 +22,7 @@ QT_ICON_PYFILE_KEY = '__qt_icon_pyfile'
 # other fixed keys
 APP_NAME_KEY = 'app_name'
 APP_PKG_DIR_KEY = 'package_dir'
+APP_PKG_VERSION_KEY = 'package_version'
 APP_ASSETS_DIR_KEY = 'assets_dir'
 
 PATH_KEYS = (
@@ -61,7 +62,7 @@ DEFAULTS = {
 }
 
 
-def get_defaults(cls, app_global_defaults: dict = {},
+def get_defaults(cls: type, app_global_defaults: dict = {},
                  app_local_defaults: dict = {}):
     tmp = deepcopy(DEFAULTS)
 
@@ -69,9 +70,16 @@ def get_defaults(cls, app_global_defaults: dict = {},
     cfgpkgdir = get_path_to_top_package_dir()
     tmp['config_package_dir'] = cfgpkgdir
 
+    from ..version import __version__
+    tmp['config_package_version'] = __version__
+
     from ..utils.system import get_top_package_dir_for_obj
     pkgdir = get_top_package_dir_for_obj(cls)
     tmp[APP_PKG_DIR_KEY] = pkgdir
+
+    from ..utils.system import get_top_module_for_obj
+    tmp[APP_PKG_VERSION_KEY] = getattr(get_top_module_for_obj(cls),
+                                       '__version__')
 
     # tmp['config_assets_dir'] = pkgdir/'assets'
     tmp.update(app_global_defaults)

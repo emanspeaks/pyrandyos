@@ -63,22 +63,47 @@ def press_any_key():
         os_sys('read -srn1 -p "Press any key to continue... "')
 
 
-def get_top_package_dir_for_obj(obj: object):
+def get_module_and_name_for_obj(obj: object):
+    "returns mod, modname"
     mod = getmodule(obj)
-    modname = mod.__name__
+    return mod, mod.__name__
+
+
+def get_top_module_name(modname: str = None):
+    if not modname:
+        stk = stack()
+        frm = stk[1]
+        return get_top_module_name_for_obj(frm[0])
+    return modname.split('.')[0]
+
+
+def get_top_module_name_for_obj(obj: object):
+    _, modname = get_module_and_name_for_obj(obj)
+    return get_top_module_name(modname)
+
+
+def get_top_package_dir_for_obj(obj: object):
+    mod, modname = get_module_and_name_for_obj(obj)
     if modname == '__main__':
         return None if is_notebook() else Path(getfile(mod)).parent
     return get_path_to_top_package_dir(modname)
 
 
-def get_path_to_top_package_dir(modname: str = None):
-    if not modname:
-        stk = stack()
-        frm = stk[1]
-        return get_top_package_dir_for_obj(frm[0])
-
+def get_top_module(modname: str = None):
     try:
-        return Path(getfile(import_module(modname.split('.')[0]))).parent
+        return import_module(get_top_module_name(modname))
+    except TypeError:
+        print('no pkg')
+        pass
+
+
+def get_top_module_for_obj(obj: object):
+    return get_top_module(get_top_module_name_for_obj(obj))
+
+
+def get_path_to_top_package_dir(modname: str = None):
+    try:
+        return Path(getfile(get_top_module(modname))).parent
     except TypeError:
         print('no pkg')
         pass
