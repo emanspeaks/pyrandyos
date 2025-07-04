@@ -3,7 +3,9 @@ from collections.abc import Callable
 
 from PySide2.QtGui import QIcon
 from PySide2.QtCore import QSize
-from PySide2.QtWidgets import QToolButton, QSlider, QWidget
+from PySide2.QtWidgets import (
+    QToolButton, QSlider, QWidget, QAction, QSizePolicy,
+)
 
 from .abc import QtWidgetWrapper
 from ..logging import log_func_call
@@ -86,3 +88,30 @@ def create_slider(parent: QtWidgetWrapper | QWidget, min_value: int,
         slide.valueChanged.connect(callback)
 
     return slide
+
+
+@log_func_call
+def create_action(parent: QtWidgetWrapper | QWidget, text: str = "",
+                  icon: QIcon | str | Path = None,
+                  callback: Callable = None, enabled: bool = True):
+    action = QAction(parent if isinstance(parent, QWidget)
+                     else parent.qtroot)
+    if text:
+        action.setText(text)
+
+    if icon:
+        if not isinstance(icon, QIcon):
+            icon = load_icon(icon)
+
+        action.setIcon(icon)
+
+    if callback:
+        action.triggered.connect(callback)
+    return action
+
+
+@log_func_call
+def create_toolbar_expanding_spacer():
+    spacer = QWidget()
+    spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+    return spacer

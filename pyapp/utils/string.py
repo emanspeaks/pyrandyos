@@ -1,3 +1,5 @@
+from collections.abc import Iterable
+
 from ..logging import log_func_call
 
 
@@ -49,3 +51,8 @@ def quote_str(s: str):
     """
     if s:
         return '"' + ensure_str(s).strip('"').strip("'") + '"'
+
+
+@log_func_call
+def iterable_max_chars(x: Iterable):
+    return max(len(str(y)) for y in x)

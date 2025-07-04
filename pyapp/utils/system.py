@@ -63,6 +63,17 @@ def press_any_key():
         os_sys('read -srn1 -p "Press any key to continue... "')
 
 
+def get_current_stack_frame_info(level: int = 1):
+    stk = stack()
+    frm = stk[level]
+    return frm[0]
+
+
+def get_current_module_and_name():
+    "returns mod, modname"
+    return get_module_and_name_for_obj(get_current_stack_frame_info(2))
+
+
 def get_module_and_name_for_obj(obj: object):
     "returns mod, modname"
     mod = getmodule(obj)
@@ -71,9 +82,7 @@ def get_module_and_name_for_obj(obj: object):
 
 def get_top_module_name(modname: str = None):
     if not modname:
-        stk = stack()
-        frm = stk[1]
-        return get_top_module_name_for_obj(frm[0])
+        return get_top_module_name_for_obj(get_current_stack_frame_info(2))
     return modname.split('.')[0]
 
 

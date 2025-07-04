@@ -6,7 +6,8 @@
         ".git/**",
         "*.code-workspace",
         ".gitignore",
-        ".local-gitignore"
+        ".local-gitignore",
+        "pyapp/qt_gui/icons/thirdparty/**/names.py"
     ],
     "dictionaryDefinitions": [
         {
@@ -26,6 +27,7 @@
         "cfgfile"
     ],
     "words": [
-        "jloads"
+        "jloads",
+        "tmpmodname"
     ]
 }
