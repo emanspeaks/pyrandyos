@@ -15,5 +15,6 @@ def init_iconfonts(use_tmpdir: bool = True, do_import: bool = True):
     tmpdir = PyApp.mkdir_temp() if use_tmpdir else ICON_ASSETS_DIR
     for fontmod, fontspec in THIRDPARTY_FONTSPEC.items():
         fontspec.initialize(fontmod, tmpdir)
+        relqualname = fontspec.relative_module_qualname
         if do_import:
-            import_module(f'{thirdpartymod}.{fontmod}')
+            import_module(f'{thirdpartymod}.{relqualname}')
