@@ -53,14 +53,23 @@ def log_func_call(arg):
         @wraps(func)
         def wrapper(*args, **kwargs):
             log = get_logger(func.__module__)
-            log.log(
-                level,
-                f"Function call: {func.__qualname__}"
-                f"({', '.join(repr(arg) for arg in args)}"
-                f"{', ' if args and kwargs else ''}"
-                f"{', '.join(f'{k}={v!r}' for k, v in kwargs.items())})",
-                stacklevel=2,
-            )
+            try:
+                log.log(
+                    level,
+                    f"Function call: {func.__qualname__}"
+                    f"({', '.join(repr(arg) for arg in args)}"
+                    f"{', ' if args and kwargs else ''}"
+                    f"{', '.join(f'{k}={v!r}' for k, v in kwargs.items())}) "
+                    f"{{function defined {func.__code__.co_filename}"
+                    f"({func.__code__.co_firstlineno})}}",
+                    stacklevel=2,
+                )
+            except BaseException as e:
+                log.log(
+                    level,
+                    f"Error logging function call: {func.__qualname__} - {e}",
+                    stacklevel=2,
+                )
             return func(*args, **kwargs)
         return cast(F, wrapper)
 

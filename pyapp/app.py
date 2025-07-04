@@ -5,7 +5,7 @@ from .logging import get_logger, Logger, log_func_call, DEBUGLOW2
 from .config import AppConfig
 from .config.defaults import (
     BASE_LOG_PATH_KEY, APP_NAME_KEY, get_log_dir_keys, APP_PKG_DIR_KEY,
-    APP_ASSETS_DIR_KEY,
+    APP_ASSETS_DIR_KEY, APP_PKG_VERSION_KEY,
 )
 from .config.local import process_local_config
 
@@ -13,7 +13,7 @@ from .utils.constants import DEFAULT_GROUP, DEFAULT_DIR_MODE
 from .utils.log import setup_logging, create_log_file
 from .utils.main import main_context
 from .utils.system import (
-    mkdir_chgrp, get_top_package_dir_for_obj
+    mkdir_chgrp, get_top_package_dir_for_obj, get_top_module_for_obj,
 )
 
 
@@ -27,8 +27,8 @@ class PyApp(AppConfig):
     # class attributes with fallback defaults
     APP_GLOBAL_DEFAULTS = {}
     APP_LOCAL_DEFAULTS = {}
-    APP_ASSETS_DIR: Path = None
-    APP_PKG_DIR: Path = None
+    APP_ASSETS_DIR: str | Path = None
+    "path to be resolved when config is processed; may use variable expansion"
 
     use_local_config: bool = None
 
@@ -59,6 +59,7 @@ class PyApp(AppConfig):
 
         # start logging and process the rest of the configuration data
         cls.set(BASE_LOG_PATH_KEY, logfile)
+        cls.set(APP_PKG_VERSION_KEY, cls.get_package_version())
         pkgdir = cls.get_package_dir()
         cls.set(APP_PKG_DIR_KEY, pkgdir)
         assets_dir = cls.get_assets_dir()
@@ -133,14 +134,20 @@ class PyApp(AppConfig):
 
     @classmethod
     @log_func_call
+    def get_package_version(cls):
+        return getattr(get_top_module_for_obj(cls), '__version__')
+
+    @classmethod
+    @log_func_call
     def get_package_dir(cls):
-        return (cls.APP_PKG_DIR
-                or get_top_package_dir_for_obj(cls))
+        return get_top_package_dir_for_obj(cls)
 
     @classmethod
     @log_func_call
     def get_assets_dir(cls):
-        return cls.APP_ASSETS_DIR
+        assetsdir = cls.get(APP_ASSETS_DIR_KEY, cls.APP_ASSETS_DIR)
+        if assetsdir:
+            return Path(assetsdir)
 
     @classmethod
     @log_func_call(DEBUGLOW2)

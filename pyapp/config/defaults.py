@@ -73,14 +73,6 @@ def get_defaults(cls: type, app_global_defaults: dict = {},
     from ..version import __version__
     tmp['config_package_version'] = __version__
 
-    from ..utils.system import get_top_package_dir_for_obj
-    pkgdir = get_top_package_dir_for_obj(cls)
-    tmp[APP_PKG_DIR_KEY] = pkgdir
-
-    from ..utils.system import get_top_module_for_obj
-    tmp[APP_PKG_VERSION_KEY] = getattr(get_top_module_for_obj(cls),
-                                       '__version__')
-
     # tmp['config_assets_dir'] = pkgdir/'assets'
     tmp.update(app_global_defaults)
     local: dict = tmp.get('local', {})

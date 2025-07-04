@@ -19,12 +19,15 @@ dependencies = [
   "tqdm",
   "pyside2",
   "types-pyside2",
+  "qdarkstyle",
 ]
 
 [tool.hatch.build]
 include = [
   "pyapp/qt_gui/icons/*.svg",
   "pyapp/qt_gui/icons/*.qrc",
+  "pyapp/qt_gui/icons/vscode-codicons/src/icons/*.svg",
+  "pyapp/qt_gui/icons/vscode-codicons/LICENSE",
 ]
 
 [tool.hatch.version]

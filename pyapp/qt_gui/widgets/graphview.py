@@ -1,12 +1,12 @@
 from PySide2.QtWidgets import QGraphicsView, QGraphicsScene
 
 from ...logging import log_func_call
-from ..abc import QtWidgetWrapper, QtWindowWrapper
+from ..abc import QtWidgetWrapper
 
 
 class GraphViewWidget(QtWidgetWrapper):
     @log_func_call
-    def __init__(self, parent: QtWindowWrapper, scene: QGraphicsScene = None):
+    def __init__(self, parent: QtWidgetWrapper, scene: QGraphicsScene = None):
         super().__init__(parent)
         qtwin = parent.qtroot
 
@@ -17,4 +17,4 @@ class GraphViewWidget(QtWidgetWrapper):
 
         view = QGraphicsView(scene, qtwin)
         self.view = view
-        self.qtroot = view
+        self.qtroot: QGraphicsView = view

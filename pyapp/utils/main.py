@@ -22,12 +22,12 @@ def main_context(appname: str):
             raise e
     except KeyboardInterrupt:
         pass
-    except BaseException:
+    except BaseException as e:
         status_ok = False
         exit_code = 1
-        log_exc()
+        log_exc(value=e)
         if is_debug_enabled():
-            raise
+            raise e
 
     finally:
         if exit_code:

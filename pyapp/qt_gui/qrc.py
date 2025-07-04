@@ -12,7 +12,6 @@ from ..utils.constants import IS_WIN32
 from ..utils.system import import_python_file
 from ..app import PyApp
 
-# Path to this file (qrc.py)
 HERE = Path(__file__).parent
 ICONS_DIR = HERE/"icons"
 QRC_FILE = ICONS_DIR/"icons.qrc"

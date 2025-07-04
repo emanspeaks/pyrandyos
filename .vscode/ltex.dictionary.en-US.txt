@@ -38,6 +38,7 @@ pyrcc
 pyscript
 pyside
 pywin
+qdarkstyle
 qresource
 qtbasewidget
 qtroot
@@ -55,9 +56,11 @@ tkbasewidget
 tkroot
 tkwindow
 tnew
+toolbtn
 tqdm
 UNC
 UNCs
 utmain
 VSCode
 ymdhms
+vscode-codicons
