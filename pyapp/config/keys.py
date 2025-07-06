@@ -17,9 +17,10 @@ LOCAL_CONFIG_FILE_KEY = 'local_config_file'
 LOG_TRACE_ENABLED_KEY = 'log_trace_enabled'
 SHOW_TRACEBACK_LOCALS_KEY = 'show_traceback_locals'
 LOCAL_CFG_KEY = 'local'
+QRC_FILE_KEY = 'qrc_file'
+QRC_PYFILE_KEY = 'qrc_pyfile'
 # not included in PATH_KEYS since this is internal only
 BASE_LOG_PATH_KEY = '__log_path'
-QT_ICON_PYFILE_KEY = '__qt_icon_pyfile'
 
 # other fixed keys
 APP_NAME_KEY = 'app_name'
@@ -34,7 +35,8 @@ PATH_KEYS = (
     TMP_DIR_KEY,
     APP_PKG_DIR_KEY,
     APP_ASSETS_DIR_KEY,
-    QT_ICON_PYFILE_KEY,
+    QRC_PYFILE_KEY,
+    QRC_FILE_KEY,
 
     # "local.delivery_config_dir",
     LOCAL_CONFIG_FILE_KEY,

@@ -59,6 +59,7 @@ pywin
 qdarkstyle
 QFontIcon
 QIconFont
+qrcfile
 qresource
 QtAwesome
 qtbasewidget

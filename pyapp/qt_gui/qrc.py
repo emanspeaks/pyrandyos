@@ -1,41 +1,43 @@
 """
-This module ensures that the Qt resource file (icons.qrc) is compiled to a
-Python module (icons_rc.py) at runtime if it is missing or out of date.
+This module ensures that the Qt resource file (resources.qrc) is compiled to a
+Python module (qt_resources.py) at runtime if it is missing or out of date.
 It should be imported before any Qt widgets are created.
 """
 from subprocess import run, CalledProcessError
 from pathlib import Path
 
-from ....logging import log_func_call
-from ....config.keys import QT_ICON_PYFILE_KEY
-from ....utils.constants import IS_WIN32
-from ....utils.system import import_python_file
-from ....app import PyApp
+from ..logging import log_func_call
+from ..config.keys import QRC_PYFILE_KEY, QRC_FILE_KEY
+from ..utils.constants import IS_WIN32
+from ..utils.system import import_python_file
+from ..app import PyApp
 
 HERE = Path(__file__).parent
-ICONS_DIR = HERE
-QRC_FILE = ICONS_DIR/"icons.qrc"
-PY_FILENAME = "icons_rc.py"
+PY_FILENAME = "qt_resources.py"
+QT_RESOURCES_MODULE = f"{__name__}.resources"
 
 
 @log_func_call
 def compile_qrc():
     """Compile the Qt resource file if needed."""
-    if not QRC_FILE.exists():
-        raise FileNotFoundError(f"Resource file not found: {QRC_FILE}")
+    qrcfile: Path = PyApp.get(QRC_FILE_KEY, None)
+    if not qrcfile:
+        return
+    if qrcfile and not qrcfile.exists():
+        raise FileNotFoundError(f"Resource file not found: {qrcfile}")
 
     tmpdir = PyApp.mkdir_temp()
     py_file = tmpdir/PY_FILENAME
-    PyApp.set(QT_ICON_PYFILE_KEY, py_file)
+    PyApp.set(QRC_PYFILE_KEY, py_file)
 
     # Only recompile if .py is missing or older than .qrc
-    if py_file.exists() and py_file.stat().st_mtime > QRC_FILE.stat().st_mtime:
+    if py_file.exists() and py_file.stat().st_mtime > qrcfile.stat().st_mtime:
         return  # Up to date
 
     # Try to find pyside2-rcc or pyrcc5
     rcc_cmds = [
-        ["pyside2-rcc", str(QRC_FILE)],
-        ["pyrcc5", str(QRC_FILE)],
+        ["pyside2-rcc", str(qrcfile)],
+        ["pyrcc5", str(qrcfile)],
     ]
     for cmd in rcc_cmds:
         try:
@@ -55,9 +57,15 @@ def compile_qrc():
 @log_func_call
 def import_qrc():
     # Import the generated resource module so resources are registered
-    py_file: Path = PyApp[QT_ICON_PYFILE_KEY]
+    qrcfile: Path = PyApp.get(QRC_FILE_KEY, None)
+    if not qrcfile:
+        return
+    py_file: Path = PyApp.get(QRC_PYFILE_KEY, None)
+    if not py_file or not py_file.exists():
+        compile_qrc()
+
     try:
-        mod = import_python_file(py_file, "pyapp.qt_gui.icons.icons_rc")
+        mod = import_python_file(py_file, QT_RESOURCES_MODULE)
     except ImportError:
         mod = None
 
