@@ -70,6 +70,7 @@ class FileSetTqdm(tqdm):
             yield obj
 
 
+@log_func_call
 def get_tqdm_ncols(file=None, ncols: int | None = None,
                    dynamic_ncols: bool = False, **kwargs):
     if ncols is not None:
@@ -92,6 +93,7 @@ def get_tqdm_ncols(file=None, ncols: int | None = None,
 
 
 @contextmanager
+@log_func_call
 def optional_tqdm(use_tqdm: bool = True, tqdmclass: type = tqdm,
                   *args, **kwargs) -> Generator[tqdm, None, None]:
     """

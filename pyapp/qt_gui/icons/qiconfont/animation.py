@@ -25,8 +25,11 @@ from PySide2.QtCore import QTimer, QRect, QRectF
 from PySide2.QtWidgets import QWidget
 from PySide2.QtGui import QPainter
 
+from ....logging import log_func_call, DEBUGLOW2
+
 
 class Spin:
+    @log_func_call
     def __init__(self, parent_widget: QWidget, interval: int = 10,
                  step: int = 1, autostart: bool = True):
         self.parent_widget = parent_widget
@@ -36,6 +39,7 @@ class Spin:
 
         self.info = {}
 
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def _update(self):
         if self.parent_widget in self.info:
             timer, angle, step = self.info[self.parent_widget]
@@ -47,6 +51,7 @@ class Spin:
             self.info[self.parent_widget] = timer, angle, step
             self.parent_widget.update()
 
+    @log_func_call
     def setup(self, icon_painter: QPainter, painter: QPainter,
               rect: QRect | QRectF):
         if self.parent_widget not in self.info:
@@ -63,11 +68,13 @@ class Spin:
             painter.rotate(angle)
             painter.translate(-x_center, -y_center)
 
+    @log_func_call
     def start(self):
         if self.parent_widget in self.info:
             timer: QTimer = self.info[self.parent_widget][0]
             timer.start(self.interval)
 
+    @log_func_call
     def stop(self):
         if self.parent_widget in self.info:
             timer: QTimer = self.info[self.parent_widget][0]
@@ -75,6 +82,7 @@ class Spin:
 
 
 class Pulse(Spin):
+    @log_func_call
     def __init__(self, parent_widget: QWidget, autostart: bool = True):
         super().__init__(parent_widget, interval=300, step=45,
                          autostart=autostart)

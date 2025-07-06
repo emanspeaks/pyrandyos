@@ -1,35 +1,36 @@
 from .constants.cli import CSI
+from ..logging import log_func_call
 
 
 class ScreenControl:
     @staticmethod
-    # @log_func_call
+    @log_func_call
     def put_cursor_at_line_col(line: int, col: int):
         # return ff'{CSI}{line};{col}f'
         return f'{CSI}{line};{col}H'
 
     @staticmethod
-    # @log_func_call
+    @log_func_call
     def move_cursor_up(n: int):
         return f'{CSI}{n}A'
 
     @staticmethod
-    # @log_func_call
+    @log_func_call
     def move_cursor_down(n: int):
         return f'{CSI}{n}B'
 
     @staticmethod
-    # @log_func_call
+    @log_func_call
     def move_cursor_fwd(n: int):
         return f'{CSI}{n}C'
 
     @staticmethod
-    # @log_func_call
+    @log_func_call
     def move_cursor_bwd(n: int):
         return f'{CSI}{n}D'
 
 
-# @log_func_call
+@log_func_call
 def render_console_string(s: str):
     """
     parses a string with ANSI control characters and generates the equivalent

@@ -13,6 +13,7 @@ class MainContext:
     It sets up logging and handles exceptions.
     """
 
+    @log_func_call
     def __init__(self, appname: str):
         self.appname = appname
 

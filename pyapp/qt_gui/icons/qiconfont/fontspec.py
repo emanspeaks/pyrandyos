@@ -1,6 +1,7 @@
 from pathlib import Path
 from json import loads as jloads
 
+from ....logging import log_func_call
 from ....utils.net import download_file, get_github_download_url
 from ....utils.filemeta import filehash
 
@@ -11,6 +12,7 @@ CharMap = dict[str, int]
 
 
 class QIconFontGitCommit:
+    @log_func_call
     def __init__(self, git_repo_base_url: str, git_commit_hash: str,
                  license_relpath: Path | tuple[Path]):
         self.git_repo_base_url = git_repo_base_url
@@ -19,6 +21,7 @@ class QIconFontGitCommit:
 
 
 class QIconFontGitFile:
+    @log_func_call
     def __init__(self, git_commit: QIconFontGitCommit, repo_relpath: Path,
                  md5sum: str = None):
         self.git_commit = git_commit
@@ -26,6 +29,7 @@ class QIconFontGitFile:
         self.md5sum = md5sum
         self.parent: 'QIconFontSpec' = None
 
+    @log_func_call
     def get_local_path(self, download_dir: Path = None):
         name = self.repo_relpath.name
         classname = self.parent.classname
@@ -41,6 +45,7 @@ class QIconFontGitFile:
         tgtdir.mkdir(parents=True, exist_ok=True)
         return tgtdir/name
 
+    @log_func_call
     def download(self, dest: Path):
         git = self.git_commit
         repo = git.git_repo_base_url
@@ -49,6 +54,7 @@ class QIconFontGitFile:
         return download_file(get_github_download_url(repo, commit, relpath),
                              dest)
 
+    @log_func_call
     def get_or_download(self, download_dir: Path = None):
         p = self.get_local_path(download_dir)
         if not p.exists():
@@ -66,11 +72,13 @@ class QIconTtfFileSpec(QIconFontGitFile):
 
 
 class QIconCharMapFileSpec(QIconFontGitFile):
+    @log_func_call
     def __init__(self, git_commit: QIconFontGitCommit, repo_relpath: Path,
                  codepoint_base: int = 16, md5sum: str = None):
         super().__init__(git_commit, repo_relpath, md5sum)
         self.codepoint_base = codepoint_base
 
+    @log_func_call
     def load_charmap(self) -> CharMap:
         jsonfile = self.get_local_path()
         charmap: dict[str, str | int] = jloads(jsonfile.read_text())
@@ -80,6 +88,7 @@ class QIconCharMapFileSpec(QIconFontGitFile):
 
 
 class QIconFontSpec:
+    @log_func_call
     def __init__(self,  # target_relative_module_name: str,
                  ttf_filespec: QIconTtfFileSpec,
                  charmap_filespec: QIconCharMapFileSpec):
@@ -95,11 +104,13 @@ class QIconFontSpec:
         self.classname: str = None
         self.relative_module_qualname: str = None
 
+    @log_func_call
     def ensure_local_files(self, download_dir: Path = None):
         ttffile = self.ttf_filespec.get_or_download(download_dir)
         jsonfile = self.charmap_filespec.get_or_download(download_dir)
         return ttffile, jsonfile
 
+    @log_func_call
     def initialize(self, target_relative_class_qualname: str,
                    download_dir: Path = None):
         tmpmodname = target_relative_class_qualname
@@ -112,6 +123,7 @@ class QIconFontSpec:
         self.ensure_local_files(download_dir)
         self.charmap = self.charmap_filespec.load_charmap()
 
+    @log_func_call
     def relative_class_qualname(self):
         modname = self.relative_module_qualname
         classname = self.classname

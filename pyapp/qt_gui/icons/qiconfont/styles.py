@@ -27,11 +27,14 @@ SOFTWARE.
 from PySide2.QtGui import QPalette, QColor
 from PySide2.QtWidgets import QApplication
 
+from ....logging import log_func_call
+
 # Constant to reference default themes
 DEFAULT_DARK_PALETTE = "Dark"
 DEFAULT_LIGHT_PALETTE = "Light"
 
 
+@log_func_call
 def dark(app: QApplication):
     """
     Apply dark theme to the Qt application instance.
@@ -77,6 +80,7 @@ def dark(app: QApplication):
     app.setStyle("Fusion")
 
 
+@log_func_call
 def light(app: QApplication):
     """
     Apply light theme to the Qt application instance.

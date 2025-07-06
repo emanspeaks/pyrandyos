@@ -139,6 +139,7 @@ def build_cmd_arg_list(value: list[str] | dict | str = None,
     return args
 
 
+@log_func_call
 def press_any_key():
     if IS_WIN32:
         os_sys('pause')
@@ -146,10 +147,12 @@ def press_any_key():
         os_sys('read -srn1 -p "Press any key to continue... "')
 
 
+@log_func_call
 def is_dir_conda_env(p: Path):
     return (p/'conda-meta/history').exists()
 
 
+@log_func_call
 def get_conda_base_prefix():
     # we don't need to worry about case sensitivity because the Conda source
     # code always uses all caps for these.  It's easy to update later if that
