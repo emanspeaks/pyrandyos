@@ -23,6 +23,7 @@ EXCLUDE_CLASSES = {
     # Add class names (as strings) to exclude from decoration
     'MillisecondFormatter',
     'LevelFilter',
+    'LogMultiFormatter',
 }
 
 EXCLUDE_METHODS = {
@@ -59,53 +60,36 @@ def file_needs_decorator(filepath: Path):
     new_lines = []
     i = 0
     changed = False
-    inside_excluded_class = False
-    excluded_class_indent = None
-    inside_type_checking = False
-    type_checking_indent = None
-    current_class = None
-    class_indent = None
+    scope_stack = []
     while i < len(lines):
         line = lines[i]
-        # Detect entering TYPE_CHECKING block
+        indent = len(line) - len(line.lstrip())
+        # Pop scopes if indentation decreases (ignore blank lines)
+        while scope_stack and line.strip() and indent <= scope_stack[-1][2]:
+            scope_stack.pop()
+        # Enter TYPE_CHECKING block
         type_checking_match = match(r'^([ \t]*)if TYPE_CHECKING:', line)
         if type_checking_match:
-            inside_type_checking = True
-            type_checking_indent = len(
-                type_checking_match.group(1).replace('\t', '    ')
-            )
-        # Detect leaving TYPE_CHECKING block
-        if (inside_type_checking and line.strip()
-                and not line.lstrip().startswith('#')):
-            current_indent = len(line) - len(line.lstrip())
-            if current_indent <= (type_checking_indent or 0):
-                inside_type_checking = False
-                type_checking_indent = None
-        # Detect class definition
+            scope_stack.append(('type_checking', None, indent))
+        # Enter class
         class_match = match(r'^([ \t]*)class ([a-zA-Z0-9_]+)', line)
         if class_match:
-            class_indent = len(class_match.group(1).replace('\t', '    '))
-            current_class = class_match.group(2)
-            if current_class in EXCLUDE_CLASSES:
-                inside_excluded_class = True
-                excluded_class_indent = class_indent
-            else:
-                inside_excluded_class = False
-                excluded_class_indent = None
-        # Detect leaving class by indentation
-        if (current_class and line.strip()
-                and not line.lstrip().startswith('@')):
-            current_indent = len(line) - len(line.lstrip())
-            if current_indent <= (class_indent or 0):
-                current_class = None
-                class_indent = None
-        # Detect leaving excluded class by indentation
-        if (inside_excluded_class and line.strip()
-                and not line.lstrip().startswith('@')):
-            current_indent = len(line) - len(line.lstrip())
-            if current_indent <= (excluded_class_indent or 0):
-                inside_excluded_class = False
-                excluded_class_indent = None
+            class_name = class_match.group(2)
+            scope_stack.append(('class', class_name, indent))
+        # Check if inside TYPE_CHECKING
+        inside_type_checking = any(
+            s[0] == 'type_checking' for s in scope_stack
+        )
+        # Check if inside excluded class
+        inside_excluded_class = False
+        current_class = None
+        for s in reversed(scope_stack):
+            if s[0] == 'class':
+                current_class = s[1]
+                if current_class in EXCLUDE_CLASSES:
+                    inside_excluded_class = True
+                break
+        # Exclude specific methods
         func_match = match(r'^[ \t]*def ([a-zA-Z0-9_]+)', line)
         if func_match:
             method_name = func_match.group(1)
@@ -114,25 +98,26 @@ def file_needs_decorator(filepath: Path):
                 new_lines.append(line)
                 i += 1
                 continue
+        # Exclude functions in excluded classes or TYPE_CHECKING
         if match(r'^[ \t]*def [a-zA-Z0-9_]+', line):
             if inside_excluded_class or inside_type_checking:
                 new_lines.append(line)
                 i += 1
                 continue
-            j = i - 1
+            # Scan upwards for decorators
+            j = len(new_lines) - 1
             has_decorator = False
             is_property = False
-            # Scan upwards for decorators
-            while (j >= 0 and (lines[j].strip() == ''
-                               or lines[j].lstrip().startswith('@'))):
-                if DECORATOR_RE.match(lines[j]):
+            while j >= 0 and (new_lines[j].strip() == ''
+                              or new_lines[j].lstrip().startswith('@')):
+                if DECORATOR_RE.match(new_lines[j]):
                     has_decorator = True
-                if is_property_decorator(lines[j]):
+                if is_property_decorator(new_lines[j]):
                     is_property = True
                 j -= 1
             if not has_decorator and not is_property:
-                indent = match(r'^([ \t]*)', line).group(1)
-                new_lines.append(f'{indent}{DECORATOR}')
+                indent_str = match(r'^([ \t]*)', line).group(1)
+                new_lines.append(f'{indent_str}{DECORATOR}')
                 changed = True
         new_lines.append(line)
         i += 1
