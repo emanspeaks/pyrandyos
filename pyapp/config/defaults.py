@@ -1,64 +1,31 @@
 from pathlib import Path
 from copy import deepcopy
-
-############
-# FIXED KEYS
-#
-# What is ironic is that I titled this section in all caps, but this note is
-# here to say that all fixed keys should always be lowercase.
-
-# bootstrap keys
-BASE_PATH_KEY = 'base_path'  # not included in PATH_KEYS, handle manually
-ABS_BASE_PATH_KEY = 'base_path:abs'  # not included in PATH_KEYS
-BASE_LOG_DIR_KEY = 'log_dir'
-LOG_TIMESTAMP_KEY = 'log_timestamp_name'
-APPEND_LOG_KEY = 'append_log'
-CLI_LOG_LEVEL_KEY = 'cli_log_level'
-FILE_LOG_LEVEL_KEY = 'file_log_level'
-# not included in PATH_KEYS since this is internal only
-BASE_LOG_PATH_KEY = '__log_path'
-QT_ICON_PYFILE_KEY = '__qt_icon_pyfile'
-
-# other fixed keys
-APP_NAME_KEY = 'app_name'
-APP_PKG_DIR_KEY = 'package_dir'
-APP_PKG_VERSION_KEY = 'package_version'
-APP_ASSETS_DIR_KEY = 'assets_dir'
-
-PATH_KEYS = (
-    "log_dir",
-    "tmp_dir",
-    # "output_dir",
-    "package_dir",
-    "assets_dir",
-    QT_ICON_PYFILE_KEY,
-
-    # "local.delivery_config_dir",
-    "local_config_file",
+from .keys import (
+    BASE_PATH_KEY, BASE_LOG_DIR_KEY, TMP_DIR_KEY, LOG_TIMESTAMP_KEY,
+    APPEND_LOG_KEY, CLI_LOG_LEVEL_KEY, FILE_LOG_LEVEL_KEY,
+    LOCAL_CONFIG_FILE_KEY, LOG_TRACE_ENABLED_KEY, LOCAL_CFG_KEY,
+    CONFIG_PACKAGE_DIR_KEY, CONFIG_PACKAGE_VERSION_KEY,
+    SHOW_TRACEBACK_LOCALS_KEY,
 )
-LOGDIRKEYS = (
-    "log_dir",
-)
-
-# END FIXED KEYS
-################
 
 # defaults
 DEFAULTS = {
-    "base_path": Path('.').resolve(),
-    "log_dir": "logs",
-    "tmp_dir": "${base_path:abs}",
-    "log_timestamp_name": True,
-    "append_log": False,
-    "cli_log_level": "info",  # can also use the int values
-    "file_log_level": "info",  # can also use the int values
+    BASE_PATH_KEY: Path('.').resolve(),
+    BASE_LOG_DIR_KEY: "logs",
+    TMP_DIR_KEY: "${base_path:abs}",
+    LOG_TIMESTAMP_KEY: True,
+    APPEND_LOG_KEY: False,
+    CLI_LOG_LEVEL_KEY: "info",  # can also use the int values
+    FILE_LOG_LEVEL_KEY: "info",  # can also use the int values
+    LOG_TRACE_ENABLED_KEY: False,
+    SHOW_TRACEBACK_LOCALS_KEY: False,
 
-    "local": {
+    LOCAL_CFG_KEY: {
         "theme": "Dark",
         "default_width": 850,
         "default_height": 660,
     },
-    "local_config_file": "~/.pyapp_local_config.jsonc",
+    LOCAL_CONFIG_FILE_KEY: "~/.pyapp_local_config.jsonc",
 }
 
 
@@ -66,24 +33,15 @@ def get_defaults(cls: type, app_global_defaults: dict = {},
                  app_local_defaults: dict = {}):
     tmp = deepcopy(DEFAULTS)
 
-    from ..utils.system import get_path_to_top_package_dir
-    cfgpkgdir = get_path_to_top_package_dir()
-    tmp['config_package_dir'] = cfgpkgdir
+    from ..utils.stack import top_package_dir_path
+    cfgpkgdir = top_package_dir_path()
+    tmp[CONFIG_PACKAGE_DIR_KEY] = cfgpkgdir
 
     from ..version import __version__
-    tmp['config_package_version'] = __version__
+    tmp[CONFIG_PACKAGE_VERSION_KEY] = __version__
 
-    # tmp['config_assets_dir'] = pkgdir/'assets'
     tmp.update(app_global_defaults)
-    local: dict = tmp.get('local', {})
+    local: dict = tmp.get(LOCAL_CFG_KEY, {})
     local.update(app_local_defaults)
-    tmp['local'] = local
+    tmp[LOCAL_CFG_KEY] = local
     return tmp
-
-
-def get_path_keys(app_path_keys: tuple[str] = ()):
-    return PATH_KEYS + app_path_keys
-
-
-def get_log_dir_keys(app_log_dir_keys: tuple[str] = ()):
-    return LOGDIRKEYS + app_log_dir_keys

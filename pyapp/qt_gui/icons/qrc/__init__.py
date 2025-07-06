@@ -7,7 +7,7 @@ from subprocess import run, CalledProcessError
 from pathlib import Path
 
 from ....logging import log_func_call
-from ....config.defaults import QT_ICON_PYFILE_KEY
+from ....config.keys import QT_ICON_PYFILE_KEY
 from ....utils.constants import IS_WIN32
 from ....utils.system import import_python_file
 from ....app import PyApp

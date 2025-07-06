@@ -11,16 +11,12 @@ from ..utils.casesafe import casesafe_value_in_container, casesafe_is_equal
 from ..logging import log_func_call
 from .app import AppConfig
 from .expandutils import expand_key_recursively
-from .defaults import get_path_keys
+from .keys import get_path_keys, LOCAL_CONFIG_FILE_KEY, LOCAL_CFG_KEY
 
 
 @log_func_call
 def load_local_config():
-    from ..logging import get_logger
-    log = get_logger()
-    log.debug('in load_local_config')
-
-    local_cfg_path: Path = AppConfig['local_config_file']
+    local_cfg_path: Path = AppConfig[LOCAL_CONFIG_FILE_KEY]
     if local_cfg_path.exists():
         return load_jsonc(local_cfg_path)
     return dict()
@@ -30,10 +26,6 @@ def load_local_config():
 def process_local_config(base: dict = None, app_path_keys: tuple[str] = (),
                          case_insensitive: bool = None):
     "returns True if a local config was found and loaded, else False"
-    from ..logging import get_logger
-    log = get_logger()
-    log.debug('in process_local_config')
-
     if not base:
         base = AppConfig.get_global_config()
         case = AppConfig.get_case(case_insensitive)
@@ -43,7 +35,9 @@ def process_local_config(base: dict = None, app_path_keys: tuple[str] = (),
     local_cfg = load_local_config()
     use_local = bool(local_cfg)
     if use_local:
-        log.info(f"Using local config: {AppConfig['local_config_file']}")
+        from ..logging import get_logger
+        get_logger().info("Using local config: "
+                          f"{AppConfig[LOCAL_CONFIG_FILE_KEY]}")
 
     for k in local_cfg.keys():
         expand_key_recursively(local_cfg, k, case_insensitive=case)
@@ -63,16 +57,13 @@ def get_local_config(base: dict = None, case_insensitive: bool = None):
     else:
         case = IS_WIN32 if case_insensitive is None else case_insensitive
 
-    local_cfg: dict = config_dict_get(base, 'local', {}, case)
+    local_cfg: dict = config_dict_get(base, LOCAL_CFG_KEY, {}, case)
     return local_cfg
 
 
 @log_func_call
 def save_local_config(app_path_keys: tuple = (),
                       case_insensitive: bool = None):
-    from ..logging import get_logger
-    log = get_logger()
-    log.debug('in save_local_config')
     case = AppConfig.get_case(case_insensitive)
 
     # get the verbatim contents of "old" local config
@@ -96,7 +87,7 @@ def save_local_config(app_path_keys: tuple = (),
     out = old_local_cfg.copy()
     for k, v in local_cfg.items():
         if not casesafe_value_in_container(old_local_cfg, k, case):
-            if casesafe_value_in_container(pathkeys, f'local.{k}'):
+            if casesafe_value_in_container(pathkeys, f'{LOCAL_CFG_KEY}.{k}'):
                 v: Path
                 v = v.as_posix()
 
@@ -104,7 +95,7 @@ def save_local_config(app_path_keys: tuple = (),
         else:
             v_old = config_dict_get(old_local_cfg, k, case_insensitive=case)
             v_test = v_old
-            if casesafe_value_in_container(pathkeys, f'local.{k}'):
+            if casesafe_value_in_container(pathkeys, f'{LOCAL_CFG_KEY}.{k}'):
                 v_test: Path = config_dict_get(old_local_expanded, k,
                                                case_insensitive=case)
                 v_test = v_test.as_posix()
@@ -116,6 +107,7 @@ def save_local_config(app_path_keys: tuple = (),
                             case)
 
     # save the new output local config
-    local_cfg_path: Path = AppConfig['local_config_file']
+    local_cfg_path: Path = AppConfig[LOCAL_CONFIG_FILE_KEY]
     save_json(local_cfg_path, out)
-    log.info(f'local config saved to {local_cfg_path}')
+    from ..logging import get_logger
+    get_logger().info(f'local config saved to {local_cfg_path}')

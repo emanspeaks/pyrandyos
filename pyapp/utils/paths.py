@@ -26,13 +26,12 @@ def get_equiv_pureposixpath(x: str | Path):
         PurePosixPath: path to `x` as a `PurePosixPath`, or None if `x` is None
             or empty
     """
-    if not x:
-        return None
     # this voodoo was found experimentally and forces all flavors of Windows
     # paths and slashes to unify and become POSIX-ified.  All these steps are
     # necessary for reasons that I can't recall, but I assure you that it
     # needs to stay like this.  Don't be tempted to simplify.
-    return PurePosixPath(PureWindowsPath(str(x)).as_posix())
+    if x:
+        return PurePosixPath(PureWindowsPath(str(x)).as_posix())
 
 
 def pureposixpath_to_pathobj(ppp: PurePosixPath):
@@ -97,10 +96,9 @@ def get_expanded_pureposixpath(x: str | Path, addl_expand_vars: dict = {},
         PurePosixPath: path to `x` as a `PurePosixPath` with all known
             variables expanded, or None if `x` is None or empty
     """
-    if not x:
-        return None
-    return get_equiv_pureposixpath(expandvars(str(x), addl_expand_vars,
-                                              case_insensitive))
+    if x:
+        return get_equiv_pureposixpath(expandvars(str(x), addl_expand_vars,
+                                                  case_insensitive))
 
 
 def get_expanded_pathobj(x: str | Path, addl_expand_vars: dict = {},
@@ -122,11 +120,10 @@ def get_expanded_pathobj(x: str | Path, addl_expand_vars: dict = {},
         Path: fully-expanded absolute path to `x`, or None if `x` is None
             or empty
     """
-    if not x:
-        return None
-    return pureposixpath_to_resolved_pathobj(
-        get_expanded_pureposixpath(x, addl_expand_vars, case_insensitive)
-    )
+    if x:
+        return pureposixpath_to_resolved_pathobj(
+            get_expanded_pureposixpath(x, addl_expand_vars, case_insensitive)
+        )
 
 
 DLL_EXTS = ('.dll', '.so', '.dylib')
@@ -145,8 +142,7 @@ def get_dll_ext_for_platform(platform: str = None):
     Returns:
         str: DLL file extension for platform
     """
-    if not platform:
-        platform = sys.platform
+    platform = platform or sys.platform
 
     if platform == 'win32':
         return '.dll'

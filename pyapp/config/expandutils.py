@@ -25,9 +25,8 @@ def expand_key_recursively(config: dict, key: str,
                            fail: bool = False, set_value: bool = True,
                            case_insensitive: bool = IS_WIN32):
     case = case_insensitive
-    if not skip_expansion:
-        skip_expansion = ()
-    elif isinstance(skip_expansion, str):
+    skip_expansion = skip_expansion or ()
+    if isinstance(skip_expansion, str):
         skip_expansion = (skip_expansion,)
 
     value = config_dict_get(config, key, case_insensitive=case)

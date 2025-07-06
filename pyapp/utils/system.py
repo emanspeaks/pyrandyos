@@ -1,59 +1,142 @@
 # This module contains functions that interact either with the operating system
 # the Python interpreter, or conda environments.
-# The reason for some of the "nolog" equivalent versions of these functions can
-# be found in the comments in the `nolog_system` module.
 
 import sys
 from os import system as os_sys, environ
 from pathlib import Path
-# from importlib.util import find_spec
-from inspect import getfile, getmodule, stack
-from importlib import import_module
+from shutil import chown, copy2
+from importlib.util import spec_from_file_location, module_from_spec
+from shlex import split as shsplit
 
-from ..logging import get_logger
-
+from ..logging import DEBUGLOW, log_func_call, get_logger
 from .constants import (
     DEFAULT_GROUP, DEFAULT_DIR_MODE, DEFAULT_FILE_MODE, IS_WIN32,
 )
-from .notebook import is_notebook
 from .paths import expand_and_check_var_path
-from .nolog_system import (
-    nolog_mkdir_chgrp, nolog_chmod_chgrp, nolog_file_copy_chmod_chgrp,
-    nolog_import_python_file, nolog_add_path_to_syspath,
-    nolog_build_cmd_arg_dict, nolog_build_cmd_arg_list,
-)
+from .string import quote_str
 
 
+@log_func_call(DEBUGLOW)
 def mkdir_chgrp(p: Path, group: str = DEFAULT_GROUP,
                 mode: int = DEFAULT_DIR_MODE):
-    nolog_mkdir_chgrp(p, group, mode, get_logger())
+    if p:
+        p.mkdir(exist_ok=True, parents=True, mode=mode)
+        if group:
+            chown(p, group=group)
 
 
+@log_func_call(DEBUGLOW)
 def chmod_chgrp(p: Path, group: str = DEFAULT_GROUP,
                 mode: int = DEFAULT_FILE_MODE):
-    nolog_chmod_chgrp(p, group, mode, get_logger())
+    if p:
+        p.chmod(mode=mode)
+        if group:
+            chown(p, group=group)
 
 
+@log_func_call(DEBUGLOW)
 def file_copy_chmod_chgrp(src: Path, dest: Path, group: str = DEFAULT_GROUP,
                           mode: int = DEFAULT_FILE_MODE):
-    nolog_file_copy_chmod_chgrp(src, dest, group, mode, get_logger())
+    copy2(src, dest)  # preserves file stat metadata (like mtime, etc.)
+    chmod_chgrp(dest, group, mode)
 
 
+@log_func_call
 def import_python_file(pyfile: Path, as_name: str = None):
-    return nolog_import_python_file(pyfile, as_name, get_logger())
+    as_name = as_name or pyfile.stem
+    spec = spec_from_file_location(as_name, str(pyfile))
+    mod = module_from_spec(spec)
+    sys.modules[as_name] = mod
+    spec.loader.exec_module(mod)
+    return mod
 
 
+@log_func_call
 def add_path_to_syspath(p: Path | str):
-    nolog_add_path_to_syspath(p, get_logger())
+    log = get_logger()
+    log.debug(f'attempt to add {p} to sys.path')
+    ppath = Path(p).resolve()
+    pstr = str(p)
+    log.debug(f'(before) sys.path={sys.path}')
+    for x in sys.path:
+        if Path(x).resolve() == ppath:
+            log.debug('directory already in sys.path, taking no action')
+            return
+
+    sys.path.insert(0, pstr)
+    log.debug(f'updated sys.path to include {p}')
+    log.debug(f'(after) sys.path={sys.path}')
 
 
+@log_func_call
 def build_cmd_arg_dict(value: list[str] | dict | str = None):
-    return nolog_build_cmd_arg_dict(value)
+    value = value or dict()
+    args = dict()
+    if isinstance(value, str):
+        args = shsplit(value)
+
+    if isinstance(value, list):
+        lastkey = None
+        for x in value:
+            if x[0] == '-':
+                if lastkey:
+                    args[lastkey] = True
+
+                lastkey = x[1:]
+
+            elif lastkey:
+                if lastkey in args:
+                    orig = args[lastkey]
+                    orig = orig if isinstance(orig, list) else [orig]
+
+                    x = orig + [x]
+                args[lastkey] = x
+                lastkey = None
+
+            else:
+                ValueError('multiple values with no command or parse error')
+
+        if lastkey:
+            args[lastkey] = True
+
+    else:
+        args = value
+
+    return args
 
 
+@log_func_call
+def _add_arg_to_list(args: list, k: str, v: str,
+                     quotekeys: list[str] | tuple[str] = ()):
+    args.append(f'-{k}')
+    if v is not True:
+        if k in quotekeys:
+            v = quote_str(v)
+
+        args.append(str(v))
+
+
+@log_func_call
 def build_cmd_arg_list(value: list[str] | dict | str = None,
                        quotekeys: list[str] | tuple[str] = ()):
-    return nolog_build_cmd_arg_list(value, quotekeys)
+    value = value or list()
+    args = list()
+    if isinstance(value, dict):
+        for k, v in value.items():
+            if v is False:
+                continue
+
+            v = v if isinstance(v, list) else [v]
+            for x in v:
+                _add_arg_to_list(args, k, x, quotekeys)
+
+    elif isinstance(value, str):
+        args = shsplit(value)
+
+    else:
+        args = value
+
+    return args
 
 
 def press_any_key():
@@ -61,61 +144,6 @@ def press_any_key():
         os_sys('pause')
     else:
         os_sys('read -srn1 -p "Press any key to continue... "')
-
-
-def get_current_stack_frame_info(level: int = 1):
-    stk = stack()
-    frm = stk[level]
-    return frm[0]
-
-
-def get_current_module_and_name():
-    "returns mod, modname"
-    return get_module_and_name_for_obj(get_current_stack_frame_info(2))
-
-
-def get_module_and_name_for_obj(obj: object):
-    "returns mod, modname"
-    mod = getmodule(obj)
-    return mod, mod.__name__
-
-
-def get_top_module_name(modname: str = None):
-    if not modname:
-        return get_top_module_name_for_obj(get_current_stack_frame_info(2))
-    return modname.split('.')[0]
-
-
-def get_top_module_name_for_obj(obj: object):
-    _, modname = get_module_and_name_for_obj(obj)
-    return get_top_module_name(modname)
-
-
-def get_top_package_dir_for_obj(obj: object):
-    mod, modname = get_module_and_name_for_obj(obj)
-    if modname == '__main__':
-        return None if is_notebook() else Path(getfile(mod)).parent
-    return get_path_to_top_package_dir(modname)
-
-
-def get_top_module(modname: str = None):
-    try:
-        return import_module(get_top_module_name(modname))
-    except TypeError:
-        print('no pkg')
-        pass
-
-
-def get_top_module_for_obj(obj: object):
-    return get_top_module(get_top_module_name_for_obj(obj))
-
-
-def get_path_to_top_package_dir(modname: str = None):
-    try:
-        return Path(getfile(get_top_module(modname))).parent
-    except TypeError:
-        print('no pkg')
-        pass
 
 
 def is_dir_conda_env(p: Path):

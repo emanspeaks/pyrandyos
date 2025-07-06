@@ -5,7 +5,7 @@ from .casesafe import (
 )
 
 
-@log_func_call(DEBUGLOW2)
+@log_func_call(DEBUGLOW2, trace_only=True)
 def try_get_item(config: dict | list | tuple, key: str | int,
                  default=NODEFAULT, case_insensitive: bool = IS_WIN32):
     try:
@@ -16,7 +16,7 @@ def try_get_item(config: dict | list | tuple, key: str | int,
         return default
 
 
-@log_func_call(DEBUGLOW2)
+@log_func_call(DEBUGLOW2, trace_only=True)
 def config_dict_get(config: dict[str] | list | tuple, key: str,
                     default=NODEFAULT, case_insensitive: bool = IS_WIN32):
     """
@@ -54,7 +54,7 @@ def config_dict_get(config: dict[str] | list | tuple, key: str,
     return value
 
 
-@log_func_call(DEBUGLOW2)
+@log_func_call(DEBUGLOW2, trace_only=True)
 def config_dict_set(config: dict, key: str, value,
                     case_insensitive: bool = IS_WIN32):
     """
@@ -80,7 +80,7 @@ def config_dict_set(config: dict, key: str, value,
         config_dict_set(config[part0], part1, value)
 
 
-@log_func_call(DEBUGLOW2)
+@log_func_call(DEBUGLOW2, trace_only=True)
 def config_dict_update(config: dict, data: dict,
                        case_insensitive: bool = IS_WIN32):
     """

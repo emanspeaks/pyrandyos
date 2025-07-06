@@ -10,9 +10,7 @@ class GraphViewWidget(QtWidgetWrapper):
         super().__init__(parent)
         qtwin = parent.qtroot
 
-        if not scene:
-            scene = QGraphicsScene(qtwin)
-
+        scene = scene or QGraphicsScene(qtwin)
         self.scene = scene
 
         view = QGraphicsView(scene, qtwin)

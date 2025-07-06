@@ -37,11 +37,8 @@ def ensure_bytes(x: str | bytes, encoding: str = 'utf-8'):
     Returns:
         bytes: `x` coerced to `bytes`
     """  # noqa: E501
-    if not hasattr(x, 'decode'):
-        x = str(x)
-    if hasattr(x, 'encode'):
-        x = x.encode(encoding)
-    return bytes(x)
+    x = x if hasattr(x, 'decode') else str(x)
+    return bytes(x.encode(encoding) if hasattr(x, 'encode') else x)
 
 
 @log_func_call

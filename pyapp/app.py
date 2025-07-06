@@ -1,19 +1,22 @@
 import sys
 from pathlib import Path
 
-from .logging import get_logger, Logger, log_func_call, DEBUGLOW2
+from .logging import (
+    get_logger, Logger, log_func_call, DEBUGLOW2, set_trace_logging,
+)
 from .config import AppConfig
-from .config.defaults import (
+from .config.keys import (
     BASE_LOG_PATH_KEY, APP_NAME_KEY, get_log_dir_keys, APP_PKG_DIR_KEY,
-    APP_ASSETS_DIR_KEY, APP_PKG_VERSION_KEY,
+    APP_ASSETS_DIR_KEY, APP_PKG_VERSION_KEY, TMP_DIR_KEY, LOCAL_CFG_KEY
 )
 from .config.local import process_local_config
 
 from .utils.constants import DEFAULT_GROUP, DEFAULT_DIR_MODE
 from .utils.log import setup_logging, create_log_file
-from .utils.main import main_context
-from .utils.system import (
-    mkdir_chgrp, get_top_package_dir_for_obj, get_top_module_for_obj,
+from .utils.main import MainContext
+from .utils.system import mkdir_chgrp
+from .utils.stack import (
+    top_package_dir_path, top_module_and_name, set_show_traceback_locals
 )
 
 
@@ -49,12 +52,13 @@ class PyApp(AppConfig):
 
         # setup logging first if necessary:
         if setup_log:
-            if not logfile:
-                logcfg = cls.expand_log_config()
-                logdir, ts_name, append, cli_log_level, file_log_level = logcfg
-                logfile = create_log_file(logdir, ts_name, append,
-                                          cls.APP_LOG_PREFIX)
+            (logdir, ts_name, append, cli_log_level, file_log_level,
+             log_trace_enabled, tb_locals_enabled) = cls.expand_log_config()
+            logfile = logfile or create_log_file(logdir, ts_name, append,
+                                                 cls.APP_LOG_PREFIX)
 
+            set_trace_logging(log_trace_enabled)
+            set_show_traceback_locals(tb_locals_enabled)
             setup_logging(logfile, cli_log_level, file_log_level)
 
         # start logging and process the rest of the configuration data
@@ -98,7 +102,7 @@ class PyApp(AppConfig):
         if args is None:
             args = sys.argv[1:]
 
-        with main_context(cls.APP_NAME):
+        with MainContext(cls.APP_NAME):
             sys.exit(cls.main(*cls.preprocess_args(args)))
 
     @classmethod
@@ -125,7 +129,7 @@ class PyApp(AppConfig):
                    mode: int = DEFAULT_DIR_MODE):
         # log = get_logger()
         # log.debug('in mkdir_temp')
-        tmp_dir: Path = cls.get('tmp_dir')
+        tmp_dir: Path = cls.get(TMP_DIR_KEY)
         if name:
             tmp_dir = tmp_dir/name
 
@@ -135,12 +139,12 @@ class PyApp(AppConfig):
     @classmethod
     @log_func_call
     def get_package_version(cls):
-        return getattr(get_top_module_for_obj(cls), '__version__')
+        return getattr(top_module_and_name(cls)[0], '__version__')
 
     @classmethod
     @log_func_call
     def get_package_dir(cls):
-        return get_top_package_dir_for_obj(cls)
+        return top_package_dir_path(cls)
 
     @classmethod
     @log_func_call
@@ -152,4 +156,5 @@ class PyApp(AppConfig):
     @classmethod
     @log_func_call(DEBUGLOW2)
     def get_default_win_size(cls):
-        return cls['local.default_width'], cls['local.default_height']
+        return (cls[f'{LOCAL_CFG_KEY}.default_width'],
+                cls[f'{LOCAL_CFG_KEY}.default_height'])

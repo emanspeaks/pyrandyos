@@ -2,7 +2,7 @@ from logging import getLogger, Logger
 from pathlib import Path
 from copy import deepcopy
 
-from ..logging import DEBUGLOW2, log_func_call
+from ..logging import DEBUGLOW2, log_func_call, DEBUGLOW
 from ..utils.classproperty import classproperty
 from ..utils.paths import (
     get_expanded_pathobj, get_expanded_pureposixpath, pureposixpath_to_pathobj
@@ -12,13 +12,15 @@ from ..utils.cfgdict import (
     config_dict_get, config_dict_set, config_dict_update,
 )
 from ..utils.constants import NODEFAULT, IS_WIN32
-from ..utils.nolog_system import nolog_build_cmd_arg_list
+from ..utils.system import build_cmd_arg_list
 from ..utils.casesafe import casesafe_is_equal, casesafe_value_in_container
 
-from .defaults import (
-    get_defaults, BASE_LOG_DIR_KEY, BASE_PATH_KEY, LOG_TIMESTAMP_KEY,
+from .defaults import get_defaults
+from .keys import (
+    BASE_LOG_DIR_KEY, BASE_PATH_KEY, LOG_TIMESTAMP_KEY,
     APPEND_LOG_KEY, CLI_LOG_LEVEL_KEY, get_path_keys, BASE_LOG_PATH_KEY,
-    FILE_LOG_LEVEL_KEY, ABS_BASE_PATH_KEY,
+    FILE_LOG_LEVEL_KEY, ABS_BASE_PATH_KEY, LOG_TRACE_ENABLED_KEY,
+    SHOW_TRACEBACK_LOCALS_KEY,
 )
 from .expandutils import expand_key_recursively
 
@@ -33,12 +35,12 @@ class AppConfigType(type):
     # its subclasses.
     CONFIG_CASE_INSENSITIVE: bool
 
-    @log_func_call(DEBUGLOW2)
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def get_case(cls, case_insensitive: bool = None):
         return (cls.CONFIG_CASE_INSENSITIVE if case_insensitive is None
                 else case_insensitive)
 
-    @log_func_call(DEBUGLOW2)
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def __contains__(cls, item):
         return casesafe_value_in_container(_GLOBAL_CFG, item, cls.get_case())
 
@@ -54,7 +56,7 @@ class AppConfig(metaclass=AppConfigType):
                                       'instantiated')
 
     @classproperty
-    @log_func_call(DEBUGLOW2)
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def log(cls):
         return _GLOBAL_LOG
 
@@ -71,7 +73,7 @@ class AppConfig(metaclass=AppConfigType):
                         cls.get_case(case_insensitive))
 
     @classmethod
-    @log_func_call
+    @log_func_call(DEBUGLOW)
     def __class_getitem__(cls, key: str):
         return config_dict_get(_GLOBAL_CFG, key,
                                case_insensitive=cls.get_case())
@@ -85,12 +87,12 @@ class AppConfig(metaclass=AppConfigType):
         _GLOBAL_CFG = config
 
     @classmethod
-    @log_func_call
+    @log_func_call(DEBUGLOW)
     def get_global_config(cls):
         return _GLOBAL_CFG
 
     @classproperty
-    @log_func_call
+    @log_func_call(DEBUGLOW)
     def global_config(cls):
         return cls.get_global_config()
 
@@ -100,7 +102,7 @@ class AppConfig(metaclass=AppConfigType):
         cls.set_global_config(config)
 
     @classmethod
-    @log_func_call
+    @log_func_call(DEBUGLOW)
     def get(cls, key: str, default=NODEFAULT,
             case_insensitive: bool = None):
         """
@@ -137,7 +139,7 @@ class AppConfig(metaclass=AppConfigType):
     @classmethod
     @log_func_call
     def build_cmd_args_from_config(cls, key: str):
-        return nolog_build_cmd_arg_list(cls[key])
+        return build_cmd_arg_list(cls[key])
 
     @classmethod
     @log_func_call
@@ -149,9 +151,8 @@ class AppConfig(metaclass=AppConfigType):
 
         config = config or _GLOBAL_CFG
         case = cls.get_case(case_insensitive)
-        if not skip_expansion:
-            skip_expansion = ()
-        elif isinstance(skip_expansion, str):
+        skip_expansion = skip_expansion or ()
+        if isinstance(skip_expansion, str):
             skip_expansion = (skip_expansion,)
 
         for k in config.keys():
@@ -185,16 +186,13 @@ class AppConfig(metaclass=AppConfigType):
                           app_global_defaults: dict = {},
                           app_local_defaults: dict = {},
                           case_insensitive: bool = None):
-        if not defaults:
-            defaults = get_defaults(cls, app_global_defaults,
-                                    app_local_defaults)
+        defaults = defaults or get_defaults(cls, app_global_defaults,
+                                            app_local_defaults)
 
         config = deepcopy(defaults)
         if indata:
-            if not isinstance(indata, dict):
-                indata = load_jsonc(indata)
-
-            config_dict_update(config, indata, case_insensitive)
+            config_dict_update(config, indata if isinstance(indata, dict)
+                               else load_jsonc(indata), case_insensitive)
 
         if overrides:
             config_dict_update(config, overrides, case_insensitive)
@@ -215,14 +213,20 @@ class AppConfig(metaclass=AppConfigType):
         expand_key_recursively(config, APPEND_LOG_KEY, skip_expansion)
         expand_key_recursively(config, CLI_LOG_LEVEL_KEY, skip_expansion)
         expand_key_recursively(config, FILE_LOG_LEVEL_KEY, skip_expansion)
+        expand_key_recursively(config, LOG_TRACE_ENABLED_KEY, skip_expansion)
+        expand_key_recursively(config, SHOW_TRACEBACK_LOCALS_KEY,
+                               skip_expansion)
         base_path = get_expanded_pathobj(config[BASE_PATH_KEY], config)
         logdir = config_dict_get(config, BASE_LOG_DIR_KEY)
         timestamp_name = config_dict_get(config, LOG_TIMESTAMP_KEY)
         append_log = config_dict_get(config, APPEND_LOG_KEY)
         cli_log_level = config_dict_get(config, CLI_LOG_LEVEL_KEY)
         file_log_level = config_dict_get(config, FILE_LOG_LEVEL_KEY)
+        log_trace_enabled = config_dict_get(config, LOG_TRACE_ENABLED_KEY)
+        tb_locals_enabled = config_dict_get(config, SHOW_TRACEBACK_LOCALS_KEY)
         return (cls.handle_path(logdir, base_path), timestamp_name,
-                append_log, cli_log_level, file_log_level)
+                append_log, cli_log_level, file_log_level, log_trace_enabled,
+                tb_locals_enabled)
 
     @classmethod
     @log_func_call

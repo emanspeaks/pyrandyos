@@ -25,11 +25,13 @@ filt
 FluentUI
 fluentui-system-icons
 fmtdict
+fnames
 hubot
 ified
 indata
 inittmp
 inquote
+ipynb
 jdumps
 klass
 lastc
@@ -46,6 +48,7 @@ octoface
 outf
 ppath
 pyapp
+PyApp
 PYAPP
 pycache
 pyfile
@@ -68,6 +71,7 @@ shcore
 shibokensupport
 SHLVL
 shsplit
+sinfo
 STARTBRAK
 str
 tgtdir
