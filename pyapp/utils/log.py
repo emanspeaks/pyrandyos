@@ -48,28 +48,28 @@ class LevelFilter:
 debugfmtstr = '%(asctime)s | %(levelname)s | %(pathname)s(%(lineno)d) | %(funcName)s | %(message)s'  # noqa: E501
 debug_ms_fmt = MillisecondFormatter(debugfmtstr)
 simple_color_fmt = LogMultiFormatter({
-    INFO: Formatter(ConsoleText.GreenText
-                    + "%(message)s"
-                    + ConsoleText.Reset),
-    LOGSTDOUT: Formatter(ConsoleText.WhiteText
-                         + "%(message)s"
-                         + ConsoleText.Reset),
-    LOGSTDERR: Formatter(ConsoleText.CyanText
-                         + "%(message)s"
-                         + ConsoleText.Reset),
-    LOGTQDM: Formatter(ConsoleText.BlueText
-                       + "%(message)s"
-                       + ConsoleText.Reset),
-    WARNING: Formatter(ConsoleText.YellowText
-                       + "%(levelname)s: %(message)s"
-                       + ConsoleText.Reset),
-    ERROR: Formatter(ConsoleText.RedText
-                     + "%(levelname)s: %(message)s"
-                     + ConsoleText.Reset),
-    CRITICAL: Formatter(ConsoleText.MagentaText
-                        + "%(levelname)s: %(message)s"
-                        + ConsoleText.Reset),
-    'DEFAULT': Formatter("%(levelname)s: %(message)s"),
+    INFO: MillisecondFormatter(ConsoleText.GreenText
+                               + "%(message)s"
+                               + ConsoleText.Reset),
+    LOGSTDOUT: MillisecondFormatter(ConsoleText.WhiteText
+                                    + "%(message)s"
+                                    + ConsoleText.Reset),
+    LOGSTDERR: MillisecondFormatter(ConsoleText.CyanText
+                                    + "%(message)s"
+                                    + ConsoleText.Reset),
+    LOGTQDM: MillisecondFormatter(ConsoleText.BlueText
+                                  + "%(message)s"
+                                  + ConsoleText.Reset),
+    WARNING: MillisecondFormatter(ConsoleText.YellowText
+                                  + "%(asctime)s %(levelname)s: %(message)s"
+                                  + ConsoleText.Reset),
+    ERROR: MillisecondFormatter(ConsoleText.RedText
+                                + "%(asctime)s %(levelname)s: %(message)s"
+                                + ConsoleText.Reset),
+    CRITICAL: MillisecondFormatter(ConsoleText.MagentaText
+                                   + "%(asctime)s %(levelname)s: %(message)s"
+                                   + ConsoleText.Reset),
+    'DEFAULT': MillisecondFormatter("%(asctime)s %(levelname)s: %(message)s"),
 })
 
 

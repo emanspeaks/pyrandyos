@@ -7,6 +7,8 @@
     "pyapp/qt_gui/notify.py",
     "pyapp/utils/classproperty.py",
     "pyapp/utils/stack.py",
+    "pyapp/utils/casesafe.py",
+    "pyapp/utils/cfgdict.py",
     "pyapp/logging.py"//,
   ],
   "exclude_classes": [
@@ -26,5 +28,6 @@
     "env",
     ".conda",
     "tests"//,
-  ]
+  ],
+  "base_dir": "C:/scratch/git/pyapp"
 }

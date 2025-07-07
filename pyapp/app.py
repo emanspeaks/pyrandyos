@@ -124,7 +124,7 @@ class PyApp(AppConfig):
             mkdir_chgrp(p, group, mode)
 
     @classmethod
-    @log_func_call
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def mkdir_temp(cls, name: str = None, group: str = DEFAULT_GROUP,
                    mode: int = DEFAULT_DIR_MODE):
         # log = get_logger()

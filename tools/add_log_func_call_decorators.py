@@ -20,7 +20,7 @@ def load_exclude_config(config_path):
             "exclude_classes": [],
             "exclude_methods": {},
             "exclude_dirs": [],
-            "base": None
+            "base_dir": None
         }
     with open(config_path, "r", encoding="utf-8") as f:
         return parse_jsonc(f.read())
@@ -130,7 +130,7 @@ def main(root_dirs, config_path=None):
 
     if config_path:
         config = load_exclude_config(config_path)
-        base_path = config.get("base")
+        base_path = config.get("base_dir")
         if base_path:
             base_path = Path(base_path).resolve()
         else:

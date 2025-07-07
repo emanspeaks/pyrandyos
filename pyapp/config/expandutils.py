@@ -1,14 +1,14 @@
 from os import environ
 from pathlib import Path
 
-from ..logging import log_func_call
+from ..logging import log_func_call, DEBUGLOW2
 from ..utils.expandvars import substitute_key, get_unresolved_keys
 from ..utils.cfgdict import config_dict_get, config_dict_set
 from ..utils.constants import IS_WIN32
 from ..utils.casesafe import casesafe_value_in_container
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def _expand_nested(config: dict, key: str, value,
                    skip_expansion: str | list[str] | tuple[str] = None,
                    case_insensitive: bool = IS_WIN32):
@@ -19,7 +19,7 @@ def _expand_nested(config: dict, key: str, value,
                                           case_insensitive=case), case)
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def expand_key_recursively(config: dict, key: str,
                            skip_expansion: str | list[str] | tuple[str] = None,
                            fail: bool = False, set_value: bool = True,

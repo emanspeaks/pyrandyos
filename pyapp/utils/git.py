@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from ..logging import log_func_call
+from ..logging import log_func_call, DEBUGLOW2, WARNING
 from .net import download_file, get_github_download_url
 from .filemeta import filehash
 
 
 class GitCommitSpec:
-    @log_func_call
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def __init__(self, git_repo_base_url: str, git_commit_hash: str,
                  license_relpath: Path | tuple[Path] = None):
         self.git_repo_base_url = git_repo_base_url
@@ -15,7 +15,7 @@ class GitCommitSpec:
 
 
 class GitFileSpec:
-    @log_func_call
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def __init__(self, git_commit: GitCommitSpec, repo_relpath: Path,
                  md5sum: str = None, local_path: Path = None):
         self.git_commit = git_commit
@@ -24,10 +24,14 @@ class GitFileSpec:
         self.local_path = local_path
         self.parent: 'GitDependencySpec' = None
 
-    @log_func_call
-    def get_local_path(self, download_dir: Path | None = None):
+    @log_func_call(DEBUGLOW2, trace_only=True)
+    def get_local_path(self, download_dir: Path | None = None,
+                       override_path: Path | None = None):
         name = self.repo_relpath.name
-        p = self.local_path
+        p = self.local_path or override_path
+        if not p:
+            raise ValueError("Base path must be provided if local_path is "
+                             "not set")
         if p.is_dir():
             p /= name
 
@@ -41,7 +45,7 @@ class GitFileSpec:
         download_dir.mkdir(parents=True, exist_ok=True)
         return download_dir/name
 
-    @log_func_call
+    @log_func_call(WARNING)
     def download(self, dest: Path):
         git = self.git_commit
         repo = git.git_repo_base_url
@@ -50,7 +54,7 @@ class GitFileSpec:
         return download_file(get_github_download_url(repo, commit, relpath),
                              dest)
 
-    @log_func_call
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def get_or_download(self, download_dir: Path = None):
         p = self.get_local_path(download_dir)
         if not p.exists():

@@ -11,6 +11,7 @@ from logging import (  # noqa: F401
     getLogger as _getLogger, WARN, ERROR, DEBUG, INFO, CRITICAL, WARNING,
     Logger,
 )
+from traceback import format_exception_only
 
 from ._testing.debug import is_debug_enabled
 from .utils.stack import (
@@ -64,12 +65,16 @@ def log_func_call(arg, *, trace_only: bool = False):  # noqa: E302
                 log = get_logger(func.__module__)
                 try:
                     code = func.__code__
+                    funcname = func.__name__
                     _log(
                         log,
                         level,
                         f"Function call: {func.__qualname__}"
-                        f"({', '.join(repr(arg) for arg in args)}"
-                        f"{', ' if args and kwargs else ''}"
+                        f"({', '.join(
+                            'self' if not i and funcname == '__init__'
+                            else
+                            repr(arg) for i, arg in enumerate(args)
+                        )}{', ' if args and kwargs else ''}"
                         f"{', '.join(f'{k}={v!r}'
                                      for k, v in kwargs.items())}) "
                         f"{{function defined {code.co_filename}"
@@ -81,7 +86,10 @@ def log_func_call(arg, *, trace_only: bool = False):  # noqa: E302
                         log,
                         level,
                         "Error logging function call: "
-                        f"{func.__qualname__} - {e}",
+                        f"{func.__qualname__} - "
+                        f"{''.join(format_exception_only(e)).strip()} "
+                        f"{{function defined {code.co_filename}"
+                        f"({code.co_firstlineno})}}",
                         # stacklevel=2,
                     )
             return func(*args, **kwargs)
@@ -133,5 +141,5 @@ def _log(log: Logger, level, msg, *args, exc_info=None, extra=None,
     record = log.makeRecord(log.name, level, fn, lno, msg, args, exc_info,
                             func, extra, sinfo)
     if exc_info:
-        record.exc_text = _format_exc(exc_info[1], exc_info[2]) + "\n"
+        record.exc_text = _format_exc(exc_info[1], exc_info[2])
     log.handle(record)

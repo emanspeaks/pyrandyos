@@ -2,7 +2,7 @@ from logging import getLogger, Logger
 from pathlib import Path
 from copy import deepcopy
 
-from ..logging import DEBUGLOW2, log_func_call, DEBUGLOW
+from ..logging import DEBUGLOW2, log_func_call
 from ..utils.classproperty import classproperty
 from ..utils.paths import (
     get_expanded_pathobj, get_expanded_pureposixpath, pureposixpath_to_pathobj
@@ -73,7 +73,7 @@ class AppConfig(metaclass=AppConfigType):
                         cls.get_case(case_insensitive))
 
     @classmethod
-    @log_func_call(DEBUGLOW)
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def __class_getitem__(cls, key: str):
         return config_dict_get(_GLOBAL_CFG, key,
                                case_insensitive=cls.get_case())
@@ -87,12 +87,12 @@ class AppConfig(metaclass=AppConfigType):
         _GLOBAL_CFG = config
 
     @classmethod
-    @log_func_call(DEBUGLOW)
+    @log_func_call(DEBUGLOW2)
     def get_global_config(cls):
         return _GLOBAL_CFG
 
     @classproperty
-    @log_func_call(DEBUGLOW)
+    @log_func_call(DEBUGLOW2)
     def global_config(cls):
         return cls.get_global_config()
 
@@ -102,7 +102,7 @@ class AppConfig(metaclass=AppConfigType):
         cls.set_global_config(config)
 
     @classmethod
-    @log_func_call(DEBUGLOW)
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def get(cls, key: str, default=NODEFAULT,
             case_insensitive: bool = None):
         """
@@ -146,9 +146,6 @@ class AppConfig(metaclass=AppConfigType):
     def process_config(cls, skip_expansion: str | list[str] = 'skip_expand',
                        config: dict = None, app_path_keys: tuple[str] = (),
                        case_insensitive: bool = None):
-        log = _GLOBAL_LOG or getLogger(__name__)
-        log.debug('in process_config')
-
         config = config or _GLOBAL_CFG
         case = cls.get_case(case_insensitive)
         skip_expansion = skip_expansion or ()

@@ -5,7 +5,7 @@ from re import compile, ASCII
 from functools import partial
 from os import environ
 
-from ..logging import log_func_call
+from ..logging import log_func_call, DEBUGLOW2
 from .cfgdict import config_dict_get
 from .constants import IS_WIN32
 from .casesafe import casesafe_is_equal, casesafe_value, casesafe_key_in_dict
@@ -16,7 +16,7 @@ _ENDBRAK = '}'
 _NOTFOUND = object()
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def expandvars_base(x: str, callback: Callable) -> str:
     """
     Invokes `callback()` when string `x` contains a variable of the form
@@ -76,7 +76,7 @@ def expandvars_base(x: str, callback: Callable) -> str:
     return data['x']
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def substitute_callback(key: str, subst: str, case_insensitive: bool,
                         data: dict):
     if casesafe_is_equal(data['name'], key, case_insensitive):
@@ -89,28 +89,28 @@ def substitute_callback(key: str, subst: str, case_insensitive: bool,
     return True
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def substitute_key(value: str, key: str, subst: str,
                    case_insensitive: bool = IS_WIN32):
     return expandvars_base(value, partial(substitute_callback, key, subst,
                                           case_insensitive))
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def unresolved_keys_callback(keylist: list, data: dict):
     keylist.append(data['name'])
     data['i'] = data['j']
     return True
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def get_unresolved_keys(x: str):
     keys: list[str] = list()
     expandvars_base(x, partial(unresolved_keys_callback, keys))
     return keys
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def expandvars_callback(addl_expand_vars: dict, case_insensitive: bool,
                         data: dict):
     value = _NOTFOUND
@@ -136,7 +136,7 @@ def expandvars_callback(addl_expand_vars: dict, case_insensitive: bool,
         substitute_callback(name, value, case_insensitive, data)
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def expandvars(x: str, addl_expand_vars: dict[str, Any] = {},
                case_insensitive: bool = IS_WIN32) -> str:
     """
@@ -160,7 +160,7 @@ def expandvars(x: str, addl_expand_vars: dict[str, Any] = {},
                                       case_insensitive))
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def is_key_resolved(x: str, key: str, case_insensitive: bool = IS_WIN32):
     return not casesafe_key_in_dict(get_unresolved_keys(x), key,
                                     case_insensitive)

@@ -8,7 +8,7 @@ from shutil import chown, copy2
 from importlib.util import spec_from_file_location, module_from_spec
 from shlex import split as shsplit
 
-from ..logging import DEBUGLOW, log_func_call, get_logger
+from ..logging import DEBUGLOW2, log_func_call, get_logger
 from .constants import (
     DEFAULT_GROUP, DEFAULT_DIR_MODE, DEFAULT_FILE_MODE, IS_WIN32,
 )
@@ -16,7 +16,7 @@ from .paths import expand_and_check_var_path
 from .string import quote_str
 
 
-@log_func_call(DEBUGLOW)
+@log_func_call(DEBUGLOW2, trace_only=True)
 def mkdir_chgrp(p: Path, group: str = DEFAULT_GROUP,
                 mode: int = DEFAULT_DIR_MODE):
     if p:
@@ -25,7 +25,7 @@ def mkdir_chgrp(p: Path, group: str = DEFAULT_GROUP,
             chown(p, group=group)
 
 
-@log_func_call(DEBUGLOW)
+@log_func_call(DEBUGLOW2, trace_only=True)
 def chmod_chgrp(p: Path, group: str = DEFAULT_GROUP,
                 mode: int = DEFAULT_FILE_MODE):
     if p:
@@ -34,7 +34,7 @@ def chmod_chgrp(p: Path, group: str = DEFAULT_GROUP,
             chown(p, group=group)
 
 
-@log_func_call(DEBUGLOW)
+@log_func_call(DEBUGLOW2, trace_only=True)
 def file_copy_chmod_chgrp(src: Path, dest: Path, group: str = DEFAULT_GROUP,
                           mode: int = DEFAULT_FILE_MODE):
     copy2(src, dest)  # preserves file stat metadata (like mtime, etc.)
@@ -68,7 +68,7 @@ def add_path_to_syspath(p: Path | str):
     log.debug(f'(after) sys.path={sys.path}')
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def build_cmd_arg_dict(value: list[str] | dict | str = None):
     value = value or dict()
     args = dict()
@@ -105,7 +105,7 @@ def build_cmd_arg_dict(value: list[str] | dict | str = None):
     return args
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def _add_arg_to_list(args: list, k: str, v: str,
                      quotekeys: list[str] | tuple[str] = ()):
     args.append(f'-{k}')
@@ -116,7 +116,7 @@ def _add_arg_to_list(args: list, k: str, v: str,
         args.append(str(v))
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def build_cmd_arg_list(value: list[str] | dict | str = None,
                        quotekeys: list[str] | tuple[str] = ()):
     value = value or list()
@@ -147,7 +147,7 @@ def press_any_key():
         os_sys('read -srn1 -p "Press any key to continue... "')
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2)
 def is_dir_conda_env(p: Path):
     return (p/'conda-meta/history').exists()
 

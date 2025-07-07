@@ -69,6 +69,7 @@ qtwindow
 RBAR
 repr
 shcore
+shiboken
 shibokensupport
 SHLVL
 shsplit

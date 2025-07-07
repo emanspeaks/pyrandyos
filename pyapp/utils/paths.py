@@ -1,12 +1,12 @@
 import sys
 from pathlib import Path, PurePosixPath, PureWindowsPath, PurePath
 
-from ..logging import log_func_call
+from ..logging import log_func_call, DEBUGLOW2
 from .expandvars import expandvars, is_key_resolved
 from .constants import IS_WIN32
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def get_equiv_pureposixpath(x: str | Path):
     """
     Returns a `PurePosixPath` object equivalent to the given input path.
@@ -36,7 +36,7 @@ def get_equiv_pureposixpath(x: str | Path):
         return PurePosixPath(PureWindowsPath(str(x)).as_posix())
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def pureposixpath_to_pathobj(ppp: PurePosixPath):
     """
     Converts a `PurePosixPath` object to a `Path` object, expanding user
@@ -54,7 +54,7 @@ def pureposixpath_to_pathobj(ppp: PurePosixPath):
         return Path(ppp.as_posix()).expanduser()
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def pureposixpath_to_resolved_pathobj(ppp: PurePosixPath):
     """
     Converts a `PurePosixPath` object to an absolute `Path` object, expanding
@@ -76,7 +76,7 @@ def pureposixpath_to_resolved_pathobj(ppp: PurePosixPath):
     return pathobj.resolve()
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def get_expanded_pureposixpath(x: str | Path, addl_expand_vars: dict = {},
                                case_insensitive: bool = IS_WIN32):
     """
@@ -106,7 +106,7 @@ def get_expanded_pureposixpath(x: str | Path, addl_expand_vars: dict = {},
                                                   case_insensitive))
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def get_expanded_pathobj(x: str | Path, addl_expand_vars: dict = {},
                          case_insensitive: bool = IS_WIN32):
     """
@@ -135,7 +135,7 @@ def get_expanded_pathobj(x: str | Path, addl_expand_vars: dict = {},
 DLL_EXTS = ('.dll', '.so', '.dylib')
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def get_dll_ext_for_platform(platform: str = None):
     """
     Returns the preferred DLL file extension for the given
@@ -158,7 +158,7 @@ def get_dll_ext_for_platform(platform: str = None):
     return '.so'
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def replace_extension(p: Path | PurePath, ext: str):
     """
     Returns path `p` with the final suffix replaced by `ext`.
@@ -174,7 +174,7 @@ def replace_extension(p: Path | PurePath, ext: str):
     return p.with_suffix(ext)
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def test_alt_dll_paths(dll_path: Path, prefer_ext: str):
     """
     Test existence of the given DLL path with extensions other than the
@@ -196,7 +196,7 @@ def test_alt_dll_paths(dll_path: Path, prefer_ext: str):
             return p
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def expand_and_check_var(var_name: str, addl_expand_vars: dict = {},
                          case_insensitive: bool = IS_WIN32):
     "returns resolved, value"
@@ -206,7 +206,7 @@ def expand_and_check_var(var_name: str, addl_expand_vars: dict = {},
     return resolved, value
 
 
-@log_func_call
+@log_func_call(DEBUGLOW2, trace_only=True)
 def expand_and_check_var_path(var_name: str, addl_expand_vars: dict = {},
                               case_insensitive: bool = IS_WIN32,
                               resolve_path: bool = True):

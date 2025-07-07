@@ -99,6 +99,7 @@ def is_internal_frame(frame: FrameSummary):
             or ('importlib' == p.parent and '_bootstrap' in p.name)
             or 'debugpy' in p.parts
             or 'pydevd' in p.parts
+            or 'shiboken2' in p.parts
             or p == RUNPY_SRCFILE
             or p == SCRIPTPATH
             or loc.get('__traceback_hide__'))
@@ -129,9 +130,24 @@ def get_framesummary_for_frame(f: FrameType):
         line = getcachedline(filename, lineno)
         start_offset = byte_offset_to_character_offset(line, colno)
         end_offset = byte_offset_to_character_offset(line, end_colno)
+        if lineno != end_lineno:
+            # this is in traceback.StackSummary.format_frame_summary()
+            # in Python 3.12.11, but probably is a bug?  It's not doing the
+            # byte offset and just doing a raw line length...
+            # which overrides the end_colno value.  Maybe this is correct
+            # since it is supposed to be accounting for multiline blocks?
+            # Either way, it's a problem for us since we are just printing
+            # the first line, which may also not be correct.
+            end_offset = len(line.rstrip())
+
         stripped_line = line.strip()
         if end_offset - start_offset >= len(stripped_line):
-            end_colno -= 1
+            if lineno != end_lineno:
+                # handles the "bug" above
+                end_lineno = lineno
+
+            # do this regardless
+            end_colno = end_offset - 1
 
     kwargs = {
         'end_lineno': end_lineno,
@@ -194,7 +210,7 @@ def find_caller(stack_info=False, stacklevel=1):
     stk = filter_stack()
     if not stk:
         return "(unknown file)", 0, "(unknown function)", None
-    f = stk[stacklevel - 1]
+    f = stk[-stacklevel]
     sinfo = (f"Stack (most recent call last):\n{''.join(stk.format())}"
              if stack_info else None)
     return f.filename, f.lineno, f.name, sinfo
@@ -205,9 +221,12 @@ def filter_traceback_fullstack(tb: TracebackType):
     tbstack = filter_stack(build_stacksummary_for_tb(tb))
     stk = filter_stack(build_stacksummary_for_frame(tb.tb_frame))
     fullstack = StackSummary.from_list(stk[:-1] + tbstack)
-    if not SHOW_TRACEBACK_LOCALS:
-        # remove locals from the stack frames
-        for f in fullstack:
+    for f in fullstack:
+        if SHOW_TRACEBACK_LOCALS:
+            if '__builtins__' in f.locals:
+                del f.locals['__builtins__']
+        else:
+            # remove locals from the stack frames
             f.locals = None
 
     return fullstack
