@@ -9,7 +9,7 @@ DECORATOR = '@log_func_call'
 
 DECORATOR_RE = compile(r'^[ \t]*@[_]?log_func_call(\s*\(.*\))?\s*$',
                        flags=MULTILINE)
-CONFIG_FILENAME = "log_func_call_exclude.json"
+CONFIG_FILENAME = "log_func_call_exclude.jsonc"
 
 
 def load_exclude_config(config_path):

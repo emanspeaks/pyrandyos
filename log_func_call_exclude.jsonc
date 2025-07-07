@@ -7,15 +7,15 @@
     "pyapp/qt_gui/notify.py",
     "pyapp/utils/classproperty.py",
     "pyapp/utils/stack.py",
-    "pyapp/logging.py",
+    "pyapp/logging.py"//,
   ],
   "exclude_classes": [
     "MillisecondFormatter",
     "LevelFilter",
-    "LogMultiFormatter",
+    "LogMultiFormatter"//,
   ],
   "exclude_methods": {
-    "FileSetTqdm": ["__iter__"],
+    "FileSetTqdm": ["__iter__"]//,
   },
   "exclude_dirs": [
     "__pycache__",
@@ -25,6 +25,6 @@
     "venv",
     "env",
     ".conda",
-    "tests",
+    "tests"//,
   ]
 }
