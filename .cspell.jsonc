@@ -7,7 +7,7 @@
         "*.code-workspace",
         ".gitignore",
         ".local-gitignore",
-        "pyapp/qt_gui/icons/thirdparty/**/names.py"
+        "pyapp/gui/icons/thirdparty/**/names.py"
     ],
     "dictionaryDefinitions": [
         {

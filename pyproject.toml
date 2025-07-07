@@ -24,11 +24,11 @@ dependencies = [
 
 [tool.hatch.build]
 include = [
-  "pyapp/qt_gui/icons/qrc/*.svg",
-  "pyapp/qt_gui/icons/qrc/*.qrc",
-  "pyapp/qt_gui/icons/assets/**/*.ttf",
-  "pyapp/qt_gui/icons/assets/**/*.json",
-  "pyapp/qt_gui/icons/assets/**/LICENSE*",
+  "pyapp/gui/icons/qrc/*.svg",
+  "pyapp/gui/icons/qrc/*.qrc",
+  "pyapp/gui/icons/assets/**/*.ttf",
+  "pyapp/gui/icons/assets/**/*.json",
+  "pyapp/gui/icons/assets/**/LICENSE*",
 ]
 
 [tool.hatch.version]

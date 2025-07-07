@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from tempfile import gettempdir
 
 from .logging import (
     get_logger, Logger, log_func_call, DEBUGLOW2, set_trace_logging,
@@ -129,7 +130,17 @@ class PyApp(AppConfig):
                    mode: int = DEFAULT_DIR_MODE):
         # log = get_logger()
         # log.debug('in mkdir_temp')
-        tmp_dir: Path = cls.get(TMP_DIR_KEY)
+        tmp_dir: Path | None = cls.get(TMP_DIR_KEY)
+        if not tmp_dir:
+            try:
+                appname = cls.APP_NAME
+            except AttributeError:
+                appname = 'PyApp'
+
+            tmp_dir = Path(gettempdir())/appname
+            if cls.global_config:
+                cls.set(TMP_DIR_KEY, tmp_dir)
+
         if name:
             tmp_dir = tmp_dir/name
 
