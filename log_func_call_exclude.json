@@ -5,11 +5,14 @@
     "pyapp/config/keys.py",
     "pyapp/qt_gui/icons/qiconfont/update_from_spec.py",
     "pyapp/qt_gui/notify.py",
-    "pyapp/utils/classproperty.py"
+    "pyapp/utils/classproperty.py",
+    "pyapp/utils/stack.py",
+    "pyapp/logging.py"
   ],
   "exclude_classes": [
     "MillisecondFormatter",
-    "LevelFilter"
+    "LevelFilter",
+    "LogMultiFormatter"
   ],
   "exclude_methods": {
     "FileSetTqdm": ["__iter__"]

@@ -87,6 +87,7 @@ UNC
 UNCs
 unpolish
 utmain
+venv
 vint
 VSCode
 vscode-codicons
