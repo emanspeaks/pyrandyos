@@ -9,6 +9,8 @@
     "pyapp/utils/stack.py",
     "pyapp/utils/casesafe.py",
     "pyapp/utils/cfgdict.py",
+    "pyapp/qt_gui/loadstatus.py",
+    "pyapp/qt_gui/splash.py",
     "pyapp/logging.py"//,
   ],
   "exclude_classes": [
@@ -17,7 +19,8 @@
     "LogMultiFormatter"//,
   ],
   "exclude_methods": {
-    "FileSetTqdm": ["__iter__"]//,
+    "FileSetTqdm": ["__iter__"],
+    "MainWindowView": ["register_chip_load_steps"]
   },
   "exclude_dirs": [
     "__pycache__",

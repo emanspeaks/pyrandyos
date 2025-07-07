@@ -1,14 +1,16 @@
 from importlib import import_module
 
-from ....logging import log_func_call, WARN
+from ....logging import log_func_call
 from ....app import PyApp
+from ...loadstatus import load_status_step
 
 from .font import QIconFont, IconCache  # noqa: F401
 from .sources import THIRDPARTY_FONTSPEC  # noqa: F401
 from .fontspec import ICON_ASSETS_DIR
 
 
-@log_func_call(WARN)
+@load_status_step("Loading icon fonts")
+@log_func_call
 def init_iconfonts(use_tmpdir: bool = True, do_import: bool = True):
     thirdpartymod = f"{'.'.join(__name__.split('.')[:-1])}.thirdparty"
     tmpdir = PyApp.mkdir_temp() if use_tmpdir else ICON_ASSETS_DIR

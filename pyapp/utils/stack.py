@@ -223,8 +223,9 @@ def filter_traceback_fullstack(tb: TracebackType):
     fullstack = StackSummary.from_list(stk[:-1] + tbstack)
     for f in fullstack:
         if SHOW_TRACEBACK_LOCALS:
-            if '__builtins__' in f.locals:
-                del f.locals['__builtins__']
+            loc = f.locals
+            if loc and '__builtins__' in loc:
+                del loc['__builtins__']
         else:
             # remove locals from the stack frames
             f.locals = None

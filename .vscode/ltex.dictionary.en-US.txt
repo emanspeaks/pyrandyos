@@ -41,6 +41,7 @@ logcfg
 Marull
 mcol
 monkeypatch
+mymax
 ncols
 newppp
 nrows
@@ -61,6 +62,7 @@ QFontIcon
 QIconFont
 qrcfile
 qresource
+qtapp
 QtAwesome
 qtbasewidget
 qtroot
