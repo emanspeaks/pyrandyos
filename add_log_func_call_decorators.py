@@ -1,7 +1,9 @@
+import sys
 from pathlib import Path
 from re import compile, match, MULTILINE
-import json
-import sys
+
+from pyapp.utils.json import parse_jsonc
+
 
 DECORATOR = '@log_func_call'
 
@@ -21,7 +23,7 @@ def load_exclude_config(config_path):
             "base": None
         }
     with open(config_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        return parse_jsonc(f.read())
 
 
 def should_skip_dir(path: Path, exclude_dirs) -> bool:

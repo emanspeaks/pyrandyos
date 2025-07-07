@@ -2,6 +2,7 @@
 from json import loads as jloads, JSONDecodeError, dumps as jdumps
 from pathlib import Path
 from types import NoneType
+from re import sub
 
 from ..logging import log_func_call
 
@@ -64,6 +65,9 @@ def parse_jsonc(jsonstr: str) -> dict | list:
             lastc = c
         curline += lastc
         buf += curline
+
+    # Remove trailing commas in objects and arrays
+    buf = sub(r',([ \t\r\n]*[}}\]])', r'\1', buf)
 
     return jloads(buf)
 
