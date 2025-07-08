@@ -28,7 +28,7 @@
 		"version": "0.2.0",
 		"configurations": [
 			{
-				"name": "Python: Icon Browser",
+				"name": "PyApp: Icon Browser",
 				"type": "debugpy",
 				"request": "launch",
 				"module": "pyapp",
@@ -42,15 +42,19 @@
 				// "stopOnEntry": true
 			},
 			{
-				"name": "Python: @log_func_call script",
+				"name": "PyApp: @log_func_call script",
 				"type": "debugpy",
 				"request": "launch",
-				"program": "${workspaceFolder:pyapp}/tools/add_log_func_call_decorators.py",
-				"args": [
-					"${workspaceFolder:pyapp}/tools/log_func_call_exclude.jsonc"
-				],
+				"module": "pyapp",
 				"console": "integratedTerminal",
-				"justMyCode": false
+				"justMyCode": false,
+				"args": [
+					"log_func_call",
+					"${workspaceFolder:pyapp}/pyapp/tools/.log_func_call_exclude.jsonc"
+				],
+				"cwd": "${workspaceFolder:pyapp}"//,
+				// "guiEventLoop": "qt"
+				// "stopOnEntry": true
 			},
 			{
 				"name": "Python: Current File",
@@ -59,7 +63,7 @@
 				"program": "${file}",
 				"console": "integratedTerminal",
 				"justMyCode": false
-			},
+			}
 		],
 		"compounds": []
 	}

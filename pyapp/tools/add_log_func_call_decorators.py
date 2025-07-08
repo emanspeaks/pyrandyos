@@ -9,7 +9,7 @@ DECORATOR = '@log_func_call'
 
 DECORATOR_RE = compile(r'^[ \t]*@[_]?log_func_call(\s*\(.*\))?\s*$',
                        flags=MULTILINE)
-CONFIG_FILENAME = "log_func_call_exclude.jsonc"
+CONFIG_FILENAME = ".log_func_call_exclude.jsonc"
 
 
 def load_exclude_config(config_path):
@@ -133,6 +133,7 @@ def main(root_dirs, config_path=None):
         base_path = config.get("base_dir")
         if base_path:
             base_path = Path(base_path).resolve()
+            root_dirs = [str(base_path)]  # Use base_dir as only search root
         else:
             base_path = Path.cwd().resolve()
         configs = [config]
