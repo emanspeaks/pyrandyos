@@ -28,14 +28,6 @@
 		"version": "0.2.0",
 		"configurations": [
 			{
-				"name": "Python: Current File",
-				"type": "debugpy",
-				"request": "launch",
-				"program": "${file}",
-				"console": "integratedTerminal",
-				"justMyCode": false
-			},
-			{
 				"name": "Python: Icon Browser",
 				"type": "debugpy",
 				"request": "launch",
@@ -48,7 +40,26 @@
 				"cwd": "${workspaceFolder:pyapp}"//,
 				// "guiEventLoop": "qt"
 				// "stopOnEntry": true
-			}
+			},
+			{
+				"name": "Python: @log_func_call script",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder:pyapp}/tools/add_log_func_call_decorators.py",
+				"args": [
+					"${workspaceFolder:pyapp}/tools/log_func_call_exclude.jsonc"
+				],
+				"console": "integratedTerminal",
+				"justMyCode": false
+			},
+			{
+				"name": "Python: Current File",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"justMyCode": false
+			},
 		],
 		"compounds": []
 	}

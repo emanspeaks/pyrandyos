@@ -147,11 +147,18 @@ def main(root_dirs, config_path=None):
     exclude_classes = set()
     exclude_methods = dict()
     exclude_dirs = set()
+    exclude_functions_by_file = dict()
 
     for config in configs:
         exclude_files.update(config.get("exclude_files", []))
         exclude_classes.update(config.get("exclude_classes", []))
         exclude_dirs.update(config.get("exclude_dirs", []))
+        # exclude_functions is now a dict: {filename: [func1, func2, ...]}
+        ef = config.get("exclude_functions", {})
+        for fname, funclist in ef.items():
+            if fname not in exclude_functions_by_file:
+                exclude_functions_by_file[fname] = set()
+            exclude_functions_by_file[fname].update(funclist)
 
         for cls, methods in config.get("exclude_methods", {}).items():
             if cls not in exclude_methods:
@@ -175,6 +182,11 @@ def main(root_dirs, config_path=None):
         i = 0
         changed = False
         scope_stack = []
+        # Compute relative path from base_dir for this file
+        rel_path = str(filepath.resolve().relative_to(base_path))
+        rel_path = rel_path.replace('\\', '/').replace('\\', '/')
+        exclude_funcs_for_file = exclude_functions_by_file.get(rel_path, set())
+
         while i < len(lines):
             line = lines[i]
             indent = len(line) - len(line.lstrip())
@@ -210,16 +222,24 @@ def main(root_dirs, config_path=None):
                         inside_excluded_class = True
                     break
 
-            # Exclude specific methods
+            # Exclude specific methods or module-level functions
             func_match = match(r'^[ \t]*def ([a-zA-Z0-9_]+)', line)
             if func_match:
                 method_name = func_match.group(1)
-                if (current_class and current_class in exclude_methods and
-                        method_name in exclude_methods[current_class]):
-                    new_lines.append(line)
-                    i += 1
-                    new_lines.append("")
-                    continue
+                if current_class:
+                    if (current_class in exclude_methods and
+                            method_name in exclude_methods[current_class]):
+                        new_lines.append(line)
+                        i += 1
+                        new_lines.append("")
+                        continue
+                else:
+                    # module-level function
+                    if method_name in exclude_funcs_for_file:
+                        new_lines.append(line)
+                        i += 1
+                        new_lines.append("")
+                        continue
 
             # Exclude functions in excluded classes or TYPE_CHECKING
             if match(r'^[ \t]*def [a-zA-Z0-9_]+', line):
