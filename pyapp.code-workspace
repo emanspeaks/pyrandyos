@@ -34,6 +34,20 @@
 				"program": "${file}",
 				"console": "integratedTerminal",
 				"justMyCode": false
+			},
+			{
+				"name": "Python: Icon Browser",
+				"type": "debugpy",
+				"request": "launch",
+				"module": "pyapp",
+				"console": "integratedTerminal",
+				"justMyCode": false,
+				"args": [
+					"${workspaceFolder:pyapp}/.pyapp_config.jsonc"
+				],
+				"cwd": "${workspaceFolder:pyapp}"//,
+				// "guiEventLoop": "qt"
+				// "stopOnEntry": true
 			}
 		],
 		"compounds": []

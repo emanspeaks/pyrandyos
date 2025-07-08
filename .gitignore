@@ -13,3 +13,4 @@ docs/
 .coverage
 .conda
 logs/
+tmp/

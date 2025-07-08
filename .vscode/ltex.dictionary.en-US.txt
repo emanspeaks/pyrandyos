@@ -3,10 +3,12 @@ args
 barfmt
 baselbl
 bool
+brect
 cfgdict
 cfgpkgdir
 chgrp
 clippy
+clscache
 cpbase
 cpbasetxt
 db
@@ -26,6 +28,7 @@ FluentUI
 fluentui-system-icons
 fmtdict
 fnames
+hflip
 hubot
 ified
 indata
@@ -38,12 +41,15 @@ lastc
 levelno
 loadf
 logcfg
+lvwidget
 Marull
 mcol
 monkeypatch
+mwview
 mymax
 ncols
 newppp
+NOHINT
 nrows
 octoface
 outf
@@ -51,6 +57,7 @@ ppath
 pyapp
 PyApp
 PYAPP
+PYAPPDIR
 pycache
 pyfile
 pyrcc
@@ -76,6 +83,7 @@ shibokensupport
 SHLVL
 shsplit
 sinfo
+Spyder
 STARTBRAK
 str
 tgtdir
@@ -91,6 +99,7 @@ UNCs
 unpolish
 utmain
 venv
+vflip
 vint
 VSCode
 vscode-codicons

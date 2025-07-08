@@ -20,24 +20,62 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from typing import TYPE_CHECKING
 
 from PySide2.QtCore import QTimer, QRect, QRectF
 from PySide2.QtWidgets import QWidget
 from PySide2.QtGui import QPainter
 
 from ....logging import log_func_call, DEBUGLOW2
+from ....utils.hash import TupleHashMixin
+if TYPE_CHECKING:
+    from .icon import IconLayer
 
 
-class Spin:
+class IconAnimation(TupleHashMixin):
+    """
+    Base class for icon animations.
+    This class provides a common interface for animations that can be applied
+    to icons.
+    """
+    def __init__(self, parent_widget: QWidget):
+        self.parent_widget = parent_widget
+
+    def setup(self, icon_painter: 'IconLayer', painter: QPainter,
+              rect: QRect | QRectF):
+        raise NotImplementedError("Subclasses should implement this method")
+
+    def start(self):
+        raise NotImplementedError("Subclasses should implement this method")
+
+    def stop(self):
+        raise NotImplementedError("Subclasses should implement this method")
+
+    def as_tuple(self):
+        """
+        Returns a tuple representation of the animation instance.
+        This is used for hashing and equality checks.
+        """
+        return (self.__class__.__qualname__, self.parent_widget)
+
+
+class IconSpin(IconAnimation):
     @log_func_call
     def __init__(self, parent_widget: QWidget, interval: int = 10,
                  step: int = 1, autostart: bool = True):
-        self.parent_widget = parent_widget
+        super().__init__(parent_widget)
         self.interval = interval
         self.step = step
         self.autostart = autostart
 
         self.info = {}
+
+    def as_tuple(self):
+        return super().as_tuple() + (
+            self.interval,
+            self.step,
+            self.autostart,
+        )
 
     @log_func_call(DEBUGLOW2, trace_only=True)
     def _update(self):
@@ -52,7 +90,7 @@ class Spin:
             self.parent_widget.update()
 
     @log_func_call
-    def setup(self, icon_painter: QPainter, painter: QPainter,
+    def setup(self, icon_painter: 'IconLayer', painter: QPainter,
               rect: QRect | QRectF):
         if self.parent_widget not in self.info:
             timer = QTimer(self.parent_widget)
@@ -81,8 +119,13 @@ class Spin:
             timer.stop()
 
 
-class Pulse(Spin):
+class IconPulse(IconSpin):
     @log_func_call
     def __init__(self, parent_widget: QWidget, autostart: bool = True):
         super().__init__(parent_widget, interval=300, step=45,
                          autostart=autostart)
+
+    def as_tuple(self):
+        return super().as_tuple() + (
+            self.autostart,
+        )

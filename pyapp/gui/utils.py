@@ -1,7 +1,8 @@
 from pathlib import Path
 from collections.abc import Callable
+from contextlib import contextmanager
 
-from PySide2.QtGui import QIcon
+from PySide2.QtGui import QIcon, QPainter
 from PySide2.QtCore import QSize
 from PySide2.QtWidgets import (
     QToolButton, QSlider, QWidget, QAction, QSizePolicy,
@@ -107,6 +108,8 @@ def create_action(parent: QtWidgetWrapper | QWidget, text: str = "",
 
     if callback:
         action.triggered.connect(callback)
+
+    action.setEnabled(enabled)
     return action
 
 
@@ -115,3 +118,12 @@ def create_toolbar_expanding_spacer():
     spacer = QWidget()
     spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
     return spacer
+
+
+@contextmanager
+def painter_context(painter: QPainter):
+    painter.save()
+    try:
+        yield painter
+    finally:
+        painter.restore()

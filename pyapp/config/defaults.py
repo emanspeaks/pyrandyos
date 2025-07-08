@@ -22,8 +22,8 @@ DEFAULTS = {
 
     LOCAL_CFG_KEY: {
         "theme": "Dark",
-        "default_width": 850,
-        "default_height": 660,
+        "default_width": 1080,
+        "default_height": 720,
     },
     LOCAL_CONFIG_FILE_KEY: "~/.pyapp_local_config.jsonc",
 }

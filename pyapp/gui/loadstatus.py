@@ -56,10 +56,10 @@ def load_status_step(step_name: str, show_step_start: bool = True,
 def mark_load_step_completed(step_name: str, show_step_name: bool = False,
                              process_events: bool = True):
     if step_name in LOAD_STEP_REGISTRY:
-        from .abc import get_qt_app
+        from .abc import get_gui_app
         reg = COMPLETED_LOAD_STEPS
         reg.add(step_name)
-        splash: QtSplashScreen = getattr(get_qt_app(), 'splash', None)
+        splash: QtSplashScreen = getattr(get_gui_app(), 'splash', None)
         if splash:
             splash.set_progress(value=len(reg),
                                 message=step_name if show_step_name else None,
@@ -69,18 +69,18 @@ def mark_load_step_completed(step_name: str, show_step_name: bool = False,
 def mark_load_step_started(step_name: str, show_step_name: bool = True,
                            process_events: bool = True):
     if step_name in LOAD_STEP_REGISTRY:
-        from .abc import get_qt_app
+        from .abc import get_gui_app
         reg = STARTED_LOAD_STEPS
         reg.add(step_name)
-        splash: QtSplashScreen = getattr(get_qt_app(), 'splash', None)
+        splash: QtSplashScreen = getattr(get_gui_app(), 'splash', None)
         if splash:
             splash.set_progress(message=step_name if show_step_name else None,
                                 process_events=process_events)
 
 
 def splash_message(message: str, process_events: bool = True):
-    from .abc import get_qt_app
-    splash: QtSplashScreen = getattr(get_qt_app(), 'splash', None)
+    from .abc import get_gui_app
+    splash: QtSplashScreen = getattr(get_gui_app(), 'splash', None)
     if splash:
         splash.set_progress(message=message, process_events=process_events)
 

@@ -25,10 +25,10 @@ class PyApp(AppConfig):
     # abstract class attributes
     APP_NAME: str
     APP_LOG_PREFIX: str
-    APP_PATH_KEYS: tuple[str]
-    APP_LOG_DIR_KEYS: tuple[str]
 
     # class attributes with fallback defaults
+    APP_PATH_KEYS: tuple[str] = ()
+    APP_LOG_DIR_KEYS: tuple[str] = ()
     APP_GLOBAL_DEFAULTS = {}
     APP_LOCAL_DEFAULTS = {}
     APP_ASSETS_DIR: str | Path = None

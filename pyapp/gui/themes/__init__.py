@@ -3,7 +3,8 @@ from collections.abc import Callable
 from PySide2.QtWidgets import QApplication
 
 from ...logging import log_func_call
-from .dark import dark_theme
+# from .dark import dark_theme
+from .styles import dark, light, DEFAULT_DARK_PALETTE, DEFAULT_LIGHT_PALETTE
 
 DEFAULT_THEME_NAME = '(default)'
 STATUS_LABEL = 'status_label'  # used in stylesheet for status label
@@ -21,19 +22,19 @@ class ThemeMap:
     def create_theme(self, name: str, callback: Callable = None):
         themes = self.__custom_themes
         if name not in themes:
-            themes[name] = callback if callback else self.default_theme
+            themes[name.lower()] = callback if callback else self.default_theme
 
     @log_func_call
     def init_themes(self):
-        self.create_theme('Light', self.default_theme)
-        self.create_theme('Dark', dark_theme)
+        self.create_theme(DEFAULT_LIGHT_PALETTE, light)
+        self.create_theme(DEFAULT_DARK_PALETTE, dark)
 
     @log_func_call
     def apply_theme(self, name: str = None):
         if not name or name == DEFAULT_THEME_NAME:
             self.default_theme(self.app)
         else:
-            self.__custom_themes[name](self.app)
+            self.__custom_themes[name.lower()](self.app)
 
         self.__current = name
 

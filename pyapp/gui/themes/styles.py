@@ -24,10 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from re import sub, M as re_M
+
 from PySide2.QtGui import QPalette, QColor
 from PySide2.QtWidgets import QApplication
+from qdarkstyle import load_stylesheet as load_dark_stylesheet
 
-from ....logging import log_func_call
+from ...logging import log_func_call
 
 # Constant to reference default themes
 DEFAULT_DARK_PALETTE = "Dark"
@@ -79,6 +82,12 @@ def dark(app: QApplication):
 
     app.setStyle("Fusion")
 
+    # fix for QComboBox indentation issue
+    # see: https://github.com/ColinDuquesnoy/QDarkStyleSheet/issues/308#issuecomment-1661775924  # noqa: E501
+    qss = load_dark_stylesheet(qt_api='pyside2')
+    qss = sub(r'QComboBox::indicator([^}]|\n)+}', '', qss, re_M)
+    app.setStyleSheet(qss)
+
 
 @log_func_call
 def light(app: QApplication):
@@ -128,3 +137,4 @@ def light(app: QApplication):
     app.setPalette(light_palette)
 
     app.setStyle("Fusion")
+    app.setStyleSheet('')

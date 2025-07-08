@@ -16,3 +16,20 @@ def is_debug_enabled():
         pass
 
     return False
+
+
+def hide_splash():
+    from pyapp.gui.abc import get_gui_app
+    gui_app = get_gui_app()
+    if gui_app and gui_app.splash:
+        splash = gui_app.splash.qtroot
+        if splash.isVisible():
+            splash.hide()
+            if is_debug_enabled():
+                print("Splash screen hidden, debugger is enabled")
+            else:
+                print("Splash screen hidden")
+        else:
+            print("Splash screen is already hidden")
+    else:
+        print("No splash screen to hide")

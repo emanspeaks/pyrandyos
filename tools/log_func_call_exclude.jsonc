@@ -3,7 +3,7 @@
     "add_log_func_call_decorators.py",
     "pyapp/config/defaults.py",
     "pyapp/config/keys.py",
-    "pyapp/gui/icons/qiconfont/update_from_spec.py",
+    "pyapp/gui/icons/update_from_spec.py",
     "pyapp/gui/notify.py",
     "pyapp/utils/classproperty.py",
     "pyapp/utils/stack.py",
@@ -11,6 +11,7 @@
     "pyapp/utils/cfgdict.py",
     "pyapp/gui/loadstatus.py",
     "pyapp/gui/splash.py",
+    "pyapp/gui/icons/iconfont/icon.py",
     "pyapp/logging.py"//,
   ],
   "exclude_classes": [
@@ -20,7 +21,17 @@
   ],
   "exclude_methods": {
     "FileSetTqdm": ["__iter__"],
-    "MainWindowView": ["register_chip_load_steps"]
+    "MainWindowView": ["register_chip_load_steps"],
+    "IconLayer": [
+      "paint",
+      "get_draw_size",
+      "draw_text",
+      "get_rawfont",
+      "prep_rawfont_paint",
+      "draw_path",
+      "draw_glyphrun",
+      "draw_image"
+    ]
   },
   "exclude_dirs": [
     "__pycache__",

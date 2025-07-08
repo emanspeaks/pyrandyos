@@ -69,6 +69,7 @@ def log_func_call(arg, *, trace_only: bool = False):  # noqa: E302
                     _log(
                         log,
                         level,
+                        f"{'TRACE: ' if trace_only else ''}"
                         f"Function call: {func.__qualname__}"
                         f"({', '.join(
                             'self' if not i and funcname == '__init__'
