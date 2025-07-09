@@ -1,11 +1,10 @@
 import sys as _sys
 
 from typing import (
-    TypeVar as _TypeVar, cast as _cast, overload as _overload, Any as _Any
+    TypeVar as _TypeVar, overload as _overload, Any as _Any
 )
 from types import TracebackType as _TracebackType
 from collections.abc import Callable as _Callable
-from functools import wraps as _wraps
 # want to export these for convenience, so they are not hidden by default
 from logging import (  # noqa: F401
     getLogger as _getLogger, WARN, ERROR, DEBUG, INFO, CRITICAL, WARNING,
@@ -13,9 +12,12 @@ from logging import (  # noqa: F401
 )
 from traceback import format_exception_only
 
+from .utils.signature_wrapper import (
+    generate_signature_aware_wrapper as _sig_aware_wrapper
+)
 from ._testing.debug import is_debug_enabled
 from .utils.stack import (
-    exc_info as _exc_info, find_caller as _find_caller,
+    exc_info as _exc_info, log_find_caller as _find_caller,
     format_exc as _format_exc, get_stack_frame as _get_stack_frame
 )
 
@@ -50,6 +52,48 @@ def get_logger(modname: str = None) -> Logger:
     return log or _getLogger(modname)
 
 
+def _log_func_call_handler(handler_args: tuple, handler_kwargs: dict,
+                           func: _Callable, *func_args: tuple,
+                           **func_kwargs: dict):
+    __traceback_hide__ = True  # noqa: F841
+    level: str | int = handler_args[0]
+    trace_only: bool = handler_kwargs.get('trace_only', False)
+    if not trace_only or get_tracelog():
+        log = get_logger(func.__module__)
+        try:
+            code = func.__code__
+            funcname = func.__name__
+            _log(
+                log,
+                level,
+                f"{'TRACE: ' if trace_only else ''}"
+                f"Function call: {func.__qualname__}"
+                f"({', '.join(
+                    'self' if not i and funcname == '__init__'
+                    else
+                    repr(arg) for i, arg in enumerate(func_args)
+                )}{', ' if func_args and func_kwargs else ''}"
+                f"{', '.join(f'{k}={v!r}'
+                             for k, v in func_kwargs.items())}) "
+                f"{{function defined {code.co_filename}"
+                f"({code.co_firstlineno})}}",
+                # stacklevel=2,
+            )
+        except BaseException as e:
+            _log(
+                log,
+                level,
+                "Error logging function call: "
+                f"{func.__qualname__} - "
+                f"{''.join(format_exception_only(e)).strip()} "
+                f"{{function defined {code.co_filename}"
+                f"({code.co_firstlineno})}}",
+                # stacklevel=2,
+            )
+
+    return func_args, func_kwargs
+
+
 F = _TypeVar("F", bound=_Callable[..., _Any])
 @_overload
 def log_func_call(func: F) -> F: ...
@@ -58,43 +102,8 @@ def log_func_call(level: int | str, *,
                   trace_only: bool = False) -> _Callable[[F], F]: ...
 def log_func_call(arg, *, trace_only: bool = False):  # noqa: E302
     def log_decorator(func: F) -> F:
-        @_wraps(func)
-        def log_func_call_wrapper(*args, **kwargs):
-            __traceback_hide__ = True  # noqa: F841
-            if not trace_only or get_tracelog():
-                log = get_logger(func.__module__)
-                try:
-                    code = func.__code__
-                    funcname = func.__name__
-                    _log(
-                        log,
-                        level,
-                        f"{'TRACE: ' if trace_only else ''}"
-                        f"Function call: {func.__qualname__}"
-                        f"({', '.join(
-                            'self' if not i and funcname == '__init__'
-                            else
-                            repr(arg) for i, arg in enumerate(args)
-                        )}{', ' if args and kwargs else ''}"
-                        f"{', '.join(f'{k}={v!r}'
-                                     for k, v in kwargs.items())}) "
-                        f"{{function defined {code.co_filename}"
-                        f"({code.co_firstlineno})}}",
-                        # stacklevel=2,
-                    )
-                except BaseException as e:
-                    _log(
-                        log,
-                        level,
-                        "Error logging function call: "
-                        f"{func.__qualname__} - "
-                        f"{''.join(format_exception_only(e)).strip()} "
-                        f"{{function defined {code.co_filename}"
-                        f"({code.co_firstlineno})}}",
-                        # stacklevel=2,
-                    )
-            return func(*args, **kwargs)
-        return _cast(F, log_func_call_wrapper)
+        return _sig_aware_wrapper(func, _log_func_call_handler, level,
+                                  trace_only=trace_only)
 
     if callable(arg):
         # Used as @log_func_call
@@ -120,8 +129,9 @@ def log_exc(exc_or_type: type | BaseException = None,
             exc: BaseException = None,
             traceback: _TracebackType = None):
     __traceback_hide__ = True  # noqa: F841
-    _log(get_logger(), ERROR, 'Unhandled exception', stacklevel=2,
-         exc_info=_exc_info(exc_or_type, exc, traceback))
+    excnfo = _exc_info(exc_or_type, exc, traceback)
+    _log(get_logger(), ERROR, 'Unhandled exception', exc_info=excnfo)
+    excnfo[1]._pyapp_handled = True
 
 
 def _log_exc_hook(exc_or_type: type | BaseException = None,
@@ -129,6 +139,10 @@ def _log_exc_hook(exc_or_type: type | BaseException = None,
                   traceback: _TracebackType = None):
     if not is_debug_enabled():
         log_exc(exc_or_type, exc, traceback)
+
+    if not getattr(exc, '_pyapp_handled', False):
+        # if we did not handle it, let the default handler do its job
+        _sys.__excepthook__(exc_or_type, exc, traceback)
 
 
 _sys.excepthook = _log_exc_hook
@@ -138,7 +152,7 @@ _sys.excepthook = _log_exc_hook
 def _log(log: Logger, level, msg, *args, exc_info=None, extra=None,
          stack_info=False, stacklevel=1):
     __traceback_hide__ = True  # noqa: F841
-    fn, lno, func, sinfo = _find_caller(stack_info, stacklevel)
+    fn, lno, func, sinfo = _find_caller(stack_info, stacklevel, exc_info)
     record = log.makeRecord(log.name, level, fn, lno, msg, args, exc_info,
                             func, extra, sinfo)
     if exc_info:

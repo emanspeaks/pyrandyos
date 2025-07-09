@@ -48,7 +48,7 @@ def win_write(handle: int, data: bytes):
     if not WriteConsoleW(handle, buffer, code_units_to_be_written,
                          byref(code_units_written), None):
         exc = WinError(get_last_error())
-        raise exc
+        raise exc  # use traceback from here
 
     return 2 * code_units_written.value  # bytes written
 

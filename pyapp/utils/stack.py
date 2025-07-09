@@ -1,7 +1,7 @@
 import sys
-from types import TracebackType, FrameType, ModuleType
-from typing import overload
-from collections.abc import Callable
+from types import TracebackType, FrameType, ModuleType, CodeType, CellType
+from typing import overload, TYPE_CHECKING, Any
+from collections.abc import Callable, Mapping
 from pathlib import Path
 from inspect import getfile, getmodule, currentframe
 from importlib import import_module
@@ -12,14 +12,23 @@ from linecache import (
     lazycache as lazylinecache, checkcache as checklinecache,
     getline as getcachedline
 )
+from textwrap import indent
+if TYPE_CHECKING:
+    from _typeshed import ReadableBuffer
+
 
 SCRIPTPATH = Path(__file__)
 STDLIB_LOGGING_SRCFILE = Path(_srcfile)
 RUNPY_SRCFILE = (Path(sys.modules['runpy'].__file__) if 'runpy' in sys.modules
                  else None)
-SHOW_TRACEBACK_LOCALS = False
+SHOW_TRACEBACK_LOCALS = None
 
 ModAndName = tuple[ModuleType, str]
+ExcInfoType = tuple[type, BaseException, TracebackType]
+
+
+class AnnotatedFrameSummary(FrameSummary):
+    pass
 
 
 def set_show_traceback_locals(enabled: bool = True):
@@ -93,43 +102,65 @@ def top_package_dir_path(arg=None):  # noqa: E302
 def is_internal_frame(frame: FrameSummary):
     __traceback_hide__ = True  # noqa: F841
     # adapted from stdlib logging._is_internal_frame
-    p = Path(frame.filename).resolve()
+    filename = frame.filename
+    p = Path(filename).resolve()
     loc = frame.locals or {}
-    return (p == STDLIB_LOGGING_SRCFILE
-            or ('importlib' == p.parent and '_bootstrap' in p.name)
-            or 'debugpy' in p.parts
-            or 'pydevd' in p.parts
-            or 'shiboken2' in p.parts
-            or p == RUNPY_SRCFILE
-            or p == SCRIPTPATH
-            or loc.get('__traceback_hide__'))
+
+    # tests broken out for debugging purposes
+    testdict = dict(
+        is_frozen=filename.startswith('<frozen '),
+        is_stdlib_logging=p == STDLIB_LOGGING_SRCFILE,
+        is_runpy=p == RUNPY_SRCFILE,
+        # is_this_file=p == SCRIPTPATH,
+        is_debugpy='debugpy' in p.parts,
+        is_pydevd='pydevd' in p.parts,
+        is_shiboken2='shiboken2' in p.parts,
+        is_importlib_bootstrap=('importlib' == p.parent
+                                and '_bootstrap' in p.name),
+        is_traceback_hide=loc.get('__traceback_hide__')
+    )
+    internal = any(testdict.values())
+    which = [k for k, v in testdict.items() if v] if internal else None  # noqa: E501, F841
+    return internal
 
 
-def get_framesummary_for_frame(f: FrameType):
+def get_framesummary_for_frame(f: FrameType, tb: TracebackType = None,
+                               src: str = None, lineno: int = None):
     # adapted from stdlib traceback._walk_tb_with_full_positions
     # and from stdlib traceback.StackSummary._extract_from_extended_frame_gen
     __traceback_hide__ = True  # noqa: F841
-    lasti = f.f_lasti
+    lasti = tb.tb_lasti if tb else f.f_lasti
     f_locals = f.f_locals
     code = f.f_code
     name = code.co_name
     filename = code.co_filename
     lazylinecache(filename, f.f_globals)
     checklinecache(filename)
-    lineno = None if lasti < 0 else f.f_lineno
-    posgen: Callable = getattr(code, 'co_positions', None)
+    fixed_lineno = lineno
+    if not lineno:
+        lineno = None if lasti < 0 else (tb.tb_lineno if tb else f.f_lineno)
+
+    posgen: Callable = (getattr(code, 'co_positions', None)
+                        if fixed_lineno is None else None)
+    underlines = bool(posgen)
     if posgen:
         lineno2, end_lineno, colno, end_colno = next(islice(posgen(),
                                                             lasti // 2, None))
         if lineno2 is not None:
             lineno = lineno2
 
+    line = getcachedline(filename, lineno) or (src.splitlines()[lineno - 1]
+                                               if src else '<unknown source>')
+    if underlines:
         # I like seeing the underlines in the tracebacks, but if the issue is
         # the entire line, it doesn't print them.  As a hack, just lop off the
         # last character of the line.
-        line = getcachedline(filename, lineno)
-        start_offset = byte_offset_to_character_offset(line, colno)
-        end_offset = byte_offset_to_character_offset(line, end_colno)
+        stripped_line = line.strip()
+        striplen = len(stripped_line)
+        endstriplen = len(line.rstrip())
+        start_offset = byte_offset_to_character_offset(line, colno or 0)
+        end_offset = byte_offset_to_character_offset(line, end_colno
+                                                     or endstriplen)
         if lineno != end_lineno:
             # this is in traceback.StackSummary.format_frame_summary()
             # in Python 3.12.11, but probably is a bug?  It's not doing the
@@ -138,10 +169,9 @@ def get_framesummary_for_frame(f: FrameType):
             # since it is supposed to be accounting for multiline blocks?
             # Either way, it's a problem for us since we are just printing
             # the first line, which may also not be correct.
-            end_offset = len(line.rstrip())
+            end_offset = endstriplen
 
-        stripped_line = line.strip()
-        if end_offset - start_offset >= len(stripped_line):
+        if end_offset - start_offset >= striplen:
             if lineno != end_lineno:
                 # handles the "bug" above
                 end_lineno = lineno
@@ -155,13 +185,14 @@ def get_framesummary_for_frame(f: FrameType):
         'end_colno': end_colno
     } if posgen else {}
 
-    summary = FrameSummary(filename, lineno, name, lookup_line=False,
-                           locals=f_locals, **kwargs)
-    summary.line
+    summary = AnnotatedFrameSummary(filename, lineno, name, lookup_line=False,
+                                    locals=f_locals, line=line, **kwargs)
+    # summary.line
     return summary
 
 
-def build_stacksummary_for_frame(f: FrameType | None = None):
+def build_stacksummary_for_frame(f: FrameType | None = None,
+                                 reverse: bool = True):
     # adapted from stdlib traceback._walk_tb_with_full_positions
     # and from stdlib traceback.StackSummary._extract_from_extended_frame_gen
     __traceback_hide__ = True  # noqa: F841
@@ -174,11 +205,13 @@ def build_stacksummary_for_frame(f: FrameType | None = None):
         result.append(get_framesummary_for_frame(f))
         f = f.f_back
 
-    result.reverse()
+    if reverse:
+        result.reverse()
+
     return result
 
 
-def build_stacksummary_for_tb(tb: TracebackType):
+def build_stacksummary_for_tb(tb: TracebackType, exc: BaseException = None):
     # adapted from stdlib traceback._walk_tb_with_full_positions
     # and from stdlib traceback.StackSummary._extract_from_extended_frame_gen
     __traceback_hide__ = True  # noqa: F841
@@ -187,9 +220,17 @@ def build_stacksummary_for_tb(tb: TracebackType):
     # because I am removing the limits here to reduce complexity.
     result = StackSummary()
     tb: TracebackType | None
+    src: str = getattr(exc, '_pyapp_exec_source', '<unknown source>')
+    src_f: FrameSummary = getattr(exc, '_pyapp_exec_source_frame', None)
+    skipset = getattr(exc, '_pyapp_skip_next_reraise', None) or set()
     while tb is not None:
-        result.append(get_framesummary_for_frame(tb.tb_frame))
+        fs = get_framesummary_for_frame(tb.tb_frame, tb, src)
+        fs._pyapp_skip_next_reraise = id(tb) in skipset
+        result.append(fs)
         tb = tb.tb_next
+
+    if src_f:
+        result.append(src_f)
 
     return result
 
@@ -197,17 +238,61 @@ def build_stacksummary_for_tb(tb: TracebackType):
 def filter_stack(stk: StackSummary = None):
     __traceback_hide__ = True  # noqa: F841
     stk = stk or build_stacksummary_for_frame(get_stack_frame(2)) or ()
-    return StackSummary.from_list([f for f in stk if not is_internal_frame(f)])
+    # return StackSummary.from_list([f for f in stk
+    #                                if not is_internal_frame(f)])
+
+    def stackgen():
+        __traceback_hide__ = True  # noqa: F841
+        last = None
+        for f in stk:
+            skip = getattr(f, '_pyapp_skip_next_reraise', False)
+            if last and not skip:
+                yield last
+
+            if is_internal_frame(f):
+                last = None
+                continue
+
+            last = f
+
+        if last:
+            yield last
+
+    return StackSummary.from_list(list(stackgen()))
 
 
 def byte_offset_to_character_offset(s: str, offset: int):
+    __traceback_hide__ = True  # noqa: F841
     as_utf8 = s.encode('utf-8')
     return len(as_utf8[:offset].decode("utf-8", errors="replace"))
 
 
-def find_caller(stack_info=False, stacklevel=1):
+def get_real_caller_stack(stacklevel: int = 1):
     __traceback_hide__ = True  # noqa: F841
-    stk = filter_stack()
+    f = get_stack_frame(1 + stacklevel)
+    return build_stacksummary_for_frame(f, reverse=False) or ()
+
+
+def filter_tb_stacksummary_if_not_internal(tb: TracebackType,
+                                           exc: BaseException = None):
+    __traceback_hide__ = True  # noqa: F841
+    stk = build_stacksummary_for_tb(tb, exc)
+    if stk:
+        f = stk[-1]
+        if not is_internal_frame(f):
+            return filter_stack(stk)
+    return stk
+
+
+def log_find_caller(stack_info: bool = False, stacklevel: int = 1,
+                    exc_info: ExcInfoType | None = None):
+    __traceback_hide__ = True  # noqa: F841
+    if exc_info:
+        stk = filter_tb_stacksummary_if_not_internal(exc_info[2], exc_info[1])
+        stacklevel = 0
+    else:
+        stk = filter_stack()
+
     if not stk:
         return "(unknown file)", 0, "(unknown function)", None
     f = stk[-stacklevel]
@@ -216,21 +301,34 @@ def find_caller(stack_info=False, stacklevel=1):
     return f.filename, f.lineno, f.name, sinfo
 
 
-def filter_traceback_fullstack(tb: TracebackType):
+def filter_traceback_fullstack(tb: TracebackType, exc: BaseException):
     __traceback_hide__ = True  # noqa: F841
-    tbstack = filter_stack(build_stacksummary_for_tb(tb))
+    tbstack = filter_tb_stacksummary_if_not_internal(tb, exc)
     stk = filter_stack(build_stacksummary_for_frame(tb.tb_frame))
     fullstack = StackSummary.from_list(stk[:-1] + tbstack)
     for f in fullstack:
-        if SHOW_TRACEBACK_LOCALS:
+        if SHOW_TRACEBACK_LOCALS or SHOW_TRACEBACK_LOCALS is None:
             loc = f.locals
-            if loc and '__builtins__' in loc:
-                del loc['__builtins__']
+            if loc:
+                if loc.get('__traceback_locals_hide__'):
+                    # remove locals from the stack frame
+                    f.locals = None
+                elif '__builtins__' in loc:
+                    del loc['__builtins__']
         else:
             # remove locals from the stack frames
             f.locals = None
 
     return fullstack
+
+
+def add_src_note_to_traceback_exception(te: TracebackException,
+                                        exc: BaseException):
+    src = getattr(exc, '_pyapp_exec_source', None)
+    if src:
+        if not te.__notes__:
+            te.__notes__ = []
+        te.__notes__.append("\n<string> code:\n" + indent(src, '    '))
 
 
 def build_traceback_exception(exc: BaseException | TracebackException,
@@ -243,7 +341,8 @@ def build_traceback_exception(exc: BaseException | TracebackException,
     tb = tb or exc.__traceback__
     te = (exc if isinstance(exc, TracebackException)
           else TracebackException(type(exc), exc, tb, compact=compact))
-    te.stack = filter_traceback_fullstack(tb)
+    te.stack = filter_traceback_fullstack(tb, exc)
+    add_src_note_to_traceback_exception(te, exc)
     top_te = te
 
     queue = [(te, exc)]
@@ -255,7 +354,8 @@ def build_traceback_exception(exc: BaseException | TracebackException,
         if te_cause and exc_cause_id not in seen:
             seen.add(exc_cause_id)
             tb = exc_cause.__traceback__
-            te_cause.stack = filter_traceback_fullstack(tb)
+            te_cause.stack = filter_traceback_fullstack(tb, exc_cause)
+            add_src_note_to_traceback_exception(te_cause, exc_cause)
             queue.append((te_cause, exc_cause))
 
         te_context = te.__context__
@@ -264,7 +364,8 @@ def build_traceback_exception(exc: BaseException | TracebackException,
         if te_context and exc_context_id not in seen:
             seen.add(exc_context_id)
             tb = exc_context.__traceback__
-            te_context.stack = filter_traceback_fullstack(tb)
+            te_context.stack = filter_traceback_fullstack(tb, exc_context)
+            add_src_note_to_traceback_exception(te_context, exc_context)
             queue.append((te_context, exc_context))
 
         te_exceptions = te.exceptions
@@ -275,7 +376,8 @@ def build_traceback_exception(exc: BaseException | TracebackException,
                 if e_id not in seen:
                     seen.add(e_id)
                     tb = e.__traceback__
-                    te_exceptions[i].stack = filter_traceback_fullstack(tb)
+                    te_exceptions[i].stack = filter_traceback_fullstack(tb, e)
+                    add_src_note_to_traceback_exception(te_exceptions[i], e)
 
             queue.extend(zip(te_exceptions, exc_exceptions))
 
@@ -303,3 +405,56 @@ def exc_info(exc_or_type: type | BaseException = None,
         exc_or_type, exc, traceback = sys.exc_info()
 
     return exc_or_type, exc, traceback
+
+
+def safe_exec(source: 'str | ReadableBuffer | CodeType',
+              globals_: dict[str, Any] | None = None,
+              locals_: Mapping[str, object] | None = None,
+              /, *,
+              closure: tuple[CellType, ...] | None = None,
+              src_frame: FrameType = None,
+              log_errors: bool = True):
+    """
+    Safely execute a Python source code string in the given environment.
+
+    Args:
+        src (str): The Python source code to execute.
+        globals (dict): The global environment in which to execute the code.
+        locals (dict): The local environment in which to execute the code.
+
+    Raises:
+        Exception: If there is an error during execution.
+    """
+    __traceback_hide__ = True  # noqa: F841
+    __traceback_locals_hide__ = True  # noqa: F841
+    kw = {'closure': closure} if sys.version_info >= (3, 11) else {}
+    try:
+        exec(source, globals_, locals_, **kw)
+    except BaseException as e:
+        e._pyapp_exec_source = source
+        e._pyapp_exec_source_frame = src_frame
+        # the next frame here will just be re-raising, so skip it
+        mark_next_tb_reraise_to_skip(e)
+        if log_errors:
+            try:
+                from pyapp.logging import log_exc
+            except ImportError:
+                pass
+            else:
+                log_exc(e)
+
+        raise e
+
+
+def mark_next_tb_reraise_to_skip(exc: BaseException):
+    """
+    Skip the last re-raise in the traceback of an exception.
+    This is useful for cleaning up tracebacks that have been modified
+    by decorators or other code that re-raises exceptions.
+    """
+    __traceback_hide__ = True  # noqa: F841
+    # the next frame here is just re-raising, so skip it
+    # tb.tb_next = tb.tb_next.tb_next
+    skipset = getattr(exc, '_pyapp_skip_next_reraise', None) or set()
+    skipset.add(id(exc.__traceback__))
+    exc._pyapp_skip_next_reraise = skipset

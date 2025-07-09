@@ -21,6 +21,7 @@ dllerrs
 drivelist
 DriveList
 ENDBRAK
+excnfo
 expandvars
 fdir
 filt
@@ -82,6 +83,7 @@ shiboken
 shibokensupport
 SHLVL
 shsplit
+sigparams
 sinfo
 Spyder
 STARTBRAK
