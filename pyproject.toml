@@ -19,16 +19,21 @@ dependencies = [
   "tqdm",
   "pyside2",
   "types-pyside2",
+]
+
+[project.optional-dependencies]
+qdarkstyle = [
   "qdarkstyle",
 ]
 
 [tool.hatch.build]
 include = [
-  "pyapp/gui/icons/qrc/*.svg",
-  "pyapp/gui/icons/qrc/*.qrc",
   "pyapp/gui/icons/assets/**/*.ttf",
   "pyapp/gui/icons/assets/**/*.json",
   "pyapp/gui/icons/assets/**/LICENSE*",
+  "pyapp/gui/themes/assets/*.qrc",
+  "pyapp/gui/themes/assets/*.svg",
+  "pyapp/gui/themes/assets/*.qss",
 ]
 
 [tool.hatch.version]

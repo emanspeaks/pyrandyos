@@ -323,12 +323,30 @@ def filter_traceback_fullstack(tb: TracebackType, exc: BaseException):
 
 
 def add_src_note_to_traceback_exception(te: TracebackException,
-                                        exc: BaseException):
+                                        exc: BaseException,
+                                        top_te: TracebackException = None):
     src = getattr(exc, '_pyapp_exec_source', None)
     if src:
-        if not te.__notes__:
-            te.__notes__ = []
-        te.__notes__.append("\n<string> code:\n" + indent(src, '    '))
+        if hasattr(te, '__notes__'):
+            noteattr = '__notes__'
+            if not getattr(te, '__notes__', None):
+                notelist = list()
+                te.__notes__ = notelist
+
+        else:
+            te = top_te or te
+            noteattr = '_pyapp_notes'
+
+        notelist = getattr(te, noteattr, None)
+        if notelist is None:
+            notelist = list()
+            setattr(te, noteattr, notelist)
+
+        notelist.append("\n<string> code:\n" + indent(src, '    '))
+
+
+def process_traceback_exception_pyapp_notes(te: TracebackException):
+    return '\n'.join(getattr(te, '_pyapp_notes', ()))
 
 
 def build_traceback_exception(exc: BaseException | TracebackException,
@@ -368,7 +386,7 @@ def build_traceback_exception(exc: BaseException | TracebackException,
             add_src_note_to_traceback_exception(te_context, exc_context)
             queue.append((te_context, exc_context))
 
-        te_exceptions = te.exceptions
+        te_exceptions = getattr(te, 'exceptions', None)
         if te_exceptions:
             exc_exceptions = exc.exceptions
             for i, e in enumerate(exc_exceptions):
@@ -386,7 +404,10 @@ def build_traceback_exception(exc: BaseException | TracebackException,
 
 def format_exc(exc: BaseException, tb: TracebackType = None):
     __traceback_hide__ = True  # noqa: F841
-    return ''.join(build_traceback_exception(exc, tb).format())
+    te = build_traceback_exception(exc, tb)
+    s = ''.join(te.format())
+    s += process_traceback_exception_pyapp_notes(te)
+    return s
 
 
 def exc_info(exc_or_type: type | BaseException = None,

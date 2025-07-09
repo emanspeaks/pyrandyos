@@ -28,9 +28,16 @@ from re import sub, M as re_M
 
 from PySide2.QtGui import QPalette, QColor
 from PySide2.QtWidgets import QApplication
-from qdarkstyle import load_stylesheet as load_dark_stylesheet
+try:
+    from qdarkstyle import load_stylesheet as load_dark_stylesheet  # type: ignore  # noqa: E501
+    HAS_QDARKSTYLE = True
+except ImportError:
+    qdarkstyle = None
+    HAS_QDARKSTYLE = False
+
 
 from ...logging import log_func_call
+from .vibedark import vibedark
 
 # Constant to reference default themes
 DEFAULT_DARK_PALETTE = "Dark"
@@ -45,6 +52,9 @@ def dark(app: QApplication):
     Args:
         app (QApplication): QApplication instance.
     """
+
+    if not HAS_QDARKSTYLE:
+        return vibedark(app)
 
     dark_palette = QPalette()
 

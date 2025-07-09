@@ -18,9 +18,13 @@ QT_RESOURCES_MODULE = f"{__name__}.resources"
 
 
 @log_func_call
-def compile_qrc():
+def compile_qrc(qrcfile: Path = None):
     """Compile the Qt resource file if needed."""
-    qrcfile: Path = PyApp.get(QRC_FILE_KEY, None)
+    if qrcfile:
+        PyApp.set(QRC_FILE_KEY, qrcfile)
+    else:
+        qrcfile: Path = qrcfile or PyApp.get(QRC_FILE_KEY, None)
+
     if not qrcfile:
         return
     if qrcfile and not qrcfile.exists():

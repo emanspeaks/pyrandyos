@@ -63,18 +63,19 @@ def _log_func_call_handler(handler_args: tuple, handler_kwargs: dict,
         try:
             code = func.__code__
             funcname = func.__name__
+            funcargstr = ', '.join(
+                'self' if not i and funcname == '__init__'
+                else repr(arg) for i, arg in enumerate(func_args)
+            )
+            funcargstr += ', ' if func_args and func_kwargs else ''
+            funcargstr += ', '.join(f'{k}={v!r}'
+                                    for k, v in func_kwargs.items())
             _log(
                 log,
                 level,
                 f"{'TRACE: ' if trace_only else ''}"
                 f"Function call: {func.__qualname__}"
-                f"({', '.join(
-                    'self' if not i and funcname == '__init__'
-                    else
-                    repr(arg) for i, arg in enumerate(func_args)
-                )}{', ' if func_args and func_kwargs else ''}"
-                f"{', '.join(f'{k}={v!r}'
-                             for k, v in func_kwargs.items())}) "
+                f"({funcargstr}) "
                 f"{{function defined {code.co_filename}"
                 f"({code.co_firstlineno})}}",
                 # stacklevel=2,
