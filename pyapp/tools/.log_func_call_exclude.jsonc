@@ -17,6 +17,7 @@
     "pyapp/gui/icons/browser/gui/splash.py",
     "pyapp/gui/icons/iconfont/animation.py",
     "pyapp/utils/hash.py",
+    "pyapp/utils/signature_wrapper.py",
     "pyapp/logging.py"//,
   ],
   "exclude_classes": [
