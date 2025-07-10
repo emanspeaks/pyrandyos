@@ -28,7 +28,7 @@ from .sources import THIRDPARTY_FONTSPEC
 _DEFHINT = QFont.PreferDefaultHinting
 
 
-class IconFontCache:
+class IconFontCacheEntry:
     @log_func_call(DEBUGLOW2, trace_only=True)
     def __init__(self):
         self.ttf_data: bytes = None
@@ -41,7 +41,7 @@ class IconFontMeta(type):
     @log_func_call(DEBUGLOW2, trace_only=True)
     def __init__(cls, name, bases, dct):
         super().__init__(name, bases, dct)
-        cls._cache = IconFontCache()
+        cls._cache = IconFontCacheEntry()
 
 
 class IconFont(metaclass=IconFontMeta):
@@ -94,7 +94,7 @@ class IconFont(metaclass=IconFontMeta):
         return rawfont
 
     @classmethod
-    @log_func_call
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def ensure_font_loaded(cls):
         cache = cls._cache
         if cache.id_ is None:
@@ -117,12 +117,12 @@ class IconFont(metaclass=IconFontMeta):
                 )
 
     @classmethod
-    @log_func_call
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def get_codepoint_by_name(cls, icon_name: str):
         return cls.get_spec().charmap.get(icon_name, None)
 
     @classmethod
-    @log_func_call
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def get_glyph(cls, name_or_codepoint: str | int):
         i = name_or_codepoint
         if isinstance(name_or_codepoint, str):

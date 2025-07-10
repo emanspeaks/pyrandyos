@@ -22,6 +22,7 @@
 
 from typing import TYPE_CHECKING
 from importlib import import_module
+from weakref import WeakValueDictionary
 
 from PySide2.QtCore import QRect, Qt, QSizeF, QRectF, QPointF, QSize, QPoint
 from PySide2.QtGui import (
@@ -46,7 +47,7 @@ if TYPE_CHECKING:
 _NOHINT = QFont.PreferNoHinting
 _DEFHINT = QFont.PreferDefaultHinting
 
-IconCache = dict[str, QIcon]
+IconCache = WeakValueDictionary[str, QIcon]
 PaletteType = QPalette.ColorRole | tuple[QPalette.ColorGroup,
                                          QPalette.ColorRole]
 RgbTriple = tuple[int, int, int]
@@ -74,7 +75,7 @@ class IconLayer(TupleHashMixin):
             self._is_disabled_icon,
         )
 
-    @log_func_call(DEBUGLOW2)
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def __init__(
         self,
         font: 'IconFont | type[IconFont] | str',
@@ -333,7 +334,7 @@ class IconStateSpec(TupleHashMixin):
 
 
 class IconSpec(TupleHashMixin):
-    _cache: IconCache = dict()
+    _cache: IconCache = WeakValueDictionary()
 
     def __init__(self, on: IconStateSpec, off: IconStateSpec = None):
         self.on = on
@@ -351,7 +352,7 @@ class IconSpec(TupleHashMixin):
             self.off.as_tuple(),
         )
 
-    @log_func_call
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def icon(self):
         cache = self._cache
         cache_key = self.as_tuple()
