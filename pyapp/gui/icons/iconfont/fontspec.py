@@ -74,6 +74,7 @@ class IconFontSpec(GitDependencySpec):
         self.charmap: CharMap = None
         self.classname: str = None
         self.relative_module_qualname: str = None
+        self._initialized = False
 
     @log_func_call(DEBUGLOW2, trace_only=True)
     def ensure_local_files(self, download_dir: Path = None):
@@ -81,18 +82,20 @@ class IconFontSpec(GitDependencySpec):
         jsonfile = self.charmap_filespec.get_or_download(download_dir)
         return ttffile, jsonfile
 
-    @log_func_call
+    @log_func_call(DEBUGLOW2, trace_only=True)
     def initialize(self, target_relative_class_qualname: str,
                    download_dir: Path = None):
-        tmpmodname = target_relative_class_qualname
-        self.target_relative_class_qualname = tmpmodname
-        self.relative_module_qualname = tmpmodname.lower()
-        self.classname = tmpmodname.replace('.', '_')
+        if not self._initialized:
+            tmpmodname = target_relative_class_qualname
+            self.target_relative_class_qualname = tmpmodname
+            self.relative_module_qualname = tmpmodname.lower()
+            self.classname = tmpmodname.replace('.', '_')
 
-        self.ttf_filespec.classname = self.classname
+            self.ttf_filespec.classname = self.classname
 
-        self.ensure_local_files(download_dir)
-        self.charmap = self.charmap_filespec.load_charmap()
+            self.ensure_local_files(download_dir)
+            self.charmap = self.charmap_filespec.load_charmap()
+            self._initialized = True
 
     @log_func_call(DEBUGLOW2, trace_only=True)
     def relative_class_qualname(self):

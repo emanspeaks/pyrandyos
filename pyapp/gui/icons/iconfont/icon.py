@@ -110,7 +110,11 @@ class IconLayer(TupleHashMixin):
         if not glyph:
             if glyph_name:
                 glyph = font.get_codepoint_by_name(glyph_name)
-
+                if not glyph:
+                    raise ValueError(
+                        f"Glyph name '{glyph_name}' not found in "
+                        f"font {font._SPECNAME}."
+                    )
             else:
                 raise ValueError(
                     "Either 'glyph' or 'glyph_name' must be specified."

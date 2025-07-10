@@ -149,8 +149,9 @@ def get_framesummary_for_frame(f: FrameType, tb: TracebackType = None,
         if lineno2 is not None:
             lineno = lineno2
 
-    line = getcachedline(filename, lineno) or (src.splitlines()[lineno - 1]
-                                               if src else '<unknown source>')
+    line = ((src.splitlines()[lineno - 1] if src else '<unknown source>')
+            if filename == '<string>' else
+            getcachedline(filename, lineno))
     if underlines:
         # I like seeing the underlines in the tracebacks, but if the issue is
         # the entire line, it doesn't print them.  As a hack, just lop off the

@@ -1,0 +1,108 @@
+{
+  "_comment": "Icon mapping for QProxyStyle theming - organized by Qt element types",
+
+  "standard_pixmaps": {
+    "SP_ArrowUp": {
+      "fontspec_name": "Material6",
+      "icon_name": "chevron-up"
+    },
+    "SP_ArrowDown": {
+      "fontspec_name": "Material6",
+      "icon_name": "chevron-down"
+    },
+    "SP_ArrowLeft": {
+      "fontspec_name": "Material6",
+      "icon_name": "chevron-left"
+    },
+    "SP_ArrowRight": {
+      "fontspec_name": "Material6",
+      "icon_name": "chevron-right"
+    },
+    "SP_ArrowBack": {
+      "fontspec_name": "Material6",
+      "icon_name": "chevron-left"
+    },
+    "SP_ArrowForward": {
+      "fontspec_name": "Material6",
+      "icon_name": "chevron-right"
+    }
+  },
+
+  "primitive_elements": {
+    "PE_IndicatorCheckBox": {
+      "unchecked": {
+        "fontspec_name": "Material6",
+        "icon_name": "checkbox-blank-outline"
+      },
+      "checked": {
+        "fontspec_name": "Material6",
+        "icon_name": "checkbox-marked"
+      },
+      "indeterminate": {
+        "fontspec_name": "Material6",
+        "icon_name": "checkbox-intermediate"
+      }
+    },
+    "PE_IndicatorRadioButton": {
+      "unchecked": {
+        "fontspec_name": "Material6",
+        "icon_name": "radiobox-blank"
+      },
+      "checked": {
+        "fontspec_name": "Material6",
+        "icon_name": "radiobox-marked"
+      }
+    },
+    "PE_IndicatorBranch": {
+      "closed": {
+        "fontspec_name": "Material6",
+        "icon_name": "chevron-right"
+      },
+      "open": {
+        "fontspec_name": "Material6",
+        "icon_name": "chevron-down"
+      }
+    }
+  },
+
+  "complex_controls": {
+    "CC_ComboBox": {
+      "SC_ComboBoxArrow": {
+        "fontspec_name": "Material6",
+        "icon_name": "chevron-down"
+      }
+    },
+    "CC_SpinBox": {
+      "SC_SpinBoxUp": {
+        "fontspec_name": "Material6",
+        "icon_name": "chevron-up"
+      },
+      "SC_SpinBoxDown": {
+        "fontspec_name": "Material6",
+        "icon_name": "chevron-down"
+      }
+    },
+    "CC_ScrollBar": {
+      "SC_ScrollBarAddLine": {
+        "horizontal": {
+          "fontspec_name": "Material6",
+          "icon_name": "chevron-right"
+        },
+        "vertical": {
+          "fontspec_name": "Material6",
+          "icon_name": "chevron-down"
+        }
+      },
+      "SC_ScrollBarSubLine": {
+        "horizontal": {
+          "fontspec_name": "Material6",
+          "icon_name": "chevron-left"
+        },
+        "vertical": {
+          "fontspec_name": "Material6",
+          "icon_name": "chevron-up"
+        }
+      }
+    }
+  }
+}

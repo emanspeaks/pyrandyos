@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from pathlib import Path
 from collections.abc import Callable
 from contextlib import contextmanager
@@ -9,8 +10,9 @@ from PySide2.QtWidgets import (
     QToolButton, QSlider, QWidget, QAction, QSizePolicy,
 )
 
-from .abc import QtWidgetWrapper
 from ..logging import log_func_call
+if TYPE_CHECKING:
+    from .abc import QtWidgetWrapper
 
 
 @log_func_call
@@ -19,7 +21,7 @@ def load_icon(icon_path: str | Path) -> QIcon:
 
 
 @log_func_call
-def create_toolbtn(parent: QtWidgetWrapper | QWidget,
+def create_toolbtn(parent: 'QtWidgetWrapper | QWidget',
                    callback: Callable = None,
                    sustain: bool = False, sus_repeat_interval_ms: int = 33,
                    sus_delay_ms: int = 0, toggleable: bool = False,
@@ -44,7 +46,7 @@ def create_toolbtn(parent: QtWidgetWrapper | QWidget,
 
 
 @log_func_call
-def create_icon_toolbtn(parent: QtWidgetWrapper | QWidget, size: QSize,
+def create_icon_toolbtn(parent: 'QtWidgetWrapper | QWidget', size: QSize,
                         icon: QIcon | str | Path,
                         callback: Callable = None,
                         sustain: bool = False,
@@ -63,7 +65,7 @@ def create_icon_toolbtn(parent: QtWidgetWrapper | QWidget, size: QSize,
 
 
 @log_func_call
-def create_text_toolbtn(parent: QtWidgetWrapper | QWidget, text: str,
+def create_text_toolbtn(parent: 'QtWidgetWrapper | QWidget', text: str,
                         callback: Callable = None,
                         sustain: bool = False,
                         sus_repeat_interval_ms: int = 33,
@@ -77,7 +79,7 @@ def create_text_toolbtn(parent: QtWidgetWrapper | QWidget, text: str,
 
 
 @log_func_call
-def create_slider(parent: QtWidgetWrapper | QWidget, min_value: int,
+def create_slider(parent: 'QtWidgetWrapper | QWidget', min_value: int,
                   max_value: int, value: int, callback: Callable = None):
     slide = QSlider(parent if isinstance(parent, QWidget) else parent.qtroot)
     slide.setMinimum(min_value)
@@ -93,7 +95,7 @@ def create_slider(parent: QtWidgetWrapper | QWidget, min_value: int,
 
 
 @log_func_call
-def create_action(parent: QtWidgetWrapper | QWidget, text: str = "",
+def create_action(parent: 'QtWidgetWrapper | QWidget', text: str = "",
                   icon: QIcon | str | Path = None,
                   callback: Callable = None, enabled: bool = True):
     action = QAction(parent if isinstance(parent, QWidget)
@@ -132,20 +134,15 @@ def painter_context(painter: QPainter):
 
 def qicon_to_data_uri(icon: QIcon, size: QSize) -> str:
     """Convert QIcon to data URI"""
-    try:
-        # Get pixmap from icon
-        pixmap = icon.pixmap(size)
+    # Get pixmap from icon
+    pixmap = icon.pixmap(size)
 
-        # Convert to PNG bytes
-        byte_array = QByteArray()
-        buffer = QBuffer(byte_array)
-        buffer.open(QBuffer.WriteOnly)
-        pixmap.save(buffer, "PNG")
+    # Convert to PNG bytes
+    byte_array = QByteArray()
+    buffer = QBuffer(byte_array)
+    buffer.open(QBuffer.WriteOnly)
+    pixmap.save(buffer, "PNG")
 
-        # Encode as base64 data URI
-        png_data = b64encode(byte_array.data()).decode('ascii')
-        return f"data:image/png;base64,{png_data}"
-
-    except Exception as e:
-        print(f"Warning: Could not convert icon to data URI: {e}")
-        return ""
+    # Encode as base64 data URI
+    png_data = b64encode(byte_array.data()).decode('ascii')
+    return f"data:image/png;base64,{png_data}"

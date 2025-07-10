@@ -34,6 +34,7 @@ include = [
   "pyapp/gui/themes/assets/*.qrc",
   "pyapp/gui/themes/assets/*.svg",
   "pyapp/gui/themes/assets/*.qss",
+  "pyapp/gui/themes/assets/*.json",
 ]
 
 [tool.hatch.version]

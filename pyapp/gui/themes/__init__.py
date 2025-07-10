@@ -3,8 +3,7 @@ from collections.abc import Callable
 from PySide2.QtWidgets import QApplication
 
 from ...logging import log_func_call
-from .vibedark import vibedark
-from .styles import dark, light, DEFAULT_DARK_PALETTE, DEFAULT_LIGHT_PALETTE
+from .styles import dark, light, vibedark, HAS_QDARKSTYLE
 
 DEFAULT_THEME_NAME = '(default)'
 STATUS_LABEL = 'status_label'  # used in stylesheet for status label
@@ -26,8 +25,8 @@ class ThemeMap:
 
     @log_func_call
     def init_themes(self):
-        self.create_theme(DEFAULT_LIGHT_PALETTE, light)
-        self.create_theme(DEFAULT_DARK_PALETTE, dark)
+        self.create_theme('light', light)
+        self.create_theme('dark', dark if HAS_QDARKSTYLE else vibedark)
         self.create_theme('vibedark', vibedark)
 
     @log_func_call
@@ -44,8 +43,14 @@ class ThemeMap:
         return self.__current
 
     @log_func_call
-    def list_themes(self):
-        return list(self.__custom_themes.keys())
+    def list_themes(self, always_include_dark: bool = True,
+                    include_default: bool = True):
+        tmp = list(self.__custom_themes.keys())
+        if not HAS_QDARKSTYLE and not always_include_dark and 'dark' in tmp:
+            tmp.remove('dark')
+        if include_default and DEFAULT_THEME_NAME not in tmp:
+            tmp.append(DEFAULT_THEME_NAME)
+        return tmp
 
     @classmethod
     @log_func_call

@@ -20,6 +20,7 @@ debugfmtstr
 dllerrs
 drivelist
 DriveList
+Duquesnoy
 ENDBRAK
 excnfo
 expandvars
@@ -36,6 +37,7 @@ indata
 inittmp
 inquote
 ipynb
+ispec
 jdumps
 klass
 lastc
@@ -54,6 +56,7 @@ NOHINT
 nrows
 octoface
 outf
+Pizetta
 ppath
 pyapp
 PyApp
@@ -72,6 +75,7 @@ qicon
 QIconFont
 QLCD
 qproperty
+QPROXYSTYLE
 qrcfile
 qresource
 qsplitter
@@ -83,6 +87,7 @@ qtwin
 qtwindow
 RBAR
 repr
+scroller
 shcore
 shiboken
 shibokensupport
@@ -110,4 +115,5 @@ vflip
 vint
 VSCode
 vscode-codicons
+waivable
 ymdhms
