@@ -44,7 +44,7 @@ def vibedark(app: QApplication):
                      QColor(127, 127, 127))
 
     # qss_file = ASSETS_DIR/"vibedark.qss"
-    qss_file = ASSETS_DIR/"vibedark-old.qss"
+    qss_file = ASSETS_DIR/"vibedark.qss"
     # qss = merge_qss_icons(read_text_utf8(qss_file))
     qss = read_text_utf8(qss_file)
 
