@@ -35,7 +35,7 @@ except ImportError:
     qdarkstyle = None
     HAS_QDARKSTYLE = False
 
-from ....logging import log_func_call
+from ....logging import log_func_call, get_logger
 from .vibedark import vibedark
 
 
@@ -49,6 +49,8 @@ def dark(app: QApplication):
     """
 
     if not HAS_QDARKSTYLE:
+        get_logger().warning("QDarkStyle is not installed. "
+                             "Downmoding to VibeDark")
         return vibedark(app)
 
     dark_palette = QPalette()

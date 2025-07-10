@@ -26,7 +26,7 @@ class ThemeMap:
     @log_func_call
     def init_themes(self):
         self.create_theme('light', light)
-        self.create_theme('dark', dark if HAS_QDARKSTYLE else vibedark)
+        self.create_theme('dark', dark)
         self.create_theme('vibedark', vibedark)
 
     @log_func_call
@@ -43,7 +43,7 @@ class ThemeMap:
         return self.__current
 
     @log_func_call
-    def list_themes(self, always_include_dark: bool = True,
+    def list_themes(self, always_include_dark: bool = False,
                     include_default: bool = True):
         tmp = list(self.__custom_themes.keys())
         if not HAS_QDARKSTYLE and not always_include_dark and 'dark' in tmp:

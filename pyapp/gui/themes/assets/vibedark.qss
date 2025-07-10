@@ -180,6 +180,8 @@ QComboBox {
     border: 1px solid #444a5a;
     border-radius: 4px;
     padding: 4px 8px;
+    selection-background-color: #2a82da;
+    selection-color: #fff;
 }
 QComboBox:focus {
     border: 1.5px solid #2a82da;
@@ -188,8 +190,8 @@ QComboBox QAbstractItemView {
     background: #232323;
     color: #f0f0f0;
     border: 1px solid #2a82da;
-    selection-background-color: #2a82da;
-    selection-color: #fff;
+    /* selection-background-color: #2a82da;
+    selection-color: #fff; */
 }
 QComboBox::drop-down {
     background: #232323;
