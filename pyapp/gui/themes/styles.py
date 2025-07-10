@@ -35,7 +35,6 @@ except ImportError:
     qdarkstyle = None
     HAS_QDARKSTYLE = False
 
-
 from ...logging import log_func_call
 from .vibedark import vibedark
 

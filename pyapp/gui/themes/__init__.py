@@ -3,7 +3,7 @@ from collections.abc import Callable
 from PySide2.QtWidgets import QApplication
 
 from ...logging import log_func_call
-# from .dark import dark_theme
+from .vibedark import vibedark
 from .styles import dark, light, DEFAULT_DARK_PALETTE, DEFAULT_LIGHT_PALETTE
 
 DEFAULT_THEME_NAME = '(default)'
@@ -28,6 +28,7 @@ class ThemeMap:
     def init_themes(self):
         self.create_theme(DEFAULT_LIGHT_PALETTE, light)
         self.create_theme(DEFAULT_DARK_PALETTE, dark)
+        self.create_theme('vibedark', vibedark)
 
     @log_func_call
     def apply_theme(self, name: str = None):
