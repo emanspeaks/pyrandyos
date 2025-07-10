@@ -1,9 +1,10 @@
 from pathlib import Path
 from collections.abc import Callable
 from contextlib import contextmanager
+from base64 import b64encode
 
 from PySide2.QtGui import QIcon, QPainter
-from PySide2.QtCore import QSize
+from PySide2.QtCore import QSize, QByteArray, QBuffer
 from PySide2.QtWidgets import (
     QToolButton, QSlider, QWidget, QAction, QSizePolicy,
 )
@@ -127,3 +128,24 @@ def painter_context(painter: QPainter):
         yield painter
     finally:
         painter.restore()
+
+
+def qicon_to_data_uri(icon: QIcon, size: QSize) -> str:
+    """Convert QIcon to data URI"""
+    try:
+        # Get pixmap from icon
+        pixmap = icon.pixmap(size)
+
+        # Convert to PNG bytes
+        byte_array = QByteArray()
+        buffer = QBuffer(byte_array)
+        buffer.open(QBuffer.WriteOnly)
+        pixmap.save(buffer, "PNG")
+
+        # Encode as base64 data URI
+        png_data = b64encode(byte_array.data()).decode('ascii')
+        return f"data:image/png;base64,{png_data}"
+
+    except Exception as e:
+        print(f"Warning: Could not convert icon to data URI: {e}")
+        return ""

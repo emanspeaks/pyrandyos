@@ -1477,7 +1477,7 @@ QLineEdit:selected {
   color: #455364;
 }
 
-/* QTabWiget --------------------------------------------------------------
+/* QTabWidget --------------------------------------------------------------
 
 https://doc.qt.io/qt-5/stylesheet-examples.html#customizing-qtabwidget-and-qtabbar
 
@@ -1746,7 +1746,7 @@ QTabBar QToolButton::right-arrow:enabled, QDockWidget QTabBar QToolButton::right
 QTabBar QToolButton::right-arrow:disabled, QDockWidget QTabBar QToolButton::right-arrow:disabled {
 }
 
-/* QDockWiget -------------------------------------------------------------
+/* QDockWidget -------------------------------------------------------------
 
 --------------------------------------------------------------------------- */
 QDockWidget {
