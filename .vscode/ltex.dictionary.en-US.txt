@@ -106,6 +106,7 @@ tnew
 toolbtn
 tqdm
 ttffile
+txtbox
 UNC
 UNCs
 unpolish

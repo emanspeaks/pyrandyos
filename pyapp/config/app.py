@@ -20,7 +20,7 @@ from .keys import (
     BASE_LOG_DIR_KEY, BASE_PATH_KEY, LOG_TIMESTAMP_KEY,
     APPEND_LOG_KEY, CLI_LOG_LEVEL_KEY, get_path_keys, BASE_LOG_PATH_KEY,
     FILE_LOG_LEVEL_KEY, ABS_BASE_PATH_KEY, LOG_TRACE_ENABLED_KEY,
-    SHOW_TRACEBACK_LOCALS_KEY,
+    SHOW_TRACEBACK_LOCALS_KEY, LOG_FUNC_CALL_ENABLED_KEY,
 )
 from .expandutils import expand_key_recursively
 
@@ -211,6 +211,8 @@ class AppConfig(metaclass=AppConfigType):
         expand_key_recursively(config, CLI_LOG_LEVEL_KEY, skip_expansion)
         expand_key_recursively(config, FILE_LOG_LEVEL_KEY, skip_expansion)
         expand_key_recursively(config, LOG_TRACE_ENABLED_KEY, skip_expansion)
+        expand_key_recursively(config, LOG_FUNC_CALL_ENABLED_KEY,
+                               skip_expansion)
         expand_key_recursively(config, SHOW_TRACEBACK_LOCALS_KEY,
                                skip_expansion)
         base_path = get_expanded_pathobj(config[BASE_PATH_KEY], config)
@@ -220,10 +222,12 @@ class AppConfig(metaclass=AppConfigType):
         cli_log_level = config_dict_get(config, CLI_LOG_LEVEL_KEY)
         file_log_level = config_dict_get(config, FILE_LOG_LEVEL_KEY)
         log_trace_enabled = config_dict_get(config, LOG_TRACE_ENABLED_KEY)
+        log_func_call_enabled = config_dict_get(config,
+                                                LOG_FUNC_CALL_ENABLED_KEY)
         tb_locals_enabled = config_dict_get(config, SHOW_TRACEBACK_LOCALS_KEY)
         return (cls.handle_path(logdir, base_path), timestamp_name,
                 append_log, cli_log_level, file_log_level, log_trace_enabled,
-                tb_locals_enabled)
+                tb_locals_enabled, log_func_call_enabled)
 
     @classmethod
     @log_func_call

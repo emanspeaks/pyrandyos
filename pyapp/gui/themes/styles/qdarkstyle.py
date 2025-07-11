@@ -32,15 +32,17 @@ try:
     from qdarkstyle import load_stylesheet as load_dark_stylesheet  # type: ignore  # noqa: E501
     HAS_QDARKSTYLE = True
 except ImportError:
-    qdarkstyle = None
+    def load_dark_stylesheet():
+        pass
+
     HAS_QDARKSTYLE = False
 
-from ....logging import log_func_call
+from ....logging import log_func_call, get_logger
 from .vibedark import vibedark
 
 
 @log_func_call
-def dark(app: QApplication):
+def qdarkstyle(app: QApplication):
     """
     Apply dark theme to the Qt application instance.
 
@@ -49,6 +51,8 @@ def dark(app: QApplication):
     """
 
     if not HAS_QDARKSTYLE:
+        get_logger().warning("QDarkStyle is not installed. "
+                             "Downmoding to VibeDark")
         return vibedark(app)
 
     dark_palette = QPalette()

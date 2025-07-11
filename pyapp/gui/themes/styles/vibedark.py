@@ -2,11 +2,15 @@ from pathlib import Path
 
 from PySide2.QtWidgets import QApplication
 from PySide2.QtGui import QPalette, QColor
+# from PySide2.QtCore import QSize
 
 from ....logging import log_func_call
 from ....utils.encoding import read_text_utf8
+# from ....utils.json import load_jsonc
 # from ..proxies import create_themed_proxy_style
 from ...icons.iconfont.icon import IconSpec
+# from ...utils import qicon_to_data_uri
+# from ..qss import merge_qss_properties
 
 ASSETS_DIR = Path(__file__).parent.parent / "assets"
 
@@ -46,8 +50,8 @@ def vibedark(app: QApplication):
 
     # qss_file = ASSETS_DIR/"vibedark.qss"
     qss_file = ASSETS_DIR/"vibedark.qss"
-    # qss = merge_qss_icons(read_text_utf8(qss_file))
     qss = read_text_utf8(qss_file)
+    # qss = merge_qss_icons(qss)
 
     # qss_dump = PyApp.mkdir_temp()/'vibedark-full.qss'
     # qss_dump.write_text(qss, encoding='utf-8')

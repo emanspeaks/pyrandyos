@@ -73,6 +73,7 @@ class IconFontSpec(GitDependencySpec):
         self.solid = solid
         self.charmap: CharMap = None
         self.classname: str = None
+        self.shortname: str = None
         self.relative_module_qualname: str = None
         self._initialized = False
 
@@ -89,9 +90,14 @@ class IconFontSpec(GitDependencySpec):
             tmpmodname = target_relative_class_qualname
             self.target_relative_class_qualname = tmpmodname
             self.relative_module_qualname = tmpmodname.lower()
-            self.classname = tmpmodname.replace('.', '_')
-
-            self.ttf_filespec.classname = self.classname
+            tmpmodname_parts = tmpmodname.split('.')
+            classname = '_'.join(tmpmodname_parts)
+            self.classname = classname
+            # self.ttf_filespec.classname = classname
+            shortnameparts = tmpmodname_parts.copy()
+            if len(shortnameparts) > 1:
+                shortnameparts[-1] = shortnameparts[-1][0]
+            self.shortname = '_'.join(shortnameparts).lower()
 
             self.ensure_local_files(download_dir)
             self.charmap = self.charmap_filespec.load_charmap()

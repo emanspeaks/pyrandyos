@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from base64 import b64encode
 
 from PySide2.QtGui import QIcon, QPainter
-from PySide2.QtCore import QSize, QByteArray, QBuffer
+from PySide2.QtCore import QSize, QByteArray, QBuffer, Qt
 from PySide2.QtWidgets import (
     QToolButton, QSlider, QWidget, QAction, QSizePolicy,
 )
@@ -95,13 +95,22 @@ def create_slider(parent: 'QtWidgetWrapper | QWidget', min_value: int,
 
 
 @log_func_call
+def show_toolbtn_icon_and_text(btn: QToolButton):
+    btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+
+
+@log_func_call
 def create_action(parent: 'QtWidgetWrapper | QWidget', text: str = "",
                   icon: QIcon | str | Path = None,
-                  callback: Callable = None, enabled: bool = True):
+                  callback: Callable = None, enabled: bool = True,
+                  tooltip: str = None):
     action = QAction(parent if isinstance(parent, QWidget)
                      else parent.qtroot)
     if text:
-        action.setText(text)
+        action.setIconText(text)
+
+    if tooltip:
+        action.setToolTip(tooltip)
 
     if icon:
         if not isinstance(icon, QIcon):
@@ -117,9 +126,14 @@ def create_action(parent: 'QtWidgetWrapper | QWidget', text: str = "",
 
 
 @log_func_call
+def set_widget_sizepolicy_expanding(w: QWidget):
+    w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+
+
+@log_func_call
 def create_toolbar_expanding_spacer():
     spacer = QWidget()
-    spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+    set_widget_sizepolicy_expanding(spacer)
     return spacer
 
 
