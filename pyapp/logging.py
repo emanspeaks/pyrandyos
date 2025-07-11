@@ -4,7 +4,7 @@ from typing import (
     TypeVar as _TypeVar, overload as _overload, Any as _Any
 )
 from types import TracebackType as _TracebackType
-from collections.abc import Callable as _Callable
+from collections.abc import Callable as _Callable, Mapping as _Mapping
 # want to export these for convenience, so they are not hidden by default
 from logging import (  # noqa: F401
     getLogger as _getLogger, WARN, ERROR, DEBUG, INFO, CRITICAL, WARNING,
@@ -18,7 +18,8 @@ from .utils.signature_wrapper import (
 from ._testing.debug import is_debug_enabled
 from .utils.stack import (
     exc_info as _exc_info, log_find_caller as _find_caller,
-    format_exc as _format_exc, get_stack_frame as _get_stack_frame
+    format_exc as _format_exc, get_stack_frame as _get_stack_frame,
+    ExcInfoType as _ExcInfoType,
 )
 
 
@@ -43,14 +44,23 @@ TRACELOG: bool = False
 FUNCCALLLOG: bool = False
 
 
-def get_logger(modname: str = None) -> Logger:
+def get_logger(modname: str = None, stacklevel: int = 2) -> Logger:
     __traceback_hide__ = True  # noqa: F841
-    modname = modname or _get_stack_frame(2).f_globals['__name__']
+    modname = modname or _get_stack_frame(stacklevel).f_globals['__name__']
 
     log = None
     # if _AppConfig:
     #     log = _AppConfig.log
     return log or _getLogger(modname)
+
+
+def log_message(level: int | str, msg: str, *args,
+                exc_info: _ExcInfoType = None,
+                extra: _Mapping[str, object] = None, stack_info: bool = False,
+                stacklevel: int = 1):
+    _log(get_logger(stacklevel=stacklevel + 2), level, msg, *args,
+         exc_info=exc_info, extra=extra, stack_info=stack_info,
+         stacklevel=stacklevel + 1)
 
 
 def _log_func_call_handler(handler_args: tuple, handler_kwargs: dict,
@@ -161,8 +171,9 @@ _sys.excepthook = _log_exc_hook
 # _sys.excepthook = (lambda: None) if is_debug_enabled() else log_exc
 
 
-def _log(log: Logger, level, msg, *args, exc_info=None, extra=None,
-         stack_info=False, stacklevel=1):
+def _log(log: Logger, level: int | str, msg: str, *args,
+         exc_info: _ExcInfoType = None, extra: _Mapping[str, object] = None,
+         stack_info: bool = False, stacklevel: int = 1):
     __traceback_hide__ = True  # noqa: F841
     fn, lno, func, sinfo = _find_caller(stack_info, stacklevel, exc_info)
     record = log.makeRecord(log.name, level, fn, lno, msg, args, exc_info,
