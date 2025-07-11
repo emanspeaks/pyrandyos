@@ -40,6 +40,7 @@ APP_LOG_LEVEL_NAMES = {
 }
 
 TRACELOG: bool = False
+FUNCCALLLOG: bool = False
 
 
 def get_logger(modname: str = None) -> Logger:
@@ -58,7 +59,7 @@ def _log_func_call_handler(handler_args: tuple, handler_kwargs: dict,
     __traceback_hide__ = True  # noqa: F841
     level: str | int = handler_args[0]
     trace_only: bool = handler_kwargs.get('trace_only', False)
-    if not trace_only or get_tracelog():
+    if get_func_call_logging() and (not trace_only or get_tracelog()):
         log = get_logger(func.__module__)
         try:
             code = func.__code__
@@ -114,6 +115,16 @@ def log_func_call(arg, *, trace_only: bool = False):  # noqa: E302
         # Used as @log_func_call(level)
         level = arg
         return log_decorator
+
+
+def set_func_call_logging(enabled: bool = True):
+    global FUNCCALLLOG
+    FUNCCALLLOG = bool(enabled)
+
+
+def get_func_call_logging() -> bool:
+    global FUNCCALLLOG
+    return FUNCCALLLOG
 
 
 def set_trace_logging(enabled: bool = True):

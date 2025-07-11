@@ -4,6 +4,7 @@ from tempfile import gettempdir
 
 from .logging import (
     get_logger, Logger, log_func_call, DEBUGLOW2, set_trace_logging,
+    set_func_call_logging,
 )
 from .config import AppConfig
 from .config.keys import (
@@ -53,12 +54,21 @@ class PyApp(AppConfig):
 
         # setup logging first if necessary:
         if setup_log:
-            (logdir, ts_name, append, cli_log_level, file_log_level,
-             log_trace_enabled, tb_locals_enabled) = cls.expand_log_config()
+            (
+                logdir,
+                ts_name,
+                append,
+                cli_log_level,
+                file_log_level,
+                log_trace_enabled,
+                tb_locals_enabled,
+                log_func_call_enabled,
+            ) = cls.expand_log_config()
             logfile = logfile or create_log_file(logdir, ts_name, append,
                                                  cls.APP_LOG_PREFIX)
 
             set_trace_logging(log_trace_enabled)
+            set_func_call_logging(log_func_call_enabled)
             set_show_traceback_locals(tb_locals_enabled)
             setup_logging(logfile, cli_log_level, file_log_level)
 

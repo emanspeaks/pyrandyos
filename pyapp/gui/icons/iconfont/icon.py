@@ -370,7 +370,38 @@ class IconSpec(TupleHashMixin):
     @classmethod
     @log_func_call(DEBUGLOW2, trace_only=True)
     def generate_iconspec(cls, font: 'IconFont | type[IconFont] | str',
-                          glyph: str | int = None, glyph_name: str = None):
+                          glyph_name: str = None, glyph: str | int = None):
+        """
+        Generate a simple IconSpec object with default settings for the given
+        font and glyph.  Note that one of either `glyph_name` or `glyph` must
+        be provided or a ValueError will be raised.
+
+        Note that if `pyapp.gui.icons.iconfont.init_iconfonts()` has not been
+        called prior to this call, "name" string values cannot be resolved.
+        Only the IconFont subclass for the font or an instance thereof, and the
+        explicit "char" string or integer codepoint, may be passed to this
+        method on early imports.  Otherwise, a IconFontNotInitializedError
+        will be raised.
+
+        Args:
+            font (IconFont | type[IconFont] | str):
+                The font from which the glyph will be retrieved.  This may be
+                the fontspec label as a string, an instance of its `IconFont`
+                subclass, or even just the font's `IconFont` subclass itself.
+            glyph_name (str, optional): The detailed name string of the
+                character as listed in the character map for the font.
+                Defaults to None.
+            glyph (str | int, optional): Either the numeric codepoint or the
+                actual Unicode character to use from the font.
+                Defaults to None.
+
+        Returns:
+            IconSpec: icon spec for the given
+
+        Raises:
+            IconFontNotInitializedError: the given font has not yet been loaded
+            ValueError: incorrect glyph arguments provided
+        """
         return cls(IconStateSpec(IconLayer(font, glyph,
                                            glyph_name=glyph_name)))
 

@@ -7,7 +7,8 @@
   // "append_log": true,
   "tmp_dir": "tmp",
   // "log_trace_enabled": true,
-  "show_traceback_locals": true,
-  // "local.theme": "light"
+  // "show_traceback_locals": true,
+  // "log_func_call_enabled": true,
+  // "local.theme": "light",
   "local.theme": "vibedark"
 }

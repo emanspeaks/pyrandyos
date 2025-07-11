@@ -2,7 +2,7 @@ QToolBar QToolButton {
     background: transparent;
     color: #fff;
     border: none;
-    padding: 4px 8px;
+    /* padding: 4px 8px; */
 }
 QToolBar QToolButton:hover {
     background: #444a5a;
@@ -22,11 +22,6 @@ QLabel#status_label {
 QLabel#status_label:hover {
     background: #2a82da;
     color: #fff;
-}
-QToolTip {
-    color: #ffffff;
-    background-color: #2a82da;
-    border: 1px solid white;
 }
 QTreeView {
     background-color: #232323;
@@ -142,6 +137,9 @@ QLineEdit:focus {
 }
 QLineEdit[readOnly="true"] {
     background: #2d2d2d;
+    color: #888;
+}
+QLineEdit[text=""] {
     color: #888;
 }
 
@@ -417,10 +415,10 @@ QSplitter::handle:vertical {
 /* Tooltips */
 QToolTip {
     color: #ffffff;
-    background-color: #2a82da;
+    background-color: #444a5a;
     border: 1px solid white;
     border-radius: 4px;
-    padding: 4px 8px;
+    /* padding: 4px 8px; */
     font-size: 12px;
 }
 
@@ -430,7 +428,7 @@ QToolTip {
     background: #2d2d2d;
     border-color: #444a5a;
 }
-}
+
 QLineEdit, QTextEdit, QPlainTextEdit {
     background: #232323;
     color: #f0f0f0;
@@ -638,12 +636,4 @@ QCheckBox::indicator:unchecked, QRadioButton::indicator:unchecked {
 
 QSplitter::handle {
     background: #444a5a;
-}
-
-QToolTip {
-    color: #fff;
-    background: #2a82da;
-    border: 1px solid #fff;
-    border-radius: 4px;
-    padding: 4px 8px;
 }
