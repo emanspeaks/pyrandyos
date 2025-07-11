@@ -2,5 +2,9 @@
   <qresource prefix="/icons">
     <file>branch-closed.svg</file>
     <file>branch-open.svg</file>
+    <file>arrow-down.svg</file>
+    <file>arrow-up.svg</file>
+    <file>arrow-left.svg</file>
+    <file>arrow-right.svg</file>
   </qresource>
 </RCC>
