@@ -1,18 +1,28 @@
-from typing import TYPE_CHECKING
 from pathlib import Path
 from collections.abc import Callable
 from contextlib import contextmanager
 from base64 import b64encode
 
-from PySide2.QtGui import QIcon, QPainter
-from PySide2.QtCore import QSize, QByteArray, QBuffer, Qt
-from PySide2.QtWidgets import (
-    QToolButton, QSlider, QWidget, QAction, QSizePolicy,
+from ..logging import log_func_call
+from .widgets import GuiWidget, GuiWidgetView
+from .qt import (
+    QWidget, QToolButton, QSize, QIcon, QAction, QSizePolicy, QPainter,
+    QBuffer, QByteArray, QSlider, Qt,
 )
 
-from ..logging import log_func_call
-if TYPE_CHECKING:
-    from .abc import QtWidgetWrapper
+GuiWidgetParent = QWidget | GuiWidget | GuiWidgetView
+
+
+def get_widget_parent_qtobj(parent: GuiWidgetParent) -> QWidget:
+    """Get the Qt object of the parent widget."""
+    if isinstance(parent, QWidget):
+        return parent
+    elif isinstance(parent, GuiWidget):
+        return parent.view.qtobj
+    elif isinstance(parent, GuiWidgetView):
+        return parent.qtobj
+    else:
+        raise TypeError(f"Unsupported parent type: {type(parent)}")
 
 
 @log_func_call
@@ -21,13 +31,12 @@ def load_icon(icon_path: str | Path) -> QIcon:
 
 
 @log_func_call
-def create_toolbtn(parent: 'QtWidgetWrapper | QWidget',
+def create_toolbtn(parent: GuiWidgetParent,
                    callback: Callable = None,
                    sustain: bool = False, sus_repeat_interval_ms: int = 33,
                    sus_delay_ms: int = 0, toggleable: bool = False,
                    toggle_depressed: bool = False, enabled: bool = True):
-    button = QToolButton(parent if isinstance(parent, QWidget)
-                         else parent.qtroot)
+    button = QToolButton(get_widget_parent_qtobj(parent))
     button.setEnabled(enabled)
     if sustain:
         button.setAutoRepeat(True)
@@ -46,7 +55,7 @@ def create_toolbtn(parent: 'QtWidgetWrapper | QWidget',
 
 
 @log_func_call
-def create_icon_toolbtn(parent: 'QtWidgetWrapper | QWidget', size: QSize,
+def create_icon_toolbtn(parent: GuiWidgetParent, size: QSize,
                         icon: QIcon | str | Path,
                         callback: Callable = None,
                         sustain: bool = False,
@@ -65,7 +74,7 @@ def create_icon_toolbtn(parent: 'QtWidgetWrapper | QWidget', size: QSize,
 
 
 @log_func_call
-def create_text_toolbtn(parent: 'QtWidgetWrapper | QWidget', text: str,
+def create_text_toolbtn(parent: GuiWidgetParent, text: str,
                         callback: Callable = None,
                         sustain: bool = False,
                         sus_repeat_interval_ms: int = 33,
@@ -79,9 +88,9 @@ def create_text_toolbtn(parent: 'QtWidgetWrapper | QWidget', text: str,
 
 
 @log_func_call
-def create_slider(parent: 'QtWidgetWrapper | QWidget', min_value: int,
+def create_slider(parent: GuiWidgetParent, min_value: int,
                   max_value: int, value: int, callback: Callable = None):
-    slide = QSlider(parent if isinstance(parent, QWidget) else parent.qtroot)
+    slide = QSlider(get_widget_parent_qtobj(parent))
     slide.setMinimum(min_value)
     slide.setMaximum(max_value)
     slide.setValue(value)
@@ -100,12 +109,11 @@ def show_toolbtn_icon_and_text(btn: QToolButton):
 
 
 @log_func_call
-def create_action(parent: 'QtWidgetWrapper | QWidget', text: str = "",
+def create_action(parent: GuiWidgetParent, text: str = "",
                   icon: QIcon | str | Path = None,
                   callback: Callable = None, enabled: bool = True,
                   tooltip: str = None):
-    action = QAction(parent if isinstance(parent, QWidget)
-                     else parent.qtroot)
+    action = QAction(get_widget_parent_qtobj(parent))
     if text:
         action.setIconText(text)
 

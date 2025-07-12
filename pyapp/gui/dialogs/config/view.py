@@ -1,37 +1,38 @@
+# from __future__ import annotations
 from typing import TYPE_CHECKING
-
-from PySide2.QtWidgets import (
-    QVBoxLayout, QTreeView, QDialogButtonBox, QAbstractItemView
-)
-from PySide2.QtGui import QStandardItemModel, QStandardItem
 
 from ....logging import log_func_call, DEBUGLOW2
 from ....app import PyApp
-from ...abc import QtDialogWrapper
+from ...qt import (
+    QVBoxLayout, QTreeView, QDialogButtonBox, QAbstractItemView,
+    QStandardItemModel, QStandardItem,
+)
+from .. import GuiDialogView
+
 if TYPE_CHECKING:
-    from .ctrl import ConfigTreeDialog
+    from .pres import ConfigTreeDialog
 
 
-class ConfigTreeView(QtDialogWrapper):
-    @log_func_call
-    def __init__(self, controller: 'ConfigTreeDialog'):
-        super().__init__("Current Configuration", controller)
-        qtwin = self.qtroot
-        qtwin.resize(*PyApp.get_default_win_size())
-        self.layout = QVBoxLayout(qtwin)
+class ConfigTreeDialogView(GuiDialogView['ConfigTreeDialog']):
+    def __init__(self, basetitle: str, presenter: 'ConfigTreeDialog' = None,
+                 *qtobj_args, **qtobj_kwargs):
+        GuiDialogView.__init__(self, basetitle, presenter, *qtobj_args,
+                               **qtobj_kwargs)
+        qtobj = self.qtobj
+        qtobj.resize(*PyApp.get_default_win_size())
+        self.layout = QVBoxLayout(qtobj)
         self.create_tree()
 
-    @log_func_call
     def create_tree(self):
-        qtwin = self.qtroot
+        qtobj = self.qtobj
         layout = self.layout
-        ctrl: ConfigTreeDialog = self.controller
+        pres: 'ConfigTreeDialog' = self.gui_pres
 
         itemmodel = QStandardItemModel()
         itemmodel.setHorizontalHeaderLabels(["Key", "Value"])
         self.itemmodel = itemmodel
 
-        tree = QTreeView(qtwin)
+        tree = QTreeView(qtobj)
         tree.setEditTriggers(QAbstractItemView.NoEditTriggers)
         tree.setModel(itemmodel)
         layout.addWidget(tree)
@@ -40,12 +41,12 @@ class ConfigTreeView(QtDialogWrapper):
         header = tree.header()
         header.setStretchLastSection(True)
 
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok, qtwin)
-        buttons.accepted.connect(qtwin.accept)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok, qtobj)
+        buttons.accepted.connect(qtobj.accept)
         layout.addWidget(buttons)
         self.buttons = buttons
 
-        self.populate_tree(itemmodel, ctrl.get_config())
+        self.populate_tree(itemmodel, pres.get_config())
         tree.expandAll()
         tree.resizeColumnToContents(0)
 

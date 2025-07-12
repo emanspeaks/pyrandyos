@@ -41,10 +41,10 @@ class MainContext:
 
                     # if there is a splash screen, kill it
                     try:
-                        from ..gui.abc import get_gui_app
+                        from ..gui.gui_app import get_gui_app
                         gui_app = get_gui_app()
                         if gui_app:
-                            gui_app.splash.qtroot.hide()
+                            gui_app.splash.gui_view.qtobj.hide()
 
                     except BaseException:
                         pass

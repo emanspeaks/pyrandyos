@@ -82,6 +82,7 @@ qsplitter
 qtapp
 QtAwesome
 qtbasewidget
+qtobj
 qtroot
 qtwin
 qtwindow
@@ -114,6 +115,7 @@ utmain
 venv
 vflip
 vint
+vline
 VSCode
 vscode-codicons
 waivable

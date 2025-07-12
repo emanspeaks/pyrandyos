@@ -6,5 +6,8 @@
     <file>arrow-up.svg</file>
     <file>arrow-left.svg</file>
     <file>arrow-right.svg</file>
+    <file>vline.svg</file>
+    <file>branch-more.svg</file>
+    <file>branch-end.svg</file>
   </qresource>
 </RCC>

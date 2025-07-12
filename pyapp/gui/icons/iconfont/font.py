@@ -20,8 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from PySide2.QtCore import QThread
-from PySide2.QtGui import QFontDatabase, QFont, QRawFont
+from ...qt import QThread, QFontDatabase, QFont, QRawFont
 from ....logging import log_func_call, DEBUGLOW2
 from .sources import THIRDPARTY_FONTSPEC
 

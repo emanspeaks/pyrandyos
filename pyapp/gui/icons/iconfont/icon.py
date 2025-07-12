@@ -24,20 +24,14 @@ from typing import TYPE_CHECKING
 from importlib import import_module
 from weakref import WeakValueDictionary
 
-from PySide2.QtCore import QRect, Qt, QSizeF, QRectF, QPointF, QSize, QPoint
-from PySide2.QtGui import (
-    QPainter, QColor, QTransform, QFont, QRawFont, QImage, QIcon,
-    QIconEngine, QPixmap, QPalette
-)
-# try:
-#     # Needed since `QGlyphRun` is not available for PySide2
-#     # See spyder-ide/qtawesome#210
-#     from qtpy.QtGui import QGlyphRun
-# except ImportError:
-QGlyphRun = None
-
 from ....logging import log_func_call, DEBUGLOW2  # noqa: E402
 from ....utils.hash import TupleHashMixin  # noqa: E402
+from ...gui_app import get_gui_app
+from ...qt import (
+    QRect, Qt, QSizeF, QRectF, QPointF, QSize, QPoint, QPainter, QColor,
+    QTransform, QFont, QRawFont, QImage, QIcon, QIconEngine, QPixmap, QPalette,
+    QGlyphRun,
+)
 from ...utils import painter_context  # noqa: E402
 from .animation import IconAnimation  # noqa: E402
 from .sources import THIRDPARTY_FONTSPEC  # noqa: E402
@@ -159,10 +153,9 @@ class IconLayer(TupleHashMixin):
     def get_color(self):
         color = self.color
         if self.is_palette_color(color):
-            from ...abc import get_qt_app
-            app = get_qt_app()
+            app = get_gui_app()
             if app:
-                palette = app.palette()
+                palette = app.qtobj.palette()
                 color = palette.color(*(color if isinstance(color, tuple)
                                         else (color,)))
             else:

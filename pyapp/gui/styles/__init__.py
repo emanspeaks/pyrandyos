@@ -1,9 +1,11 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from collections.abc import Callable
 
-from PySide2.QtWidgets import QApplication
-
 from ...logging import log_func_call
-from .styles import qdarkstyle, light, vibedark, HAS_QDARKSTYLE
+from .themes import qdarkstyle, light, vibedark, HAS_QDARKSTYLE
+if TYPE_CHECKING:
+    from ..gui_app import QtApp
 
 DEFAULT_THEME_NAME = '(default)'
 STATUS_LABEL = 'status_label'  # used in stylesheet for status label
@@ -11,7 +13,7 @@ STATUS_LABEL = 'status_label'  # used in stylesheet for status label
 
 class ThemeMap:
     @log_func_call
-    def __init__(self, app: QApplication):
+    def __init__(self, app: QtApp):
         self.app = app
         self.__custom_themes: dict[str, Callable] = dict()
         self.__current: str = None
@@ -57,6 +59,6 @@ class ThemeMap:
 
     @classmethod
     @log_func_call
-    def default_theme(cls, app: QApplication):
+    def default_theme(cls, app: QtApp):
         app.setPalette(app.style().standardPalette())
         app.setStyleSheet('')

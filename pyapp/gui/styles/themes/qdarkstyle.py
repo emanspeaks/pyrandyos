@@ -23,11 +23,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from re import sub, M as re_M
 
-from PySide2.QtGui import QPalette, QColor
-from PySide2.QtWidgets import QApplication
 try:
     from qdarkstyle import load_stylesheet as load_dark_stylesheet  # type: ignore  # noqa: E501
     HAS_QDARKSTYLE = True
@@ -37,22 +36,25 @@ except ImportError:
 
     HAS_QDARKSTYLE = False
 
-from ....logging import log_func_call, get_logger
+from ....logging import log_func_call, log_warning
+from ...qt import QPalette, QColor
+if TYPE_CHECKING:
+    from ...gui_app import QtApp
+
 from .vibedark import vibedark
 
 
 @log_func_call
-def qdarkstyle(app: QApplication):
+def qdarkstyle(app: QtApp):
     """
     Apply dark theme to the Qt application instance.
 
     Args:
-        app (QApplication): QApplication instance.
+        app (QtApp): QApplication instance.
     """
 
     if not HAS_QDARKSTYLE:
-        get_logger().warning("QDarkStyle is not installed. "
-                             "Downmoding to VibeDark")
+        log_warning("QDarkStyle is not installed. Downmoding to VibeDark")
         return vibedark(app)
 
     dark_palette = QPalette()

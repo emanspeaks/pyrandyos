@@ -22,12 +22,9 @@
 
 from typing import TYPE_CHECKING
 
-from PySide2.QtCore import QTimer, QRect, QRectF
-from PySide2.QtWidgets import QWidget
-from PySide2.QtGui import QPainter
-
 from ....logging import log_func_call, DEBUGLOW2
 from ....utils.hash import TupleHashMixin
+from ...qt import QTimer, QRect, QRectF, QWidget, QPainter
 if TYPE_CHECKING:
     from .icon import IconLayer
 

@@ -50,6 +50,21 @@ QTreeView::branch:open:hover, QTreeView::branch:closed:hover {
     background: #2a82da;
     border-radius: 4px;
 }
+/* Branch lines - using background images for proper tree structure */
+QTreeView::branch:has-siblings:!adjoins-item {
+    border-image: none;
+    image: url(:/icons/vline.svg);
+}
+QTreeView::branch:has-siblings:adjoins-item {
+    border-image: none;
+    image: url(:/icons/branch-more.svg);
+}
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    border-image: none;
+    image: url(:/icons/branch-end.svg);
+}
+
+/* Branch icons with background cleared */
 QTreeView::branch:open {
     background: transparent;
 }

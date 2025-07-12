@@ -20,7 +20,7 @@ DEFAULTS = {
     LOG_TRACE_ENABLED_KEY: False,
     LOG_FUNC_CALL_ENABLED_KEY: False,
     SHOW_TRACEBACK_LOCALS_KEY: False,
-    QRC_FILE_KEY: f'${{{CONFIG_PACKAGE_DIR_KEY}}}/gui/themes/assets/vibedark.qrc',  # noqa: E501
+    QRC_FILE_KEY: f'${{{CONFIG_PACKAGE_DIR_KEY}}}/gui/styles/assets/vibedark.qrc',  # noqa: E501
 
     LOCAL_CFG_KEY: {
         "theme": "Dark",

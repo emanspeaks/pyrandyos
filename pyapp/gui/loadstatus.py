@@ -1,10 +1,10 @@
-from typing import TYPE_CHECKING, overload, Any, TypeVar
+from typing import overload, Any, TypeVar, TYPE_CHECKING
 from collections.abc import Callable
 from contextlib import contextmanager
 from functools import wraps
 
 if TYPE_CHECKING:
-    from .abc import QtSplashScreen
+    from .splash import GuiSplashScreen
 
 LOAD_STEP_REGISTRY: set[str] = set()
 COMPLETED_LOAD_STEPS: set[str] = set()
@@ -56,10 +56,10 @@ def load_status_step(step_name: str, show_step_start: bool = True,
 def mark_load_step_completed(step_name: str, show_step_name: bool = False,
                              process_events: bool = True):
     if step_name in LOAD_STEP_REGISTRY:
-        from .abc import get_gui_app
         reg = COMPLETED_LOAD_STEPS
         reg.add(step_name)
-        splash: QtSplashScreen = getattr(get_gui_app(), 'splash', None)
+        from .gui_app import get_gui_app
+        splash: GuiSplashScreen = getattr(get_gui_app(), 'splash', None)
         if splash:
             splash.set_progress(value=len(reg),
                                 message=step_name if show_step_name else None,
@@ -69,18 +69,18 @@ def mark_load_step_completed(step_name: str, show_step_name: bool = False,
 def mark_load_step_started(step_name: str, show_step_name: bool = True,
                            process_events: bool = True):
     if step_name in LOAD_STEP_REGISTRY:
-        from .abc import get_gui_app
         reg = STARTED_LOAD_STEPS
         reg.add(step_name)
-        splash: QtSplashScreen = getattr(get_gui_app(), 'splash', None)
+        from .gui_app import get_gui_app
+        splash: GuiSplashScreen = getattr(get_gui_app(), 'splash', None)
         if splash:
             splash.set_progress(message=step_name if show_step_name else None,
                                 process_events=process_events)
 
 
 def splash_message(message: str, process_events: bool = True):
-    from .abc import get_gui_app
-    splash: QtSplashScreen = getattr(get_gui_app(), 'splash', None)
+    from .gui_app import get_gui_app
+    splash: GuiSplashScreen = getattr(get_gui_app(), 'splash', None)
     if splash:
         splash.set_progress(message=message, process_events=process_events)
 

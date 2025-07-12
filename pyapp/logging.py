@@ -11,6 +11,7 @@ from logging import (  # noqa: F401
     Logger,
 )
 from traceback import format_exception_only
+from functools import partial as _partial
 
 from .utils.signature_wrapper import (
     generate_signature_aware_wrapper as _sig_aware_wrapper
@@ -61,6 +62,15 @@ def log_message(level: int | str, msg: str, *args,
     _log(get_logger(stacklevel=stacklevel + 2), level, msg, *args,
          exc_info=exc_info, extra=extra, stack_info=stack_info,
          stacklevel=stacklevel + 1)
+
+
+log_debuglow2 = _partial(log_message, DEBUGLOW2)
+log_debuglow = _partial(log_message, DEBUGLOW)
+log_debug = _partial(log_message, DEBUG)
+log_info = _partial(log_message, INFO)
+log_warning = _partial(log_message, WARNING)
+log_error = _partial(log_message, ERROR)
+log_critical = _partial(log_message, CRITICAL)
 
 
 def _log_func_call_handler(handler_args: tuple, handler_kwargs: dict,
