@@ -31,7 +31,7 @@
 				"name": "PyApp: Icon Browser",
 				"type": "debugpy",
 				"request": "launch",
-				"module": "pyapp",
+				"module": "iconbrowser",
 				"console": "integratedTerminal",
 				"justMyCode": false,
 				"args": [
