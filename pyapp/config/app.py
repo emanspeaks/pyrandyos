@@ -172,13 +172,13 @@ class AppConfig(metaclass=AppConfigType):
                 config_dict_set(config, k, cls.handle_path(v, base_path))
 
         set_trace_logging(config_dict_get(config, LOG_TRACE_ENABLED_KEY,
-                                          case=case))
+                                          case_insensitive=case))
         set_func_call_logging(config_dict_get(config,
                                               LOG_FUNC_CALL_ENABLED_KEY,
-                                              case=case))
+                                              case_insensitive=case))
         set_show_traceback_locals(config_dict_get(config,
                                                   SHOW_TRACEBACK_LOCALS_KEY,
-                                                  case=case))
+                                                  case_insensitive=case))
         return config
 
     @classmethod
