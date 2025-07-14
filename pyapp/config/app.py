@@ -2,7 +2,9 @@ from logging import getLogger, Logger
 from pathlib import Path
 from copy import deepcopy
 
-from ..logging import DEBUGLOW2, log_func_call
+from ..logging import (
+    DEBUGLOW2, log_func_call, set_trace_logging, set_func_call_logging,
+)
 from ..utils.classproperty import classproperty
 from ..utils.paths import (
     get_expanded_pathobj, get_expanded_pureposixpath, pureposixpath_to_pathobj
@@ -14,6 +16,7 @@ from ..utils.cfgdict import (
 from ..utils.constants import NODEFAULT, IS_WIN32
 from ..utils.system import build_cmd_arg_list
 from ..utils.casesafe import casesafe_is_equal, casesafe_value_in_container
+from ..utils.stack import set_show_traceback_locals
 
 from .defaults import get_defaults
 from .keys import (
@@ -168,6 +171,14 @@ class AppConfig(metaclass=AppConfigType):
             if v:
                 config_dict_set(config, k, cls.handle_path(v, base_path))
 
+        set_trace_logging(config_dict_get(config, LOG_TRACE_ENABLED_KEY,
+                                          case=case))
+        set_func_call_logging(config_dict_get(config,
+                                              LOG_FUNC_CALL_ENABLED_KEY,
+                                              case=case))
+        set_show_traceback_locals(config_dict_get(config,
+                                                  SHOW_TRACEBACK_LOCALS_KEY,
+                                                  case=case))
         return config
 
     @classmethod
