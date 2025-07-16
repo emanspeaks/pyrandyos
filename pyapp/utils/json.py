@@ -1,4 +1,3 @@
-# from adat.json
 from json import loads as jloads, JSONDecodeError, dumps as jdumps
 from pathlib import Path
 from types import NoneType
