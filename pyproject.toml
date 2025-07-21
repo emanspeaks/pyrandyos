@@ -26,16 +26,16 @@ qdarkstyle = [
   "qdarkstyle",
 ]
 
-[tool.hatch.build]
-include = [
-  "pyapp/gui/icons/assets/**/*.ttf",
-  "pyapp/gui/icons/assets/**/*.json",
-  "pyapp/gui/icons/assets/**/LICENSE*",
-  "pyapp/gui/styles/assets/*.qrc",
-  "pyapp/gui/styles/assets/*.svg",
-  "pyapp/gui/styles/assets/*.qss",
-  "pyapp/gui/styles/assets/*.json",
-]
+# [tool.hatch.build]
+# include = [
+#   "pyapp/gui/icons/assets/**/*.ttf",
+#   "pyapp/gui/icons/assets/**/*.json",
+#   "pyapp/gui/icons/assets/**/LICENSE*",
+#   "pyapp/gui/styles/assets/*.qrc",
+#   "pyapp/gui/styles/assets/*.svg",
+#   "pyapp/gui/styles/assets/*.qss",
+#   "pyapp/gui/styles/assets/*.json",
+# ]
 
 [tool.hatch.version]
 path = "pyapp/version.py"

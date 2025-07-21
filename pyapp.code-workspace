@@ -28,20 +28,6 @@
 		"version": "0.2.0",
 		"configurations": [
 			{
-				"name": "PyApp: Icon Browser",
-				"type": "debugpy",
-				"request": "launch",
-				"module": "iconbrowser",
-				"console": "integratedTerminal",
-				"justMyCode": false,
-				"args": [
-					"${workspaceFolder:pyapp}/.pyapp_config.jsonc"
-				],
-				"cwd": "${workspaceFolder:pyapp}"//,
-				// "guiEventLoop": "qt"
-				// "stopOnEntry": true
-			},
-			{
 				"name": "PyApp: @log_func_call script",
 				"type": "debugpy",
 				"request": "launch",
