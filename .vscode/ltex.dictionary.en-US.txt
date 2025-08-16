@@ -51,6 +51,7 @@ monkeypatch
 mwview
 mymax
 ncols
+ndigits
 newppp
 NOHINT
 nrows
