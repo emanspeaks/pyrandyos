@@ -23,7 +23,7 @@ DEFAULTS = {
     QRC_FILE_KEY: f'${{{CONFIG_PACKAGE_DIR_KEY}}}/gui/styles/assets/vibedark.qrc',  # noqa: E501
 
     LOCAL_CFG_KEY: {
-        "theme": "Dark",
+        "theme": "vibedark",
         "default_width": 1080,
         "default_height": 720,
     },

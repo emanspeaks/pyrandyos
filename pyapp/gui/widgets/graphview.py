@@ -10,7 +10,7 @@ class GraphViewWidget(QtWidgetWrapper[QGraphicsView]):
         super().__init__(parent, scene)
 
     def create_qtobj(self, scene: QGraphicsScene = None):
-        qtwin = self.gui_parent.gui_view.qtobj
+        qtwin = self.gui_parent.qtobj
 
         scene = scene or QGraphicsScene(qtwin)
         self.scene = scene

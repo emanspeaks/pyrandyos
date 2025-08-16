@@ -18,7 +18,7 @@ def get_widget_parent_qtobj(parent: GuiWidgetParent) -> QWidget:
     if isinstance(parent, QWidget):
         return parent
     elif isinstance(parent, GuiWidget):
-        return parent.view.qtobj
+        return parent.gui_parent.qtobj
     elif isinstance(parent, GuiWidgetView):
         return parent.qtobj
     else:
