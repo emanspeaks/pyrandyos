@@ -1,6 +1,10 @@
+from pathlib import Path
+
 from ....app import PyApp
 from ....logging import log_func_call
+from ....utils.json import save_json, jsonify
 from ...widgets import GuiWindowLikeParentType
+from ...qt import QFileDialog
 from .. import GuiDialog
 from .view import ConfigTreeDialogView
 
@@ -34,3 +38,19 @@ class ConfigTreeDialog(GuiDialog[ConfigTreeDialogView]):
     def create_gui_view(self, basetitle: str, *args,
                         **kwargs) -> ConfigTreeDialogView:
         return ConfigTreeDialogView(basetitle, self, *args, **kwargs)
+
+    def click_save_config(self):
+        qtwin = self.gui_view.qtobj
+        workdir: Path = PyApp['tmp_dir']
+        if not workdir.exists():
+            workdir = Path.cwd()
+
+        new_fn, selected_filter = QFileDialog.getSaveFileName(
+            qtwin, "Save Local Config", str(workdir),
+            "Config Files (*.jsonc, *.json)",
+        )
+        if new_fn:
+            save_json(Path(new_fn), jsonify(PyApp.get_global_config()))
+
+    def click_save_local_config(self):
+        PyApp.save_local_config()

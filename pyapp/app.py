@@ -179,3 +179,13 @@ class PyApp(AppConfig):
     def get_default_win_size(cls):
         return (cls[f'{LOCAL_CFG_KEY}.default_width'],
                 cls[f'{LOCAL_CFG_KEY}.default_height'])
+
+    @classmethod
+    @log_func_call(DEBUGLOW2)
+    def get_local_config(cls, case_insensitive: bool = None):
+        return super().get_local_config(case_insensitive=case_insensitive)
+
+    @classmethod
+    @log_func_call
+    def save_local_config(cls, case_insensitive: bool = None):
+        return super().save_local_config(cls.APP_PATH_KEYS, case_insensitive)

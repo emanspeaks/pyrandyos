@@ -1,0 +1,20 @@
+from pyapp.gui.icons.iconfont import IconSpec, IconLayer, IconStateSpec
+from pyapp.gui.icons.thirdparty.codicons import Codicons
+from pyapp.gui.icons.thirdparty.codicons import names as codicon_names
+
+ConfigLayer = IconLayer(Codicons, codicon_names.json,
+                        x=0, y=0.125, scale=0.5)
+SaveLayer = IconLayer(Codicons, codicon_names.save)
+SaveConfigIcon = IconSpec(IconStateSpec([
+    SaveLayer,
+    ConfigLayer,
+]))
+
+
+HomeLayer = IconLayer(Codicons, codicon_names.home,
+                      x=0, y=0.125, scale=0.5)
+SaveLayer = IconLayer(Codicons, codicon_names.save)
+SaveLocalConfigIcon = IconSpec(IconStateSpec([
+    SaveLayer,
+    HomeLayer,
+]))

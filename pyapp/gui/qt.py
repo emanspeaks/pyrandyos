@@ -61,6 +61,8 @@ from PySide2.QtWidgets import (  # noqa: F401
     QShortcut,
     QFileDialog,
     QStatusBar,
+    QPushButton,
+    QHBoxLayout,
 )
 
 # try:

@@ -5,9 +5,11 @@ from ....logging import log_func_call, DEBUGLOW2
 from ....app import PyApp
 from ...qt import (
     QVBoxLayout, QTreeView, QDialogButtonBox, QAbstractItemView,
-    QStandardItemModel, QStandardItem,
+    QStandardItemModel, QStandardItem, QSize, QHBoxLayout,
 )
+from ...utils import create_icon_button
 from .. import GuiDialogView
+from .icons import SaveLocalConfigIcon, SaveConfigIcon
 
 if TYPE_CHECKING:
     from .pres import ConfigTreeDialog
@@ -41,10 +43,28 @@ class ConfigTreeDialogView(GuiDialogView['ConfigTreeDialog']):
         header = tree.header()
         header.setStretchLastSection(True)
 
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok, qtobj)
-        buttons.accepted.connect(qtobj.accept)
-        layout.addWidget(buttons)
-        self.buttons = buttons
+        hbox = QHBoxLayout()
+        layout.addLayout(hbox)
+
+        savelocalbtn = create_icon_button(qtobj, QSize(32, 32),
+                                          SaveLocalConfigIcon.icon(),
+                                          pres.click_save_local_config,
+                                          "Save Local Config")
+        hbox.addWidget(savelocalbtn)
+        self.savelocalbtn = savelocalbtn
+
+        savecfgbtn = create_icon_button(qtobj, QSize(32, 32),
+                                        SaveConfigIcon.icon(),
+                                        pres.click_save_config,
+                                        "Export Full Config")
+        hbox.addWidget(savecfgbtn)
+        self.savecfgbtn = savecfgbtn
+
+        dlgbuttons = QDialogButtonBox(QDialogButtonBox.Ok, qtobj)
+        dlgbuttons.accepted.connect(qtobj.accept)
+        hbox.addStretch()
+        hbox.addWidget(dlgbuttons)
+        self.dlgbuttons = dlgbuttons
 
         self.populate_tree(itemmodel, pres.get_config())
         tree.expandAll()

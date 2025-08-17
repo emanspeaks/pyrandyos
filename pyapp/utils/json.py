@@ -6,6 +6,7 @@ from re import sub
 from ..logging import log_func_call
 
 JSONTYPES = (str, float, int, bool, list, dict, NoneType)
+JsonDataType = str | float | int | bool | list | dict | NoneType
 
 
 @log_func_call
@@ -88,3 +89,21 @@ def save_json(fn: str | Path, data: dict | list):
         data (dict | list): structured data to convert to JSON.
     """
     fn.write_text(jdumps(data, indent=2))
+
+
+@log_func_call
+def jsonify(data) -> JsonDataType:
+    if isinstance(data, dict):
+        return {k: jsonify(v) for k, v in data.items()}
+
+    elif isinstance(data, list):
+        return [jsonify(item) for item in data]
+
+    elif isinstance(data, (str, float, int, bool)) or data is None:
+        return data
+
+    elif isinstance(data, Path):
+        return data.as_posix()
+
+    else:
+        raise TypeError(f"Type is not JSON serializable: {type(data)}")

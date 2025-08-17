@@ -1,7 +1,7 @@
 from pathlib import Path
 from copy import deepcopy
 
-from ..utils.json import load_jsonc, save_json
+from ..utils.json import load_jsonc, save_json, jsonify
 from ..utils.cfgdict import (
     config_dict_update, config_dict_get, config_dict_set,
 )
@@ -108,6 +108,6 @@ def save_local_config(app_path_keys: tuple = (),
 
     # save the new output local config
     local_cfg_path: Path = AppConfig[LOCAL_CONFIG_FILE_KEY]
-    save_json(local_cfg_path, out)
+    save_json(local_cfg_path, jsonify(out))
     from ..logging import get_logger
     get_logger().info(f'local config saved to {local_cfg_path}')

@@ -17,6 +17,7 @@ dbfile
 dbpath
 dbpaths
 debugfmtstr
+dlgbuttons
 dllerrs
 drivelist
 DriveList
@@ -39,6 +40,7 @@ inquote
 ipynb
 ispec
 jdumps
+jsonify
 klass
 lastc
 levelno
@@ -91,6 +93,9 @@ qtwin
 qtwindow
 RBAR
 repr
+savebtn
+savecfgbtn
+savelocalbtn
 scroller
 shcore
 shiboken
