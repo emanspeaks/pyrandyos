@@ -1,5 +1,5 @@
-def round_half_up(value: float | int | str | None = None,
-                  ndigits: int = 0):
+def round_half_away(value: float | int | str | None = None,
+                    ndigits: int = 0):
     value = float(value)
     sgn = 1 - 2*(value < 0)
     absval = abs(value)
