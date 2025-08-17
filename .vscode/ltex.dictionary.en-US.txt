@@ -54,7 +54,9 @@ ncols
 ndigits
 newppp
 NOHINT
+npdivmod
 nrows
+numpy
 octoface
 outf
 Pizetta

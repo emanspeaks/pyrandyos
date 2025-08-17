@@ -19,6 +19,8 @@ dependencies = [
   "tqdm",
   "pyside2",
   "types-pyside2",
+  "pandas",
+  "numpy",
 ]
 
 [project.optional-dependencies]
