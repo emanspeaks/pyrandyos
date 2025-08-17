@@ -62,7 +62,7 @@ class GuiWindowLike(GuiWidget[GuiWindowLikeViewType],
                  gui_parent: GuiWidgetParentType | None = None,
                  *view_args, **view_kwargs):
         super().__init__(gui_parent, basetitle, *view_args, **view_kwargs)
-        self.gui_view: GuiWindowLikeView
+        # self.gui_view: GuiWindowLikeView
 
     def show(self):
         self.gui_view.show()

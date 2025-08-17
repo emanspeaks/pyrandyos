@@ -29,3 +29,8 @@ class ConfigTreeDialog(GuiDialog[ConfigTreeDialogView]):
         dialog.show()
         dialog.raise_()
         dialog.activateWindow()
+
+    @log_func_call
+    def create_gui_view(self, basetitle: str, *args,
+                        **kwargs) -> ConfigTreeDialogView:
+        return ConfigTreeDialogView(basetitle, self, *args, **kwargs)

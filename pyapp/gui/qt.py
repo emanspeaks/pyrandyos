@@ -59,6 +59,8 @@ from PySide2.QtWidgets import (  # noqa: F401
     QComboBox,
     QLineEdit,
     QShortcut,
+    QFileDialog,
+    QStatusBar,
 )
 
 # try:
