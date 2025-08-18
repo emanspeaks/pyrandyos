@@ -169,7 +169,8 @@ def log_exc(exc_or_type: type | BaseException = None,
 def _log_exc_hook(exc_or_type: type | BaseException = None,
                   exc: BaseException = None,
                   traceback: _TracebackType = None):
-    if not is_debug_enabled():
+    f = _get_stack_frame(2)
+    if not is_debug_enabled() or f.f_code.co_qualname == 'QtApp.notify':
         log_exc(exc_or_type, exc, traceback)
 
     if not getattr(exc, '_pyapp_handled', False):

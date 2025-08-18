@@ -1,6 +1,6 @@
 from sqlite3 import Connection
 
-from ..logging import log_func_call
+from ..logging import log_func_call  # , get_logger
 
 GET_TABLES_QUERY = "select name from sqlite_master where type='table'"
 
@@ -35,7 +35,8 @@ def get_table_fields(db: Connection, table_name: str):
 
 @log_func_call
 def execute_select(db: Connection, table_name: str,
-                   fields: str | list[str] = None, conditions: str = None):
+                   fields: str | list[str] = None, conditions: str = None,
+                   expansions: tuple[str] = ()):
     """
     Execute select for specified fields from a table in the database.
     """
@@ -55,5 +56,9 @@ def execute_select(db: Connection, table_name: str,
     else:
         field_list = '*'
 
-    return db.execute(f"select {field_list} from {table_name!r} "
-                      f"{' ' + conditions if conditions else ''}")
+    query = (f"select {field_list} from {table_name!r} "
+             f"{' ' + conditions if conditions else ''}")
+    # get_logger().debug(f"Executing query: {query} "
+    #                    f"with expansions: {expansions}")
+
+    return db.execute(query, expansions)
