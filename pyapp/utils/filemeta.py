@@ -15,7 +15,8 @@ BULLETSEP = '\n* '
 
 
 @log_func_call
-def filehash(p: Path, blocksize: int = 65536, algorithm: str = 'md5') -> str:
+def filehash(p: Path, *, blocksize: int = 65536,
+             algorithm: str = 'md5') -> str:
     hasher = newhash(algorithm)
     with p.open('rb') as f:
         while chunk := f.read(blocksize):
@@ -222,7 +223,7 @@ def generate_md5sum_file(fset: FileSet, md5file: Path = None,
     relroot = md5file.parent if md5file else base_path
     for f in FileSetTqdm(fset, desc='Generating md5sum file'):
         p = f if f.is_absolute() else base_path/f
-        md5 = filehash(p)  # hardcoding here for `md5sum` compat
+        md5 = filehash(p, algorithm='md5')  # hardcoding for `md5sum` compat
         out += f'{md5}  {p.relative_to(relroot).as_posix()}\n'
 
     if md5file:
@@ -261,7 +262,7 @@ def check_md5sum_file(md5file: Path, base_path: Path = None,
     not_matching = set()
     for f in FileSetTqdm(fset, desc='Checking md5sum file'):
         theirhash = md5data[f]
-        ourhash = filehash(f)
+        ourhash = filehash(f, algorithm='md5')
         if theirhash != ourhash:
             if verbose:
                 print(f'{f} | ours: {ourhash}, theirs: {theirhash}')

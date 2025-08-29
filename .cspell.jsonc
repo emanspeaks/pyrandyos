@@ -24,10 +24,9 @@
     ],
     "allowCompoundWords": true,
     "ignoreWords": [
-        "cfgfile"
+
     ],
     "words": [
-        "jloads",
-        "tmpmodname"
+
     ]
 }

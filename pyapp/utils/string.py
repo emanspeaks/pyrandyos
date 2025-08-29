@@ -52,4 +52,4 @@ def quote_str(s: str):
 
 @log_func_call
 def iterable_max_chars(x: Iterable):
-    return max(len(str(y)) for y in x)
+    return max(len(str(y)) for y in x) if x else 0

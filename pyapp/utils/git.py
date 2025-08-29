@@ -62,7 +62,7 @@ class GitFileSpec:
             if not p.exists():
                 raise FileNotFoundError(f"Failed to find or download {p}")
 
-        if self.md5sum and self.md5sum != filehash(p):
+        if self.md5sum and self.md5sum != filehash(p, algorithm='md5'):
             raise ValueError(f"MD5 checksum does not match for {p}")
         return p
 

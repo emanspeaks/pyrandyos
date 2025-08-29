@@ -102,7 +102,7 @@ def generate_signature_aware_wrapper(func: Callable, arg_handler: Callable,
 
     if e_to_raise:
         try:
-            from pyapp.logging import log_exc
+            from ..logging import log_exc
         except ImportError:
             pass
         else:

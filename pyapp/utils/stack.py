@@ -459,7 +459,7 @@ def safe_exec(source: 'str | ReadableBuffer | CodeType',
         mark_next_tb_reraise_to_skip(e)
         if log_errors:
             try:
-                from pyapp.logging import log_exc
+                from ..logging import log_exc
             except ImportError:
                 pass
             else:

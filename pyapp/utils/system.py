@@ -160,7 +160,7 @@ def get_conda_base_prefix():
     shlvl = environ.get('CONDA_SHLVL')
     assert shlvl, 'Not running in a Conda environment'
     resolved, base = expand_and_check_var_path('CONDA_ROOT')
-    if not resolved and shlvl > 1:
+    if not resolved and int(shlvl) > 1:
         resolved, p = expand_and_check_var_path('CONDA_EXE')
         if resolved:
             base = p.parent.parent  # CONDA_EXE defined as base/Scripts/conda
