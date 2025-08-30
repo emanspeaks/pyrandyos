@@ -63,6 +63,16 @@ from PySide2.QtWidgets import (  # noqa: F401
     QStatusBar,
     QPushButton,
     QHBoxLayout,
+    QMenuBar,
+    QMenu,
+    QStackedWidget,
+    QTextEdit,
+    QSplitter,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QTableWidget,
+    QTableWidgetItem,
+    QHeaderView,
 )
 
 # try:

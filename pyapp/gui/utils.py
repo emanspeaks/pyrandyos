@@ -112,7 +112,7 @@ def show_toolbtn_icon_and_text(btn: QToolButton):
 def create_action(parent: GuiWidgetParent, text: str = "",
                   icon: QIcon | str | Path = None,
                   callback: Callable = None, enabled: bool = True,
-                  tooltip: str = None):
+                  tooltip: str = None, checkable: bool = False):
     action = QAction(get_widget_parent_qtobj(parent))
     if text:
         action.setIconText(text)
@@ -128,6 +128,9 @@ def create_action(parent: GuiWidgetParent, text: str = "",
 
     if callback:
         action.triggered.connect(callback)
+
+    if checkable:
+        action.setCheckable(True)
 
     action.setEnabled(enabled)
     return action

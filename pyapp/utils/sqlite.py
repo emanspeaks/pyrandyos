@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlite3 import Connection
 
 from ..logging import log_func_call  # , get_logger
@@ -62,3 +63,7 @@ def execute_select(db: Connection, table_name: str,
     #                    f"with expansions: {expansions}")
 
     return db.execute(query, expansions)
+
+
+def sql_timestamp_to_datetime(ts: str):
+    return datetime.fromisoformat(ts.replace('Z', '+00:00')) if ts else None

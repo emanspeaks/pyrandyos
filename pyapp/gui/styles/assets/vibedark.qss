@@ -476,7 +476,7 @@ QCheckBox::indicator:indeterminate {
 
 /* QSplitter */
 QSplitter::handle {
-    background: #2a82da;
+    background: #444a5a;
     border-radius: 2px;
 }
 QSplitter::handle:horizontal {
@@ -484,6 +484,9 @@ QSplitter::handle:horizontal {
 }
 QSplitter::handle:vertical {
     height: 6px;
+}
+QSplitter::handle:hover {
+    background: #555b6b;
 }
 
 /* QToolTip */
