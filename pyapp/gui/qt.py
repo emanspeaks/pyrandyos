@@ -74,6 +74,7 @@ from PySide2.QtWidgets import (  # noqa: F401
     QTableWidgetItem,
     QHeaderView,
     QAbstractButton,
+    QMessageBox,
 )
 
 # try:

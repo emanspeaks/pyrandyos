@@ -9,5 +9,9 @@
     <file>vline.svg</file>
     <file>branch-more.svg</file>
     <file>branch-end.svg</file>
+    <file>branch-open-more.svg</file>
+    <file>branch-closed-more.svg</file>
+    <file>branch-open-end.svg</file>
+    <file>branch-closed-end.svg</file>
   </qresource>
 </RCC>
