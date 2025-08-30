@@ -143,14 +143,24 @@ def create_action(parent: GuiWidgetParent, text: str = "",
 
 
 @log_func_call
-def set_widget_sizepolicy_expanding(w: QWidget):
+def set_widget_sizepolicy_h_expanding(w: QWidget):
     w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+
+
+@log_func_call
+def set_widget_sizepolicy_v_expanding(w: QWidget):
+    w.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+
+
+@log_func_call
+def set_widget_sizepolicy_hv_expanding(w: QWidget):
+    w.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
 
 @log_func_call
 def create_toolbar_expanding_spacer():
     spacer = QWidget()
-    set_widget_sizepolicy_expanding(spacer)
+    set_widget_sizepolicy_hv_expanding(spacer)
     return spacer
 
 
