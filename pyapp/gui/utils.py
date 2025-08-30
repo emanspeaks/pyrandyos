@@ -7,7 +7,7 @@ from ..logging import log_func_call
 from .widgets import GuiWidget, GuiWidgetView
 from .qt import (
     QWidget, QToolButton, QSize, QIcon, QAction, QSizePolicy, QPainter,
-    QBuffer, QByteArray, QSlider, Qt, QPushButton
+    QBuffer, QByteArray, QSlider, Qt, QPushButton, QAbstractButton,
 )
 
 GuiWidgetParent = QWidget | GuiWidget | GuiWidgetView
@@ -30,61 +30,67 @@ def load_icon(icon_path: str | Path) -> QIcon:
     return QIcon(Path(icon_path).as_posix())
 
 
-@log_func_call
-def create_toolbtn(parent: GuiWidgetParent,
-                   callback: Callable = None,
-                   sustain: bool = False, sus_repeat_interval_ms: int = 33,
-                   sus_delay_ms: int = 0, toggleable: bool = False,
-                   toggle_depressed: bool = False, enabled: bool = True):
-    button = QToolButton(get_widget_parent_qtobj(parent))
-    button.setEnabled(enabled)
-    if sustain:
-        button.setAutoRepeat(True)
-        button.setAutoRepeatInterval(sus_repeat_interval_ms)
-        button.setAutoRepeatDelay(sus_delay_ms)
+# @log_func_call
+# def create_toolbtn(parent: GuiWidgetParent,
+#                    callback: Callable = None,
+#                    sustain: bool = False, sus_repeat_interval_ms: int = 33,
+#                    sus_delay_ms: int = 0, toggleable: bool = False,
+#                    toggle_depressed: bool = False, enabled: bool = True):
+#     button = QToolButton(get_widget_parent_qtobj(parent))
+#     button.setEnabled(enabled)
+#     if sustain:
+#         button.setAutoRepeat(True)
+#         button.setAutoRepeatInterval(sus_repeat_interval_ms)
+#         button.setAutoRepeatDelay(sus_delay_ms)
 
-    if toggleable:
-        button.setCheckable(True)
-        button.setChecked(toggle_depressed)
+#     if toggleable:
+#         button.setCheckable(True)
+#         button.setChecked(toggle_depressed)
 
-    if callback:
-        signal = button.toggled if toggleable else button.clicked
-        signal.connect(callback)
+#     if callback:
+#         signal = button.toggled if toggleable else button.clicked
+#         signal.connect(callback)
 
-    return button
-
-
-@log_func_call
-def create_icon_toolbtn(parent: GuiWidgetParent, size: QSize,
-                        icon: QIcon | str | Path,
-                        callback: Callable = None,
-                        sustain: bool = False,
-                        sus_repeat_interval_ms: int = 33,
-                        sus_delay_ms: int = 0, toggleable: bool = False,
-                        toggle_depressed: bool = False, enabled: bool = True):
-    if not isinstance(icon, QIcon):
-        icon = load_icon(icon)
-
-    button = create_toolbtn(parent, callback, sustain, sus_repeat_interval_ms,
-                            sus_delay_ms, toggleable, toggle_depressed,
-                            enabled)
-    button.setIcon(icon)
-    button.setIconSize(size)
-    return button
+#     return button
 
 
-@log_func_call
-def create_text_toolbtn(parent: GuiWidgetParent, text: str,
-                        callback: Callable = None,
-                        sustain: bool = False,
-                        sus_repeat_interval_ms: int = 33,
-                        sus_delay_ms: int = 0, toggleable: bool = False,
-                        toggle_depressed: bool = False, enabled: bool = True):
-    button = create_toolbtn(parent, callback, sustain, sus_repeat_interval_ms,
-                            sus_delay_ms, toggleable, toggle_depressed,
-                            enabled)
-    button.setText(text)
-    return button
+# @log_func_call
+# def create_icon_toolbtn(parent: GuiWidgetParent, size: QSize,
+#                         icon: QIcon | str | Path,
+#                         callback: Callable = None,
+#                         sustain: bool = False,
+#                         sus_repeat_interval_ms: int = 33,
+#                         sus_delay_ms: int = 0, toggleable: bool = False,
+#                         toggle_depressed: bool = False,
+#                         enabled: bool = True):
+#     if not isinstance(icon, QIcon):
+#         icon = load_icon(icon)
+
+#     button = create_toolbtn(parent, callback, sustain,
+#                             sus_repeat_interval_ms,
+#                             sus_delay_ms, toggleable, toggle_depressed,
+#                             enabled)
+#     button.setIcon(icon)
+#     button.setIconSize(size)
+#     button.setMinimumHeight(calculate_min_height(button, size))
+#     _debug_dump_icon(icon, size, name=f"toolbtn_{icon}")
+#     return button
+
+
+# @log_func_call
+# def create_text_toolbtn(parent: GuiWidgetParent, text: str,
+#                         callback: Callable = None,
+#                         sustain: bool = False,
+#                         sus_repeat_interval_ms: int = 33,
+#                         sus_delay_ms: int = 0, toggleable: bool = False,
+#                         toggle_depressed: bool = False,
+#                         enabled: bool = True):
+#     button = create_toolbtn(parent, callback, sustain,
+#                             sus_repeat_interval_ms,
+#                             sus_delay_ms, toggleable, toggle_depressed,
+#                             enabled)
+#     button.setText(text)
+#     return button
 
 
 @log_func_call
@@ -214,7 +220,28 @@ def create_icon_button(parent: GuiWidgetParent, size: QSize,
                            enabled)
     button.setIcon(icon)
     button.setIconSize(size)
+    button.setMinimumHeight(calculate_min_height(button, size))
+    # optional debug dump
+    _debug_dump_icon(icon, size, name=caption)
     if caption:
         button.setText(caption)
-
     return button
+
+
+def calculate_min_height(button: QAbstractButton, icon_size: QSize):
+    """Calculate the minimum height for a button to accommodate its icon."""
+    # Ensure the button is tall enough to vertically center the icon.
+    # If the icon size is set explicitly in code (e.g. 32x32), the
+    # QPushButton can be shorter than the icon which makes the icon
+    # appear visually off-center. Set a sensible minimum height that
+    # respects the icon height plus a small vertical padding.
+    return max(button.sizeHint().height(), icon_size.height() + 6)
+
+
+def _debug_dump_icon(icon: QIcon, size: QSize, name: str = None) -> None:
+    from ..app import PyApp
+    if PyApp.get('debug_dump_icons', False):
+        tmpdir = PyApp.mkdir_temp('icons')
+        fname = f"icon_dump_{name or 'icon'}.png"
+        pix = icon.pixmap(size)
+        pix.save(str(tmpdir/fname), "PNG")

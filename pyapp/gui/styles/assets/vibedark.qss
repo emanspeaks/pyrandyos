@@ -1,41 +1,50 @@
 /*
 VibeDark Theme
 Vibe-created and edited by Randy Eckman with the help of Github Copilot Claude Sonnet 4
+
+DESIGN PHILOSOPHY:
+This stylesheet is minimized to work with Qt's palette system. Basic colors (backgrounds,
+text, borders) are handled by the palette (see vibedark.py). QSS focuses only on:
+- Layout properties (padding, margins, border-radius)
+- Interactive states (hover, focus, pressed)
+- Special cases that override palette defaults
 */
 
 /*
-COLOR PALETTE:
---bg-primary: #232323     (main background - dark charcoal)
---bg-secondary: #2d2d2d   (alternate/disabled background)
---bg-hover: #444a5a       (hover states, borders, medium gray)
---bg-selected: #2a82da    (selection, focus, primary blue)
---bg-focus: #232b3a       (focused input background)
---bg-pressed: #1a5a9a     (pressed button state)
+QSS COLOR OVERRIDES - Colors that override the palette for specific purposes:
 
---text-primary: #f0f0f0   (main text - light gray)
---text-secondary: #aaa    (secondary text)
---text-disabled: #888     (disabled text)
---text-white: #fff        (white text on colored backgrounds)
+INTERACTIVE STATE COLORS:
+--bg-hover: #444a5a       (hover states - not provided by palette)
+--bg-focus: #232b3a       (focused input backgrounds - special focus styling)
+--accent-blue: #2a82da    (primary accent - buttons, progress, selections)
+--accent-light: #4fa3f7   (lighter accent - tree selections, combo highlights)
+--accent-muted: #555b6b   (subtle accent - muted elements)
 
---border-default: #444a5a (default borders)
---border-focus: #2a82da   (focused borders)
---border-light: #222      (subtle borders)
+TEXT COLORS:
+--text-white: #ffffff     (white text on colored backgrounds)
+--text-primary: #f0f0f0   (main text color - explicit override of palette)
+--text-contrast: #232323  (dark text on light backgrounds - combo selections)
+--text-disabled: #888     (disabled text - overrides palette for consistency)
+--text-secondary: #aaa    (secondary text - muted information)
 
---accent-blue: #2a82da    (primary accent color)
---accent-light: #4fa3f7   (lighter accent for selections)
---accent-muted: #555b6b   (muted accent for subtle elements)
+BACKGROUND COLORS:
+--bg-primary: #232323       (main background color)
+--bg-secondary: #2d2d2d   (alternate backgrounds - disabled states, alternating rows)
+--separator-light: #6c7485  (toolbar separators - more visible than standard borders)
+
+BORDER COLORS:
+--border-light: #222      (subtle borders - tree views)
+--border-default: #444a5a (medium borders - various elements)
+--border-focus: #2a82da   (focused element borders - same as accent-blue)
 */
 
 /*
-UNIQUE/EXCEPTION COLORS - Colors used outside the standard palette:
---separator-light: #6c7485  (QToolBar::separator - more visible than standard border)
---tooltip-border: white     (QToolTip border - high contrast against dark tooltip)
---disabled-global: #888888  (Global disabled state - same as --text-disabled but explicit)
-
-USAGE NOTES:
-- QComboBox uses custom dropdown selection (cannot inherit base selection styling)
-- QToolBar::separator uses lighter color for better visibility
+SPECIAL CASE NOTES:
+- QComboBox dropdown uses custom selection styling (cannot inherit palette selection)
+- QToolBar::separator uses lighter color for better visibility against dark background
 - QToolTip uses white border for maximum contrast
+- QTreeView uses custom selection colors for better visibility
+- Disabled states use explicit colors for consistency across all widget types
 */
 
 /*
@@ -51,8 +60,10 @@ PADDING PATTERNS:
 --padding-tight: 2px 8px     (status labels)
 --padding-standard: 4px 8px  (input fields, dialog buttons)
 --padding-comfortable: 4px 12px (menu bar items, combobox buttons)
+--padding-menu-bar: 4px      (menu bar items - compact)
 --padding-spacious: 6px 16px  (tabs)
---padding-menu: 6px 24px     (menu items - extra left space for icons)
+--padding-menu: 6px 6px 6px 12px (menu items - compact with extra left space)
+--padding-menu-left: 12px    (menu items - extra left padding for icons)
 
 BORDER WIDTH PATTERNS:
 --border-thin: 1px      (standard borders, most UI elements)
@@ -64,11 +75,7 @@ SIZE PATTERNS:
 --scrollbar-handle-min: 20px (minimum grab area for usability)
 --icon-small: 12x12px        (spinbox arrows)
 --icon-medium: 16x16px       (combobox arrows, checkboxes/radios)
---separator-width: 2px       (toolbar separators)
---splitter-size: 6px         (splitter handle thickness)
-
-MARGIN PATTERNS:
---separator-margin-h: 4px 6px  (horizontal separator spacing)
+--menu-dropdown-min-width: 120px (minimum width for dropdown menus)
 --separator-margin-v: 6px 4px  (vertical separator spacing - swapped)
 --menu-separator-margin: 4px 0 (menu separators)
 --slider-handle-margin: -5px   (handle overlap for proper alignment)
@@ -79,7 +86,8 @@ FONT PATTERNS:
 
 VALUE EXCEPTIONS - Non-color values used outside standard patterns:
 --zero-margin: 0px              (scrollbar margin reset)
---zero-border: none             (removing default borders)
+--zero-border: none             (removing default borders, transparent backgrounds)
+--transparent: transparent      (removing backgrounds)
 --dropdown-width: 24px          (combobox dropdown button width)
 --menu-separator-height: 1px    (menu separator line thickness)
 --progress-height: 18px         (progress bar standard height)
@@ -89,73 +97,59 @@ VALUE EXCEPTIONS - Non-color values used outside standard patterns:
 --text-spacing: 8px             (spacing between checkbox/radio and text)
 --slider-groove-height: 6px     (horizontal slider groove thickness)
 --slider-groove-width: 6px      (vertical slider groove thickness)
+--slider-groove-radius: 3px     (slider groove - slightly smaller than medium)
 --slider-handle-size: 16px      (slider handle dimensions)
+--slider-handle-margin: -5px    (handle overlap for proper alignment)
 --icon-size: 16px               (menu icon size override)
+--icon-small: 12px              (spinbox arrow dimensions)
+--icon-medium: 16px             (combobox arrow dimensions)
 --icon-padding: 6px             (menu icon left and right padding)
---transparent: transparent      (removing backgrounds)
 --center-align: center          (progress bar text alignment)
 --subcontrol-margin: margin     (groupbox title positioning)
 --subcontrol-top-left: top left (groupbox title anchor point)
---tab-spacing: 2px              (margin between tabs)
---slider-groove-radius: 3px     (slider groove - slightly smaller than medium)
---zero-radius: 0                (dropdown items - no border radius)
+--splitter-size: 6px            (splitter handle thickness)
+--disabled-global: #888888      (global disabled state - same as text-disabled but explicit)
+--tooltip-border: white         (tooltip border - high contrast against dark background)
 */
 
 /*
-QSS LIMITATION NOTES:
-- Cannot use CSS variables, so values must be repeated
+QSS TECHNICAL LIMITATIONS:
+- Cannot use CSS variables, so color values must be repeated throughout
 - Cannot create mixins or functions for common property groups
 - Pseudo-states (:hover, :focus) cannot inherit from base styles
 - Each selector must explicitly define all needed properties
+- Palette integration requires careful coordination with Python theme setup
 */
 
-/* BASE WIDGET STYLES - Common patterns for inheritance */
-/* Base input field styling */
+/* BASE WIDGET STYLES - Minimal layout-focused styling that leverages palette colors */
+
+/* Base input field styling - layout only, colors from palette */
 QLineEdit, QTextEdit, QPlainTextEdit, QSpinBox, QDoubleSpinBox {
-    background: #232323;        /* --bg-primary */
-    color: #f0f0f0;             /* --text-primary */
     border: 1px solid #444a5a;  /* --border-default | --border-thin */
     border-radius: 4px;         /* --radius-medium */
     padding: 4px 8px;           /* --padding-standard */
 }
 
-/* Base input focus state */
+/* Base input focus state - special focus styling */
 QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus,
 QSpinBox:focus, QDoubleSpinBox:focus {
     border: 1.5px solid #2a82da; /* --border-focus | --border-focus-width */
-    background: #232b3a;          /* --bg-focus */
-}
-
-/* Base input disabled state */
-QLineEdit:disabled, QTextEdit:disabled, QPlainTextEdit:disabled,
-QSpinBox:disabled, QDoubleSpinBox:disabled {
-    background: #232323;         /* --bg-primary */
-    color: #888;                 /* --text-disabled */
-}
-
-/* Base selection styling */
-QLineEdit, QTextEdit, QPlainTextEdit {
-    selection-background-color: #2a82da; /* --accent-blue */
-    selection-color: #fff;                /* --text-white */
+    background: #232b3a;          /* --bg-focus (special focus color not in palette) */
 }
 
 /* Hover/selected item styling - removed global base to prevent conflicts */
 
-/* QToolBar */
+/* QToolBar - minimal layout styling */
 QToolBar QToolButton {
-    background: transparent;    /* --transparent */
-    color: #fff;                /* --text-white */
     border: none;               /* --zero-border */
     icon-size: 16px;            /* --icon-size */
 }
 QToolBar QToolButton:hover {
-    background: #444a5a;        /* --bg-hover */
-    color: #fff;                /* --text-white */
+    background: #444a5a;        /* --bg-hover (not in palette) */
     border-radius: 4px;         /* --radius-medium */
 }
 QToolBar QToolButton:pressed {
-    background: #2a82da;        /* --accent-blue */
-    color: #fff;                /* --text-white */
+    background: #2a82da;        /* --accent-blue (override palette for pressed state) */
 }
 QToolBar::separator {
     background: #6c7485;        /* --separator-light (more visible than standard border) */
@@ -168,37 +162,29 @@ QToolBar::separator:vertical {
     margin: 6px 4px;            /* --separator-margin-v (swapped from horizontal) */
 }
 
-/* QLabel */
+/* QLabel - only special cases need styling */
 QLabel#status_label {
     padding: 2px 8px;           /* --padding-tight */
     background: #444a5a;        /* --bg-hover */
-    color: #fff;                /* --text-white */
     border-radius: 4px;         /* --radius-medium */
 }
 QLabel#status_label:hover {
-    background: #2a82da;    /* --accent-blue */
-    color: #fff;            /* --text-white */
+    background: #2a82da;        /* --accent-blue */
 }
 
-/* QTreeView */
+/* QTreeView - layout and special selection behavior */
 QTreeView {
-    background-color: #232323;       /* --bg-primary */
-    color: #f0f0f0;                 /* --text-primary */
     alternate-background-color: #2d2d2d; /* --bg-secondary */
-    selection-background-color: #4fa3f7; /* --accent-light (original tree selection) */
-    selection-color: #ffffff;            /* --text-white */
+    selection-background-color: #4fa3f7; /* --accent-light (special tree selection) */
+    selection-color: #ffffff;            /* --text-white (override palette) */
     gridline-color: #444a5a;        /* --border-default */
     border: 1px solid #222;         /* --border-light */
 }
 /* Note: selection colors inherit from base selection styling */
-QTreeView::branch:has-children:hover {
-    background: #2a82da;            /* --accent-blue */
-}
-QTreeView::branch:has-children:!has-siblings:adjoins-item:hover {
-    background: #2a82da;            /* --accent-blue */
-}
+QTreeView::branch:has-children:hover,
+QTreeView::branch:has-children:!has-siblings:adjoins-item:hover,
 QTreeView::branch:open:hover, QTreeView::branch:closed:hover {
-    background: #2a82da;        /* --accent-blue */
+    background: #2a82da;            /* --accent-blue */
 }
 /* Branch lines - using background images for proper tree structure */
 QTreeView::branch:has-siblings:!adjoins-item {
@@ -231,24 +217,19 @@ QTreeView::branch:open:has-children {
 }
 QTreeView::item:selected {
     background: #2a82da;        /* --accent-blue */
-    color: #fff;                /* --text-white */
 }
 QTreeView::item:hover {
     background: #444a5a;        /* --bg-hover */
-    color: #fff;                /* --text-white */
 }
 
-/* QHeaderView */
+/* QHeaderView - minimal layout styling */
 QHeaderView::section {
-    background-color: #232323;  /* --bg-primary */
-    color: #f0f0f0;             /* --text-primary */
     border: 1px solid #444a5a;  /* --border-default | --border-thin */
     padding: 4px;               /* --padding-standard (simplified, no horizontal) */
 }
 
-/* QScrollBar */
+/* QScrollBar - layout and special colors */
 QScrollBar {
-    background: #232323;        /* --bg-primary */
     margin: 0px;                /* --zero-margin */
 }
 QScrollBar:vertical {
@@ -258,7 +239,7 @@ QScrollBar:horizontal {
     height: 12px;               /* --scrollbar-size */
 }
 QScrollBar::handle {
-    background: #444a5a;        /* --bg-hover */
+    background: #444a5a;        /* --bg-hover (not in palette) */
     border-radius: 6px;         /* --radius-large */
 }
 QScrollBar::handle:vertical {
@@ -290,7 +271,7 @@ QLineEdit[text=""] {
 /* QPlainTextEdit */
 /* Inherits base input styling */
 
-/* QComboBox */
+/* QComboBox - special dropdown behavior requires explicit styling */
 /* Note: QComboBox cannot inherit from base input styling because it has
    custom dropdown selection behavior that conflicts with standard selection colors.
    The dropdown uses a two-tone selection system (light blue selected, dark blue hover)
@@ -308,33 +289,26 @@ QComboBox:focus {
     border: 1.5px solid #2a82da; /* --border-focus | --border-focus-width */
 }
 QComboBox QAbstractItemView {
-    background: #232323;        /* --bg-primary */
-    color: #f0f0f0;             /* --text-primary */
     border: 1px solid #2a82da;  /* --border-focus | --border-thin */
 }
 QComboBox QAbstractItemView::item {
-    background: transparent;    /* --transparent */
-    color: #f0f0f0;             /* --text-primary */
     border: none;               /* --zero-border */
     border-radius: 0;           /* special: no radius for dropdown items */
     padding: 4px 12px;          /* --padding-comfortable */
 }
 QComboBox QAbstractItemView::item:selected {
     background: #4fa3f7;        /* --accent-light */
-    color: #232323;             /* --bg-primary */
     border: 2px solid #2a82da;  /* --border-focus | --border-thick */
     border-radius: 4px;         /* --radius-medium */
     font-weight: bold;          /* --font-weight-bold */
 }
 QComboBox QAbstractItemView::item:hover {
-    background: #2a82da !important; /* --accent-blue */
-    color: #fff !important;          /* --text-white */
-    border: 2px solid #4fa3f7 !important; /* --accent-light | --border-thick */
-    border-radius: 4px !important;  /* --radius-medium */
-    font-weight: bold !important;   /* --font-weight-bold */
+    background: #2a82da;        /* --accent-blue */
+    border: 2px solid #4fa3f7;  /* --accent-light | --border-thick */
+    border-radius: 4px;         /* --radius-medium */
+    font-weight: bold;          /* --font-weight-bold */
 }
 QComboBox::drop-down {
-    background: #232323;        /* --bg-primary */
     border-left: 1px solid #444a5a; /* --border-default | --border-thin */
     width: 24px;                /* --dropdown-width */
 }
@@ -344,15 +318,12 @@ QComboBox::down-arrow {
     height: 16px;               /* --icon-medium */
 }
 
-/* QTabWidget */
+/* QTabWidget - layout and special selection styling */
 QTabWidget::pane {
     border: 1px solid #444a5a;  /* --border-default | --border-thin */
-    background: #232323;        /* --bg-primary */
     border-radius: 6px;         /* --radius-large */
 }
 QTabBar::tab {
-    background: #232323;        /* --bg-primary */
-    color: #f0f0f0;             /* --text-primary */
     border: 1px solid #444a5a;  /* --border-default | --border-thin */
     border-bottom: none;        /* --zero-border (creates connected tab look) */
     border-top-left-radius: 6px;  /* --radius-large (top corners only) */
@@ -362,41 +333,34 @@ QTabBar::tab {
 }
 QTabBar::tab:selected, QTabBar::tab:hover {
     background: #2a82da;        /* --accent-blue */
-    color: #fff;                /* --text-white */
     border-color: #2a82da;      /* --border-focus */
 }
 QTabBar::tab:!selected {
-    background: #232323;        /* --bg-primary */
     color: #aaa;                /* --text-secondary */
 }
 
-/* QMenu, QMenuBar */
+/* QMenu, QMenuBar - layout and special interaction styling */
 QMenuBar {
-    background: #232323;        /* --bg-primary */
-    color: #f0f0f0;             /* --text-primary */
+    background: #232323;        /* --bg-primary (custom menu bar background) */
+    color: #f0f0f0;             /* --text-primary (custom menu bar text) */
 }
 QMenuBar::item {
-    background: transparent;    /* --transparent */
-    color: #f0f0f0;             /* --text-primary */
-    padding: 4px 12px;          /* --padding-comfortable */
+    padding: 4px;          /* --padding-menu-bar */
 }
 QMenuBar::item:selected {
     background: #2a82da;        /* --accent-blue */
-    color: #fff;                /* --text-white */
     border-radius: 4px;         /* --radius-medium */
 }
 QMenu {
-    background: #232323;        /* --bg-primary */
-    color: #f0f0f0;             /* --text-primary */
     border: 1px solid #444a5a;  /* --border-default | --border-thin */
     border-radius: 6px;         /* --radius-large */
     icon-size: 16px;            /* --icon-size */
+    min-width: 120px;          /* --menu-dropdown-min-width */
 }
 QMenu::item {
-    background: transparent;    /* --transparent */
-    color: #f0f0f0;             /* --text-primary */
-    padding: 6px 24px 6px 24px; /* --padding-menu */
-    border-radius: 4px;         /* --radius-medium */
+    padding: 6px;           /* --padding-menu (base padding) */
+    padding-left: 12px;     /* --padding-menu-left */
+    border-radius: 4px;     /* --radius-medium */
 }
 QMenu::icon {
     padding-left: 6px;          /* --icon-padding */
@@ -404,7 +368,6 @@ QMenu::icon {
 }
 QMenu::item:selected {
     background: #2a82da;        /* --accent-blue */
-    color: #fff;                /* --text-white */
 }
 QMenu::separator {
     height: 1px;                /* --menu-separator-height */
@@ -412,35 +375,29 @@ QMenu::separator {
     margin: 4px 0;              /* --menu-separator-margin */
 }
 
-/* QStatusBar */
+/* QStatusBar - minimal layout styling */
 QStatusBar {
-    background: #232323;        /* --bg-primary */
-    color: #f0f0f0;             /* --text-primary */
+    background: #232323;        /* --bg-primary (custom status bar background) */
+    color: #f0f0f0;             /* --text-primary (custom status bar text) */
     border-top: 1px solid #444a5a; /* --border-default | --border-thin */
 }
-QStatusBar QLabel {
-    color: #f0f0f0;             /* --text-primary */
-}
 
-/* QGroupBox */
+/* QGroupBox - layout and title styling */
 QGroupBox {
     border: 1px solid #444a5a;  /* --border-default | --border-thin */
     border-radius: 6px;         /* --radius-large */
     margin-top: 16px;           /* --groupbox-title-offset */
-    background: #232323;        /* --bg-primary */
 }
 QGroupBox::title {
     subcontrol-origin: margin;  /* --subcontrol-margin */
     subcontrol-position: top left; /* --subcontrol-top-left */
     padding: 0 8px;             /* vertical zero, horizontal --padding-standard */
     color: #2a82da;             /* --accent-blue */
-    background: transparent;    /* --transparent */
 }
 
-/* QSlider */
+/* QSlider - layout and special handle styling */
 QSlider::groove {
     border: 1px solid #444a5a;  /* --border-default | --border-thin */
-    background: #232323;        /* --bg-primary */
     border-radius: 3px;         /* special: slightly smaller than --radius-medium */
 }
 QSlider::groove:horizontal {
@@ -463,10 +420,8 @@ QSlider::handle:vertical {
     margin: 0 -5px;             /* --slider-handle-margin (negative overlap, rotated) */
 }
 
-/* QProgressBar */
+/* QProgressBar - layout and special styling */
 QProgressBar {
-    background: #232323;        /* --bg-primary */
-    color: #f0f0f0;             /* --text-primary */
     border: 1px solid #444a5a;  /* --border-default | --border-thin */
     border-radius: 6px;         /* --radius-large */
     text-align: center;         /* --center-align */
@@ -477,29 +432,22 @@ QProgressBar::chunk {
     border-radius: 6px;         /* --radius-large */
 }
 
-/* QListView, QTableView */
+/* QListView, QTableView - layout and special selection */
 QListView, QTableView {
-    background: #232323;           /* --bg-primary */
-    color: #f0f0f0;               /* --text-primary */
     alternate-background-color: #2d2d2d; /* --bg-secondary */
-    selection-background-color: #2a82da;  /* --accent-blue */
-    selection-color: #fff;                /* --text-white */
     border: 1px solid #222;       /* --border-light | --border-thin */
 }
 QListView::item:selected, QTableView::item:selected {
     background: #2a82da;        /* --accent-blue */
-    color: #fff;                /* --text-white */
 }
 QListView::item:hover, QTableView::item:hover {
     background: #444a5a;        /* --bg-hover */
-    color: #fff;                /* --text-white */
 }
 
-/* QSpinBox, QDoubleSpinBox */
+/* QSpinBox, QDoubleSpinBox - special button styling */
 /* Inherits base input styling */
 QSpinBox::up-button, QSpinBox::down-button,
 QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
-    background: #232323;        /* --bg-primary */
     border: 1px solid #444a5a;  /* --border-default | --border-thin */
     width: 18px;                /* --spinbox-button-width */
     border-radius: 2px;         /* --radius-small */
@@ -532,14 +480,12 @@ QCheckBox::indicator, QRadioButton::indicator {
     height: 16px;               /* --checkbox-size */
     border-radius: 8px;         /* --radius-round */
     border: 1.5px solid #444a5a; /* --border-default | --border-focus-width */
-    background: #232323;        /* --bg-primary */
 }
 QCheckBox::indicator:checked, QRadioButton::indicator:checked {
     background: #2a82da;        /* --accent-blue */
     border: 1.5px solid #2a82da; /* --border-focus | --border-focus-width */
 }
 QCheckBox::indicator:unchecked, QRadioButton::indicator:unchecked {
-    background: #232323;        /* --bg-primary */
     border: 1.5px solid #444a5a; /* --border-default | --border-focus-width */
 }
 QCheckBox::indicator:indeterminate {
