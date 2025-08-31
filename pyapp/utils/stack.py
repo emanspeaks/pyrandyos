@@ -411,10 +411,15 @@ def format_exc(exc: BaseException, tb: TracebackType = None):
     return s
 
 
-def exc_info(exc_or_type: type | BaseException = None,
+def exc_info(exc_or_type: type | BaseException | ExcInfoType = None,
              exc: BaseException | None = None,
-             traceback: TracebackType = None):
+             traceback: TracebackType = None, skip_if_none: bool = False):
     __traceback_hide__ = True  # noqa: F841
+    if skip_if_none and not any((exc_or_type, exc, traceback)):
+        return
+    if isinstance(exc_or_type, tuple):
+        exc_or_type, exc, traceback = exc_or_type
+
     if isinstance(exc_or_type, BaseException):
         exc = exc_or_type
         exc_or_type = None

@@ -1,7 +1,7 @@
 import sys
 from types import TracebackType
 
-from ..logging import log_func_call, get_logger, log_exc
+from ..logging import log_func_call, log_exc, log_debug, log_info
 from .._testing.debug import is_debug_enabled
 from .log import setup_memory_logging
 from .stack import exc_info
@@ -21,7 +21,7 @@ class MainContext:
     def __enter__(self):
         try:
             setup_memory_logging()
-            get_logger().debug(f"starting {self.appname} main")
+            log_debug(f"starting {self.appname} main")
         except BaseException as e:
             self.__exit__(*exc_info(exc=e))
 
@@ -54,13 +54,12 @@ class MainContext:
                     raise exc
 
         finally:
-            log = get_logger()
             appname = self.appname
             if exit_code:
-                log.info(f'{appname} exited with code {exit_code}')
+                log_info(f'{appname} exited with code {exit_code}')
 
             if status_ok:
-                log.info(f'{appname} exiting gracefully')
+                log_info(f'{appname} exiting gracefully')
             else:
                 pass
 

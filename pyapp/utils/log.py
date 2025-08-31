@@ -7,14 +7,14 @@ from shutil import chown
 from datetime import datetime
 from logging import (
     LogRecord, basicConfig, DEBUG, INFO, StreamHandler, Formatter, getLogger,
-    CRITICAL, ERROR, WARNING, FileHandler, Logger, getLevelName, addLevelName,
+    CRITICAL, ERROR, WARNING, FileHandler, Logger, addLevelName,
     Handler,
 )
 from logging.handlers import MemoryHandler
 
 from ..logging import (
     DEBUGLOW2, log_func_call, LOGSTDOUT, LOGSTDERR, LOGTQDM,
-    APP_LOG_LEVEL_NAMES,
+    APP_LOG_LEVEL_NAMES, get_loglevel_num_name
 )
 from .constants import DEFAULT_GROUP, DEFAULT_DIR_MODE
 from .constants.cli import ConsoleText
@@ -174,45 +174,11 @@ def setup_logging(logfile: Path = None, cli_log_level: int | str = INFO,
 
 
 @log_func_call(DEBUGLOW2)
-def log_level_by_name(name: str):
-    try:
-        from logging import getLevelNameMapping
-    except ImportError:
-        # NOTE: the logic in here is apparently a bug and deprecated, but isn't
-        # fixed until Python 3.12.  Supporting both so I don't have to change
-        # this code later once we upgrade Python versions.
-        num = getLevelName(name)
-        if isinstance(num, str):
-            num = None
-    else:
-        num = getLevelNameMapping().get(name)
-
-    return num
-
-
-@log_func_call(DEBUGLOW2)
-def get_loglevel_num_name(level: str | int):
-    "returns num, name"
-    if isinstance(level, str):
-        level = level.upper()
-        num = log_level_by_name(level)
-        if num is None:
-            raise ValueError(f'unknown loglevel string {level} given')
-        return num, level
-    name = getLevelName(level)
-    num = log_level_by_name(name)
-    if not isinstance(num, int):
-        name = None
-
-    return level, name
-
-
-@log_func_call(DEBUGLOW2)
 def is_valid_loglevel(level: str | int):
     if isinstance(level, int):
         return True
     try:
-        name = get_loglevel_num_name(level)
+        _, name = get_loglevel_num_name(level)
     except ValueError:
         return False
     return name is not None

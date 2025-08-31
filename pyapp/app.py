@@ -128,8 +128,6 @@ class PyApp(AppConfig):
     @log_func_call
     def create_log_dirs(cls, group: str = DEFAULT_GROUP,
                         mode: int = DEFAULT_DIR_MODE):
-        # log = get_logger()
-        # log.debug('in create_log_dirs')
         for key in get_log_dir_keys(cls.APP_LOG_DIR_KEYS):
             p: Path = cls.get(key)
             mkdir_chgrp(p, group, mode)
@@ -138,8 +136,6 @@ class PyApp(AppConfig):
     @log_func_call(DEBUGLOW2, trace_only=True)
     def mkdir_temp(cls, name: str = None, group: str = DEFAULT_GROUP,
                    mode: int = DEFAULT_DIR_MODE):
-        # log = get_logger()
-        # log.debug('in mkdir_temp')
         tmp_dir: Path | None = cls.get(TMP_DIR_KEY)
         if not tmp_dir:
             try:

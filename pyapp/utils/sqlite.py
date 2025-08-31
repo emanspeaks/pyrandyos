@@ -3,7 +3,7 @@ from sqlite3 import Connection
 from contextlib import contextmanager
 
 
-from ..logging import log_func_call  # , get_logger
+from ..logging import log_func_call
 
 GET_TABLES_QUERY = "select name from sqlite_master where type='table'"
 
@@ -61,8 +61,7 @@ def execute_select(db: Connection, table_name: str,
 
     query = (f"select {field_list} from {table_name!r} "
              f"{' ' + conditions if conditions else ''}")
-    # get_logger().debug(f"Executing query: {query} "
-    #                    f"with expansions: {expansions}")
+    # log_debug(f"Executing query: {query} with expansions: {expansions}")
 
     return db.execute(query, expansions)
 

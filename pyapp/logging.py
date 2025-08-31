@@ -6,13 +6,18 @@ from typing import (
 )
 from types import TracebackType as _TracebackType
 from collections.abc import Callable as _Callable, Mapping as _Mapping
+from traceback import format_exception_only
+from functools import partial as _partial
 # want to export these for convenience, so they are not hidden by default
 from logging import (  # noqa: F401
     getLogger as _getLogger, WARN, ERROR, DEBUG, INFO, CRITICAL, WARNING,
-    Logger,
+    Logger, getLevelName as _getLevelName
 )
-from traceback import format_exception_only
-from functools import partial as _partial
+try:
+    from logging import getLevelNameMapping as _getLevelNameMapping
+except ImportError:
+    # not available until Python 3.12...allegedly
+    _getLevelNameMapping = None
 
 from .utils.signature_wrapper import (
     generate_signature_aware_wrapper as _sig_aware_wrapper
@@ -57,7 +62,7 @@ def get_logger(modname: str = None, stacklevel: int = 2) -> Logger:
 
 
 def log_message(level: int | str, msg: str, *args,
-                exc_info: _ExcInfoType = None,
+                exc_info: _ExcInfoType | BaseException = None,
                 extra: _Mapping[str, object] = None, stack_info: bool = False,
                 stacklevel: int = 1):
     _log(get_logger(stacklevel=stacklevel + 2), level, msg, *args,
@@ -163,11 +168,14 @@ def get_tracelog() -> bool:
 
 def log_exc(exc_or_type: type | BaseException = None,
             exc: BaseException = None,
-            traceback: _TracebackType = None):
+            traceback: _TracebackType = None,
+            msg: str = 'Unhandled exception',
+            mark_handled: bool = True):
     __traceback_hide__ = True  # noqa: F841
     excnfo = _exc_info(exc_or_type, exc, traceback)
-    _log(get_logger(), ERROR, 'Unhandled exception', exc_info=excnfo)
-    excnfo[1]._pyapp_handled = True
+    _log(get_logger(), ERROR, msg, exc_info=excnfo)
+    if mark_handled:
+        excnfo[1]._pyapp_handled = True
 
 
 def _log_exc_hook(exc_or_type: type | BaseException = None,
@@ -188,12 +196,47 @@ _sys.excepthook = _log_exc_hook
 
 
 def _log(log: Logger, level: int | str, msg: str, *args,
-         exc_info: _ExcInfoType = None, extra: _Mapping[str, object] = None,
+         exc_info: _ExcInfoType | BaseException = None,
+         extra: _Mapping[str, object] = None,
          stack_info: bool = False, stacklevel: int = 1):
     __traceback_hide__ = True  # noqa: F841
+    if not isinstance(level, int):
+        level, _ = get_loglevel_num_name(level)
+
+    exc_info = _exc_info(exc_info, skip_if_none=True)
     fn, lno, func, sinfo = _find_caller(stack_info, stacklevel, exc_info)
     record = log.makeRecord(log.name, level, fn, lno, msg, args, exc_info,
                             func, extra, sinfo)
     if exc_info:
         record.exc_text = _format_exc(exc_info[1], exc_info[2])
     log.handle(record)
+
+
+# @log_func_call(DEBUGLOW2)
+def log_level_by_name(name: str):
+    if _getLevelNameMapping:
+        return _getLevelNameMapping().get(name)
+    # NOTE: the logic in here is apparently a bug and deprecated, but isn't
+    # fixed until Python 3.12.  Supporting both so I don't have to change
+    # this code later once we upgrade Python versions.
+    num = _getLevelName(name)
+    if isinstance(num, str):
+        return
+    return num
+
+
+# @log_func_call(DEBUGLOW2)
+def get_loglevel_num_name(level: str | int):
+    "returns num, name"
+    if isinstance(level, str):
+        level = level.upper()
+        num = log_level_by_name(level)
+        if num is None:
+            raise ValueError(f'unknown loglevel string {level} given')
+        return num, level
+    name = _getLevelName(level)
+    num = log_level_by_name(name)
+    if not isinstance(num, int):
+        name = None
+
+    return level, name

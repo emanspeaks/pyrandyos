@@ -8,7 +8,7 @@ from shutil import chown, copy2
 from importlib.util import spec_from_file_location, module_from_spec
 from shlex import split as shsplit
 
-from ..logging import DEBUGLOW2, log_func_call, get_logger
+from ..logging import DEBUGLOW2, log_func_call, log_debug
 from .constants import (
     DEFAULT_GROUP, DEFAULT_DIR_MODE, DEFAULT_FILE_MODE, IS_WIN32,
 )
@@ -53,19 +53,18 @@ def import_python_file(pyfile: Path, as_name: str = None):
 
 @log_func_call
 def add_path_to_syspath(p: Path | str):
-    log = get_logger()
-    log.debug(f'attempt to add {p} to sys.path')
+    log_debug(f'attempt to add {p} to sys.path')
     ppath = Path(p).resolve()
     pstr = str(p)
-    log.debug(f'(before) sys.path={sys.path}')
+    log_debug(f'(before) sys.path={sys.path}')
     for x in sys.path:
         if Path(x).resolve() == ppath:
-            log.debug('directory already in sys.path, taking no action')
+            log_debug('directory already in sys.path, taking no action')
             return
 
     sys.path.insert(0, pstr)
-    log.debug(f'updated sys.path to include {p}')
-    log.debug(f'(after) sys.path={sys.path}')
+    log_debug(f'updated sys.path to include {p}')
+    log_debug(f'(after) sys.path={sys.path}')
 
 
 @log_func_call(DEBUGLOW2, trace_only=True)

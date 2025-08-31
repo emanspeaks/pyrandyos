@@ -35,9 +35,8 @@ def process_local_config(base: dict = None, app_path_keys: tuple[str] = (),
     local_cfg = load_local_config()
     use_local = bool(local_cfg)
     if use_local:
-        from ..logging import get_logger
-        get_logger().info("Using local config: "
-                          f"{AppConfig[LOCAL_CONFIG_FILE_KEY]}")
+        from ..logging import log_info
+        log_info(f"Using local config: {AppConfig[LOCAL_CONFIG_FILE_KEY]}")
 
     for k in local_cfg.keys():
         expand_key_recursively(local_cfg, k, case_insensitive=case)
@@ -109,5 +108,5 @@ def save_local_config(app_path_keys: tuple = (),
     # save the new output local config
     local_cfg_path: Path = AppConfig[LOCAL_CONFIG_FILE_KEY]
     save_json(local_cfg_path, jsonify(out))
-    from ..logging import get_logger
-    get_logger().info(f'local config saved to {local_cfg_path}')
+    from ..logging import log_info
+    log_info(f'local config saved to {local_cfg_path}')
