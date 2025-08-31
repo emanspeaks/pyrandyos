@@ -1,8 +1,8 @@
 from pathlib import Path
-from keyword import iskeyword
 
 from pyapp.utils.stack import top_package_dir_path
 from pyapp.gui.icons.iconfont.sources import THIRDPARTY_FONTSPEC
+from pyapp.gui.icons.utils import legalize_iconname
 from pyapp.gui.icons.iconfont.fontspec import (
     ICON_ASSETS_DIR, THIRDPARTY_DIR, IconFontSpec
 )
@@ -56,16 +56,7 @@ def generate_names(p: Path, fontspec: IconFontSpec):
     outf = p/NAMES_PY
     s = str(AUTOHEADER)
     for k, v in fontspec.charmap.items():
-        newname = k.replace('-', '_')
-        if iskeyword(newname):
-            newname += '_'
-
-        if newname[0].isdigit():
-            newname = f'_{newname}'
-
-        if newname == "l":
-            newname = "L"
-
+        newname = legalize_iconname(k)
         line = f"{newname} = {v}"
         if len(line) > 79:
             line += "  # noqa: E501"

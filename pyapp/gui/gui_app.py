@@ -77,10 +77,6 @@ class GuiApp(GuiQtWrapper):
     def init_gui(self, app_args: list[str], *firstwin_args, **firstwin_kwargs):
         log_debug('starting app main')
 
-        # NOTE: this is not really used anymore since I am using qdarkstyle,
-        # but wanted to keep the code for reference since I may have a need
-        # later on to use Qt resource files.
-        #
         # Ensure Qt resources are registered before any widgets are created
         compile_qrc()
         import_qrc()

@@ -27,6 +27,10 @@ from .sources import THIRDPARTY_FONTSPEC
 _DEFHINT = QFont.PreferDefaultHinting
 
 
+class IconFontNotInitializedError(RuntimeError):
+    pass
+
+
 class IconFontCacheEntry:
     @log_func_call(DEBUGLOW2, trace_only=True)
     def __init__(self):
@@ -58,7 +62,7 @@ class IconFont(metaclass=IconFontMeta):
     @classmethod
     @log_func_call(DEBUGLOW2, trace_only=True)
     def get_font(cls, size: float | int):
-        """Return a QFont corresponding to the given prefix and size."""
+        "Return a QFont corresponding to the given prefix and size."
         cls.ensure_font_loaded()
         spec = cls.get_spec()
         cache = cls._cache
@@ -118,7 +122,13 @@ class IconFont(metaclass=IconFontMeta):
     @classmethod
     @log_func_call(DEBUGLOW2, trace_only=True)
     def get_codepoint_by_name(cls, icon_name: str):
-        return cls.get_spec().charmap.get(icon_name, None)
+        charmap = cls.get_spec().charmap
+        if charmap:
+            return charmap.get(icon_name, None)
+        raise IconFontNotInitializedError("Qt application must be initialized "
+                                          "before using icon font methods "
+                                          "that require the fonts to "
+                                          "be loaded.")
 
     @classmethod
     @log_func_call(DEBUGLOW2, trace_only=True)
