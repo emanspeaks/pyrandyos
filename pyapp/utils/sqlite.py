@@ -1,5 +1,7 @@
 from datetime import datetime
 from sqlite3 import Connection
+from contextlib import contextmanager
+
 
 from ..logging import log_func_call  # , get_logger
 
@@ -67,3 +69,15 @@ def execute_select(db: Connection, table_name: str,
 
 def sql_timestamp_to_datetime(ts: str):
     return datetime.fromisoformat(ts.replace('Z', '+00:00')) if ts else None
+
+
+@contextmanager
+def sqlite_context(cxn: Connection):
+    try:
+        yield cxn
+    except Exception:
+        raise
+    else:
+        cxn.commit()
+    finally:
+        cxn.close()

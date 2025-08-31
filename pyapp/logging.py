@@ -1,4 +1,5 @@
 import sys as _sys
+from os import environ as _environ
 
 from typing import (
     TypeVar as _TypeVar, overload as _overload, Any as _Any
@@ -123,6 +124,9 @@ def log_func_call(func: F) -> F: ...
 def log_func_call(level: int | str, *,
                   trace_only: bool = False) -> _Callable[[F], F]: ...
 def log_func_call(arg, *, trace_only: bool = False):  # noqa: E302
+    if _environ.get("PYAPP_BYPASS_CALL_LOG"):
+        return arg if callable(arg) else lambda f: f
+
     def log_decorator(func: F) -> F:
         return _sig_aware_wrapper(func, _log_func_call_handler, level,
                                   trace_only=trace_only)
@@ -170,7 +174,8 @@ def _log_exc_hook(exc_or_type: type | BaseException = None,
                   exc: BaseException = None,
                   traceback: _TracebackType = None):
     f = _get_stack_frame(2)
-    if not is_debug_enabled() or f.f_code.co_qualname == 'QtApp.notify':
+    if (not is_debug_enabled() or not f
+            or f.f_code.co_qualname == 'QtApp.notify'):
         log_exc(exc_or_type, exc, traceback)
 
     if not getattr(exc, '_pyapp_handled', False):
