@@ -79,6 +79,7 @@ from PySide2.QtWidgets import (  # noqa: F401
     QAbstractButton,
     QMessageBox,
     QProgressDialog,
+    QActionGroup,
 )
 
 # try:

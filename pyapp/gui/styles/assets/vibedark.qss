@@ -379,20 +379,37 @@ QMenuBar::item:selected {
 QMenu {
     border: 1px solid #444a5a;  /* --border-default | --border-thin */
     border-radius: 6px;         /* --radius-large */
-    icon-size: 16px;            /* --icon-size */
+    icon-size: 12px;            /* Smaller icon size for compact look */
     min-width: 120px;          /* --menu-dropdown-min-width */
 }
 QMenu::item {
-    padding: 6px;           /* --padding-menu (base padding) */
-    padding-left: 12px;     /* --padding-menu-left */
+    padding: 4px;           /* Reduced from 6px for more compact look */
+    padding-left: 10px;     /* Slightly reduced left padding */
+    padding-right: 10px;    /* Consistent with left */
     border-radius: 4px;     /* --radius-medium */
+    min-width: 120px;       /* Force minimum item width */
+}
+QMenu::icon, QMenu::indicator, QMenu::right-arrow {
+    width: 12px;                /* Consistent size for all menu sub-elements */
+    height: 12px;
+    subcontrol-origin: padding;
+    subcontrol-position: center left;
 }
 QMenu::icon {
-    padding-left: 6px;          /* --icon-padding */
-    padding-right: 6px;         /* --icon-padding */
+    left: 6px;                  /* Adjusted for new padding */
+}
+QMenu::indicator {
+    left: 6px;                  /* Slightly more centered for checkmarks */
+}
+QMenu::right-arrow {
+    subcontrol-position: center right;  /* Override to right */
+    right: 6px;
 }
 QMenu::item:selected {
     background: #2a82da;        /* --accent-blue */
+}
+QMenu::item:has-children {
+    padding-right: 16px;        /* Make room for right arrow + 4px margin */
 }
 QMenu::separator {
     height: 1px;                /* --menu-separator-height */
