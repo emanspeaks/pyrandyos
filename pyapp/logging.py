@@ -246,9 +246,11 @@ def _log_exc_hook(exc_or_type: type | BaseException = None,
     # and purposes.  We have to rely on the user to decorate slots so that we
     # can know definitively they are being called externally and thus worthy
     # of trapping here even in a debug scenario.
+    tbf = traceback.tb_frame
+    is_qt_callback = tbf.f_code.co_qualname == 'QtCallable.__call__'
     if (not is_debug_enabled() or not f
             or f.f_code.co_qualname == 'QtApp.notify'
-            or traceback.tb_frame.f_code.co_qualname == 'QtCallable.__call__'):
+            or is_qt_callback):
         # stacklevel here needs to pop an additional level from the default 1
         # for the absolute stacklevel of _log_exc_hook itself for get_logger.
         # The secondary use of stacklevel otherwise would be for getting the

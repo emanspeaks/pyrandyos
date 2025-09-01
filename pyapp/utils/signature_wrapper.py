@@ -13,7 +13,7 @@ from .stack import (
 def generate_signature_aware_wrapper(func: Callable, arg_handler: Callable,
                                      *handler_args, **handler_kwargs):
     # __traceback_hide__ = True  # noqa: F841
-    __traceback_locals_hide__ = True  # noqa: F841
+    __traceback_hide_locals__ = True  # noqa: F841
     handler_partial = partial(arg_handler, handler_args, handler_kwargs, func)
     sig = signature(func)
     sigparams = sig.parameters

@@ -188,7 +188,8 @@ def get_framesummary_for_frame(f: FrameType, tb: TracebackType = None,
 
     summary = AnnotatedFrameSummary(filename, lineno, name, lookup_line=False,
                                     locals=f_locals, line=line, **kwargs)
-    # summary.line
+    hide = f_locals.get('__traceback_hide_locals__', False)
+    summary._pyapp_hide_locals = hide
     return summary
 
 
@@ -325,13 +326,26 @@ def filter_traceback_fullstack(tb: TracebackType, exc: BaseException):
     fullstack = StackSummary.from_list(stk[:-1] + tbstack)
     for f in fullstack:
         if SHOW_TRACEBACK_LOCALS or SHOW_TRACEBACK_LOCALS is None:
-            loc = f.locals
+            # make a copy so we don't actually modify the frame
+            loc = dict(f.locals)
             if loc:
-                if loc.get('__traceback_locals_hide__'):
+                hide = f._pyapp_hide_locals
+                if hide is True:
                     # remove locals from the stack frame
-                    f.locals = None
-                elif '__builtins__' in loc:
-                    del loc['__builtins__']
+                    loc = None
+                else:
+                    if hide is False:
+                        hide = ()
+
+                    elif isinstance(hide, str):
+                        hide = (hide,)
+
+                    hide = set(('__builtins__',) + tuple(hide))
+                    for n in hide:
+                        if n in loc:
+                            del loc[n]
+
+            f.locals = loc
         else:
             # remove locals from the stack frames
             f.locals = None
@@ -469,7 +483,7 @@ def safe_exec(source: 'str | ReadableBuffer | CodeType',
         Exception: If there is an error during execution.
     """
     __traceback_hide__ = True  # noqa: F841
-    __traceback_locals_hide__ = True  # noqa: F841
+    __traceback_hide_locals__ = True  # noqa: F841
     kw = {'closure': closure} if sys.version_info >= (3, 11) else {}
     try:
         exec(source, globals_, locals_, **kw)

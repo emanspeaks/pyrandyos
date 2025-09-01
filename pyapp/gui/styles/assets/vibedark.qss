@@ -408,11 +408,13 @@ QStatusBar {
 }
 QStatusBar::item {
     margin: 1px;
+    padding: 2px;
     border: 0;
     background: transparent;
 }
 QStatusBar QLabel {
     margin: 1px;
+    padding: 2px;
     border: 0;
     background: transparent;
     border-radius: 4px;

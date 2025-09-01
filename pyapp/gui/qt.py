@@ -15,6 +15,8 @@ from PySide2.QtCore import (  # noqa: F401
     QPoint,
     QStringListModel,
     QSortFilterProxyModel,
+    QItemSelection,
+    QModelIndex,
 )
 from PySide2.QtGui import (  # noqa: F401
     QPixmap,
