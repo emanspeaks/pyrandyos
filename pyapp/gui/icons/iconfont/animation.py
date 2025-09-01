@@ -23,6 +23,7 @@
 from typing import TYPE_CHECKING
 
 from ....logging import log_func_call, DEBUGLOW2
+from ...callback import qt_callback
 from ....utils.hash import TupleHashMixin
 from ...qt import QTimer, QRect, QRectF, QWidget, QPainter
 if TYPE_CHECKING:
@@ -91,7 +92,7 @@ class IconSpin(IconAnimation):
               rect: QRect | QRectF):
         if self.parent_widget not in self.info:
             timer = QTimer(self.parent_widget)
-            timer.timeout.connect(self._update)
+            timer.timeout.connect(qt_callback(self._update))
             self.info[self.parent_widget] = [timer, 0, self.step]
             if self.autostart:
                 timer.start(self.interval)

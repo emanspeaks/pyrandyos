@@ -1,9 +1,10 @@
-from logging import getLogger, Logger
+from logging import Logger
 from pathlib import Path
 from copy import deepcopy
 
 from ..logging import (
     DEBUGLOW2, log_func_call, set_trace_logging, set_func_call_logging,
+    set_global_logger, get_global_logger
 )
 from ..utils.classproperty import classproperty
 from ..utils.paths import (
@@ -28,7 +29,6 @@ from .keys import (
 from .expandutils import expand_key_recursively
 
 _GLOBAL_CFG: dict = None
-_GLOBAL_LOG: Logger = None
 
 
 class AppConfigType(type):
@@ -61,13 +61,12 @@ class AppConfig(metaclass=AppConfigType):
     @classproperty
     @log_func_call(DEBUGLOW2, trace_only=True)
     def log(cls):
-        return _GLOBAL_LOG
+        return get_global_logger()
 
     @classmethod
     @log_func_call
     def set_logger(cls, log: Logger):
-        global _GLOBAL_LOG
-        _GLOBAL_LOG = log
+        set_global_logger(log)
 
     @classmethod
     @log_func_call
@@ -84,7 +83,7 @@ class AppConfig(metaclass=AppConfigType):
     @classmethod
     @log_func_call
     def set_global_config(cls, config: dict):
-        log = _GLOBAL_LOG or getLogger(__name__)
+        log = get_global_logger()
         log.debug('setting global config')
         global _GLOBAL_CFG
         _GLOBAL_CFG = config

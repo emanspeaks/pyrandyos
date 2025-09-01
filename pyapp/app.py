@@ -3,7 +3,7 @@ from pathlib import Path
 from tempfile import gettempdir
 
 from .logging import (
-    get_logger, Logger, log_func_call, DEBUGLOW2, set_trace_logging,
+    log_info, Logger, log_func_call, DEBUGLOW2, set_trace_logging,
     set_func_call_logging,
 )
 from .config import AppConfig
@@ -48,8 +48,8 @@ class PyApp(AppConfig):
                   setup_log: bool = False, logfile: Path = None,
                   logger: Logger = None, **kwargs):
         "returns True if a local config is present and loaded, else False"
-        log = logger or get_logger()
-        cls.set_logger(log)
+        # log = logger or get_logger()
+        cls.set_logger(logger)
         cls.init_parse_config(config, kwargs)
 
         # setup logging first if necessary:
@@ -83,7 +83,7 @@ class PyApp(AppConfig):
 
         appname = cls.APP_NAME
         cls.set(APP_NAME_KEY, appname)
-        log.info(f"Starting {appname}")
+        log_info(f"Starting {appname}")
         cls.process_config()
 
         use_local_config = process_local_config(app_path_keys=cls.APP_PATH_KEYS)  # noqa: E501

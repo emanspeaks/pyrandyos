@@ -23,6 +23,10 @@ class GuiSplashScreen(GuiPresenter['GuiSplashScreenView']):
         # Prevent the splash from being closed by mouse click
         pass
 
+    def post_show_init(self):
+        "Any initialization that should be executed after the window is shown"
+        pass
+
     def show(self):
         self.gui_view.show()
 

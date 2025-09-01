@@ -38,12 +38,12 @@ def set_show_traceback_locals(enabled: bool = True):
 
 def get_stack_frame(level: int = 1):
     __traceback_hide__ = True  # noqa: F841
-    frm = currentframe()
+    f = currentframe()
     for i in range(level):
-        if frm is None:
+        if f is None:
             raise ValueError(f"Stack frame level {level} does not exist.")
-        frm = frm.f_back
-    return frm
+        f = f.f_back
+    return f
 
 
 @overload
@@ -236,9 +236,14 @@ def build_stacksummary_for_tb(tb: TracebackType, exc: BaseException = None):
     return result
 
 
-def filter_stack(stk: StackSummary = None):
+def filter_stack(stk: StackSummary = None, stacklevel: int = 2):
     __traceback_hide__ = True  # noqa: F841
-    stk = stk or build_stacksummary_for_frame(get_stack_frame(2)) or ()
+    # default stacklevel here is 2 since this is an absolute stacklevel
+    # and we need to pop off the current frame and get_stack_frame.
+    # We return the stack for the caller of this function immediately here
+    # by default.
+    stk = (stk or build_stacksummary_for_frame(get_stack_frame(stacklevel))
+           or ())
     # return StackSummary.from_list([f for f in stk
     #                                if not is_internal_frame(f)])
 
@@ -288,10 +293,21 @@ def filter_tb_stacksummary_if_not_internal(tb: TracebackType,
 def log_find_caller(stack_info: bool = False, stacklevel: int = 1,
                     exc_info: ExcInfoType | None = None):
     __traceback_hide__ = True  # noqa: F841
+    # stacklevel in this context is used to return the entry from the end
+    # of the list from filter_stack when not given exc_info and building from
+    # a traceback (in which case the stacklevel argument is effectively
+    # ignored).  Because filter_stack automatically excludes __traceback_hide__
+    # functions, including this one and likely any of its callers, we do NOT
+    # need to apply an offset to the stack; the only reason for the default
+    # stacklevel 1 is because it's actually a negative value and NOT because
+    # it implies the need to pop more entries off of the stack.
     if exc_info:
         stk = filter_tb_stacksummary_if_not_internal(exc_info[2], exc_info[1])
         stacklevel = 0
     else:
+        # with only default args here, filter_stack() will return a list
+        # whose last element is the most recent caller that is NOT a hidden
+        # function.  That means it will also exclude this current function.
         stk = filter_stack()
 
     if not stk:

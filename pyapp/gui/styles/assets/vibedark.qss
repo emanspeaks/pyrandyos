@@ -406,6 +406,17 @@ QStatusBar {
     color: #f0f0f0;             /* --text-primary (custom status bar text) */
     border-top: 1px solid #444a5a; /* --border-default | --border-thin */
 }
+QStatusBar::item {
+    margin: 1px;
+    border: 0;
+    background: transparent;
+}
+QStatusBar QLabel {
+    margin: 1px;
+    border: 0;
+    background: transparent;
+    border-radius: 4px;
+}
 
 /* QGroupBox - layout and title styling */
 QGroupBox {

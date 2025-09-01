@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from base64 import b64encode
 
 from ..logging import log_func_call
+from .callback import qt_callback
 from .widgets import GuiWidget, GuiWidgetView
 from .qt import (
     QWidget, QToolButton, QSize, QIcon, QAction, QSizePolicy, QPainter,
@@ -104,7 +105,7 @@ def create_slider(parent: GuiWidgetParent, min_value: int,
     # slide.setEnabled(enabled)
 
     if callback:
-        slide.valueChanged.connect(callback)
+        slide.valueChanged.connect(qt_callback(callback))
 
     return slide
 
@@ -133,7 +134,7 @@ def create_action(parent: GuiWidgetParent, text: str = "",
         action.setIcon(icon)
 
     if callback:
-        action.triggered.connect(callback)
+        action.triggered.connect(qt_callback(callback))
 
     if checkable:
         action.setCheckable(True)
@@ -208,7 +209,7 @@ def create_button(parent: GuiWidgetParent,
 
     if callback:
         signal = button.toggled if toggleable else button.clicked
-        signal.connect(callback)
+        signal.connect(qt_callback(callback))
 
     return button
 

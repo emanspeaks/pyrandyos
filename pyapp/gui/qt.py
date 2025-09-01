@@ -34,6 +34,7 @@ from PySide2.QtGui import (  # noqa: F401
     QIconEngine,
     QResizeEvent,
     QKeySequence,
+    QFontMetrics,
 )
 from PySide2.QtWidgets import (  # noqa: F401
     QMainWindow,

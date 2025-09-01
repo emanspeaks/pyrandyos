@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TypeVar, Generic, TypeAlias
 
-from ..qt import QCursor
+from ..qt import QCursor, QTimer
 from .. import GuiQtView, GuiPresenter, QtWidgetType, GuiView
 
 
@@ -71,6 +71,10 @@ class GuiWindowLike(GuiWidget[GuiWindowLikeViewType],
                         **kwargs) -> GuiWindowLikeViewType:
         raise NotImplementedError('Abstract method not implemented')
 
+    def post_show_init(self):
+        "Any initialization that should be executed after the window is shown"
+        pass
+
 
 class GuiWindowLikeView(GuiWidgetView[GuiWindowLikePresType, QtWidgetType],
                         Generic[GuiWindowLikePresType, QtWidgetType]):
@@ -79,6 +83,7 @@ class GuiWindowLikeView(GuiWidgetView[GuiWindowLikePresType, QtWidgetType],
         super().__init__(presenter, *qtobj_args, **qtobj_kwargs)
         self.basetitle = basetitle
         self.set_title()
+        QTimer.singleShot(0, presenter.post_show_init)
 
     def show(self):
         self.qtobj.show()

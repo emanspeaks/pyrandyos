@@ -100,6 +100,11 @@ class GuiApp(GuiQtWrapper):
         self.create_first_window(*firstwin_args, **firstwin_kwargs)
         self.gui_initialized = True
 
+    def process_events(self):
+        qtobj = self.qtobj
+        if qtobj:
+            qtobj.processEvents()
+
     @log_func_call
     def main(self, *args, **kwargs):
         if not self.gui_initialized:
