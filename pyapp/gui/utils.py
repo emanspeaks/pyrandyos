@@ -3,15 +3,19 @@ from collections.abc import Callable
 from contextlib import contextmanager
 from base64 import b64encode
 
-from ..logging import log_func_call
+from ..logging import log_func_call  # , log_info
 from .callback import qt_callback
 from .widgets import GuiWidget, GuiWidgetView
 from .qt import (
     QWidget, QToolButton, QSize, QIcon, QAction, QSizePolicy, QPainter,
     QBuffer, QByteArray, QSlider, Qt, QPushButton, QAbstractButton,
+    QFontMetrics, QStyleOptionViewItem, QFont, QRect,
 )
+# from .gui_app import get_gui_app
 
 GuiWidgetParent = QWidget | GuiWidget | GuiWidgetView
+TEXTWORDWRAP = Qt.TextWordWrap
+ALIGNLEFT = Qt.AlignLeft
 
 
 def get_widget_parent_qtobj(parent: GuiWidgetParent) -> QWidget:
@@ -256,3 +260,103 @@ def _debug_dump_icon(icon: QIcon, size: QSize, name: str = None) -> None:
         fname = f"icon_dump_{name or 'icon'}.png"
         pix = icon.pixmap(size)
         pix.save(str(tmpdir/fname), "PNG")
+
+
+def wrap_text_to_width(text: str, bbox_callback: Callable[[str], QRect],
+                       width: int):
+    "Wrap text to fit within a specified width using the given font metrics."
+    # gui = get_gui_app()
+    # log_info(f"DPI: {gui.get_dpi()}")
+    # log_info(f"DPI Scale: {gui.get_dpi_scale()}")
+    # log_info(f"Window DPI: {gui.windows[0].gui_view.get_dpi()}")
+
+    # compute column width
+    if not text or width <= 0:
+        return text
+
+    def calc_width(s: str) -> int:
+        return bbox_callback(s).width()
+
+    # as-is original width
+    test_width = calc_width(text)
+    if test_width <= width:
+        return text
+
+    # Split text by existing newlines first, then wrap each line
+    original_lines = text.splitlines()
+    wrapped = []
+    append_wrapped = wrapped.append
+    for origline in original_lines:
+        if not origline.strip():
+            # Empty line - preserve it
+            append_wrapped("")
+            continue
+
+        # Check if this line fits without wrapping
+        test_width = calc_width(origline)
+        if test_width <= width:
+            append_wrapped(origline)
+            continue
+
+        # Apply word wrapping to this line
+        curline = ""
+        words = origline.split()
+
+        def popword():
+            return words.pop(0) if words else None
+
+        w = popword()  # we already handled blank line, so should work
+        while w:
+            # Calculate width of current line + new word
+            test_line = curline + (" " if curline else "") + w
+            test_width = calc_width(test_line)
+            # if it fits, i sits...try adding another word
+            if test_width <= width:
+                curline = test_line
+                w = popword()
+                continue
+            # w pushed us over the limit, so break the line and start over
+            if curline:
+                append_wrapped(curline)
+                curline = ""
+                continue
+            # we got a long single word, break by character
+            w2 = ""
+            for c in w:
+                test_line = w2 + c
+                test_width = calc_width(test_line)
+                if test_width > width:
+                    # c put us over the limit, flush w2
+                    if w2:
+                        append_wrapped(w2)
+                        w2 = c
+                    else:
+                        # single char is too much, but we need at least 1
+                        append_wrapped(c)
+                        w2 = ""
+                else:
+                    w2 = test_line
+
+            # curline is still blank if we got here because we are in
+            # single word mode
+            w = w2 if w2 else popword()
+
+        if curline:
+            append_wrapped(curline)
+
+    return "\n".join(wrapped)
+
+
+def calc_fontmetrics_bbox(font_metrics: QFontMetrics, s: str) -> QRect:
+    return font_metrics.boundingRect(s)
+
+
+def get_styled_text_bbox(widget: QWidget, font: QFont, text: str):
+    style_option = QStyleOptionViewItem()
+    style_option.font = font
+    style_option.fontMetrics = QFontMetrics(font)
+    # Get the style from your table widget
+    style = widget.style()
+    rect = style.itemTextRect(style_option.fontMetrics, QRect(), ALIGNLEFT,
+                              True, text)
+    return rect

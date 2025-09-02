@@ -1,5 +1,5 @@
 from ..config.keys import LOCAL_CFG_KEY
-from ..logging import log_exc, log_func_call, DEBUGLOW2, log_debug
+from ..logging import log_exc, log_func_call, DEBUGLOW2, log_debug, log_info
 from ..app import PyApp
 from . import GuiQtWrapper
 from .styles import ThemeMap
@@ -8,7 +8,7 @@ from .splash import GuiSplashScreen
 from .loadstatus import load_status_step, splash_message
 from .qrc import compile_qrc, import_qrc
 from .qt import (
-    QWidget, QApplication, qVersion, QObject, QEvent, QPixmap
+    QWidget, QApplication, qVersion, QObject, QEvent, QPixmap, Qt,
 )
 
 _GUI_APP_INST: 'GuiApp | None' = None
@@ -137,6 +137,7 @@ class GuiApp(GuiQtWrapper):
 
     @log_func_call
     def create_qt_inst(self, app_args: list[str] = []):
+        self.set_high_dpi_support()
         return QtApp(list(app_args))
 
     @log_func_call
@@ -150,3 +151,20 @@ class GuiApp(GuiQtWrapper):
             qtsplash = self.splash.gui_view.qtobj
             qtsplash.finish(delegate)
             self.splash = None
+
+    def set_high_dpi_support(self):
+        # Attribute Qt::AA_EnableHighDpiScaling must be set before
+        # QCoreApplication is created.
+        try:
+            QtApp.setAttribute(Qt.AA_EnableHighDpiScaling)
+            QtApp.setAttribute(Qt.AA_UseHighDpiPixmaps)
+        except Exception as e:
+            # log_info("Failed to set high DPI support", exc_info=e)
+            # on second thought, we don't need a full traceback
+            log_info(f"Failed to set high DPI support: {e}")
+
+    def get_dpi(self):
+        return self.qtobj.primaryScreen().logicalDotsPerInch()
+
+    def get_dpi_scale(self):
+        return self.get_dpi() / 96.0

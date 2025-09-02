@@ -37,6 +37,7 @@ from PySide2.QtGui import (  # noqa: F401
     QResizeEvent,
     QKeySequence,
     QFontMetrics,
+    QFontMetricsF,
 )
 from PySide2.QtWidgets import (  # noqa: F401
     QMainWindow,
@@ -80,6 +81,7 @@ from PySide2.QtWidgets import (  # noqa: F401
     QMessageBox,
     QProgressDialog,
     QActionGroup,
+    QStyleOptionViewItem,
 )
 
 # try:
