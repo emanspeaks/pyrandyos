@@ -13,5 +13,9 @@
     <file>branch-closed-more.svg</file>
     <file>branch-open-end.svg</file>
     <file>branch-closed-end.svg</file>
+    <file>radio-checked.svg</file>
+    <file>radio-unchecked.svg</file>
+    <file>checkbox-checked.svg</file>
+    <file>checkbox-unchecked.svg</file>
   </qresource>
 </RCC>

@@ -14,6 +14,14 @@ def generate_signature_aware_wrapper(func: Callable, arg_handler: Callable,
                                      *handler_args, **handler_kwargs):
     # __traceback_hide__ = True  # noqa: F841
     __traceback_hide_locals__ = True  # noqa: F841
+
+    # If func is a partial, get the original function
+    # to ensure signature and metadata are correct.
+    if isinstance(func, partial):
+        original_func = func.func
+    else:
+        original_func = func
+
     handler_partial = partial(arg_handler, handler_args, handler_kwargs, func)
     sig = signature(func)
     sigparams = sig.parameters
@@ -113,10 +121,10 @@ def generate_signature_aware_wrapper(func: Callable, arg_handler: Callable,
     signature_aware_wrapper = env['signature_aware_wrapper']
     update_wrapper(signature_aware_wrapper, func)
 
-    # Copy metadata
-    signature_aware_wrapper.__name__ = func.__name__
-    signature_aware_wrapper.__doc__ = func.__doc__
-    signature_aware_wrapper.__module__ = func.__module__
+    # Copy metadata (from the original function if it's a partial)
+    signature_aware_wrapper.__name__ = original_func.__name__
+    signature_aware_wrapper.__doc__ = original_func.__doc__
+    signature_aware_wrapper.__module__ = original_func.__module__
 
     return signature_aware_wrapper
 
