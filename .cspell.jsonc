@@ -7,11 +7,11 @@
         "*.code-workspace",
         ".gitignore",
         ".local-gitignore",
-        "pyapp/gui/icons/thirdparty/**/names.py"
+        "pyrandyos/gui/icons/thirdparty/**/names.py"
     ],
     "dictionaryDefinitions": [
         {
-            "name": "pyapp",
+            "name": "pyrandyos",
             "path": ".vscode/ltex.dictionary.en-US.txt",
             "addWords": true
         }
@@ -20,7 +20,7 @@
         "bash",
         "win32",
         "scientific-terms-us",
-        "pyapp"
+        "pyrandyos"
     ],
     "allowCompoundWords": true,
     "ignoreWords": [

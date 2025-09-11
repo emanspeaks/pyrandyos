@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pyapp"
+name = "pyrandyos"
 dynamic = ["version"]
 description = "Library of common functions for Python applications"
 readme = "readme.md"
@@ -28,10 +28,10 @@ qdarkstyle = [
 ]
 
 [tool.hatch.version]
-path = "pyapp/version.py"
+path = "pyrandyos/version.py"
 
 [project.urls]
-Homepage = "https://github.com/emanspeaks/pyapp"
+Homepage = "https://github.com/emanspeaks/pyrandyos"
 
 [tool.coverage.report]
 # ignore_errors = true

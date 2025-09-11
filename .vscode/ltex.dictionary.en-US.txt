@@ -79,6 +79,7 @@ PYAPPDIR
 pycache
 pyfile
 pyqt
+pyrandyos
 pyrcc
 pyscript
 pyside
@@ -141,3 +142,4 @@ VSCode
 vscode-codicons
 waivable
 ymdhms
+PyRandyOS
