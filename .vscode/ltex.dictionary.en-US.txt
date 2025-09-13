@@ -31,6 +31,7 @@ excnfo
 expandvars
 fdir
 filt
+fkirc
 FluentUI
 fluentui-system-icons
 fmetrics

@@ -1,5 +1,13 @@
 name: Upload Python Package to PyPI
-on: push
+on:
+  push:
+  pull_request:
+    branches:
+      - main # Or your default branch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-pypi:

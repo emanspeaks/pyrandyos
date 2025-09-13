@@ -5,15 +5,30 @@ on:
     branches:
       - main # Or your default branch
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+#   cancel-in-progress: true
 
 jobs:
+  pre_job:
+    # continue-on-error: true # Uncomment once integration is finished
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          # All of these options are optional, so you can remove them if you are happy with the defaults
+          concurrent_skipping: 'always'
+          skip_after_successful_duplicate: 'true'
+          do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+
   build:
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: write
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -37,7 +52,7 @@ jobs:
         if: contains( matrix.os, 'ubuntu')
         run: |
           python -m pip install --upgrade pip
-          pip install hatch pdoc
+          pip install hatch
 
       - name: Compile
         run: hatch build
@@ -50,6 +65,21 @@ jobs:
           cd tests
           python pyrandyos_test.py
 
+  build-docs:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pdoc
+
       - name: Build documentation
         run: pdoc ./pyrandyos --docformat google --output-dir ./docs
 
@@ -59,7 +89,8 @@ jobs:
           path: ./docs
 
   deploy:
-    needs: build
+    needs: build-docs
+    if: startsWith(github.ref, 'refs/tags/v')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
