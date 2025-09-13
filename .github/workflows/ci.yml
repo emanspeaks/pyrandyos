@@ -78,8 +78,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install hatch pdoc
 
-      - name: Compile
-        run: hatch build
+      - name: Compile and install
+        run: |
+          hatch build
+          python -m pip install dist/*.whl
 
       - name: Build documentation
         run: pdoc ./pyrandyos --docformat google --output-dir ./docs
