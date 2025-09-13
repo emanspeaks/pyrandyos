@@ -45,6 +45,7 @@ include = [
 [project.urls]
 Homepage = "https://github.com/emanspeaks/pyrandyos"
 Issues = "https://github.com/emanspeaks/pyrandyos/issues"
+documentation = "https://py.randyos.org"
 
 [tool.coverage.report]
 # ignore_errors = true
