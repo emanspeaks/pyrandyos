@@ -87,10 +87,10 @@ jobs:
           pip install pdoc
           pdoc ./pyrandyos --docformat google --output-dir ./docs
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          path: ./docs
+          name: pyrandyos-docs
+          path: docs/
 
   deploy-docs:
     needs: build-docs
@@ -100,6 +100,15 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pyrandyos-docs
+          path: docs/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
