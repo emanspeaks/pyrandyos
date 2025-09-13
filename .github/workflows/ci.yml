@@ -93,7 +93,7 @@ jobs:
         with:
           path: ./docs
 
-  deploy:
+  deploy-docs:
     needs: build-docs
     if: startsWith(github.ref, 'refs/tags/v')
     environment:
