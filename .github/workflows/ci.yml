@@ -22,7 +22,7 @@ jobs:
         with:
           # All of these options are optional, so you can remove them if you are happy with the defaults
           concurrent_skipping: 'always'
-          skip_after_successful_duplicate: 'true'
+          # skip_after_successful_duplicate: 'true'
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
 
   build:
@@ -93,7 +93,7 @@ jobs:
         with:
           path: ./docs
 
-  deploy:
+  deploy-docs:
     needs: build-docs
     if: startsWith(github.ref, 'refs/tags/v')
     environment:
