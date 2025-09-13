@@ -72,6 +72,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+          # why does this only work on 3.10???
+          # pdoc keeps segfaulting on 3.13.  Didn't try versions in between.
 
       - name: Compile and install
         run: |
@@ -81,6 +83,7 @@ jobs:
           python -m pip install dist/*.whl
 
       - name: Build documentation
+        # delay pip install pdoc to try to avoid some dependency conflict
         run: |
           pip install pdoc
           pdoc ./pyrandyos --docformat google --output-dir ./docs
