@@ -1,0 +1,1 @@
+{"rule":"COPYRIGHT","sentence":"^\\QCopyright (c) 2025 Randy Eckman\\E$"}

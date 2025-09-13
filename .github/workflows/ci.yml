@@ -1,0 +1,106 @@
+name: CI
+on:
+  push:
+  pull_request:
+    branches:
+      - main # Or your default branch
+
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+#   cancel-in-progress: true
+
+jobs:
+  pre_job:
+    # continue-on-error: true # Uncomment once integration is finished
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          # All of these options are optional, so you can remove them if you are happy with the defaults
+          concurrent_skipping: 'always'
+          skip_after_successful_duplicate: 'true'
+          do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+
+  build:
+    runs-on: ${{ matrix.os }}
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        python-version:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Python dependencies
+        if: contains( matrix.os, 'ubuntu')
+        run: |
+          python -m pip install --upgrade pip
+          pip install hatch
+
+      - name: Compile
+        run: hatch build
+
+      - name: Run tests
+        run: |
+          ls -la
+          ls -la ./dist
+          python -m pip install dist/*.whl
+          cd tests
+          python pyrandyos_test.py
+
+  build-docs:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          # why does this only work on 3.10???
+          # pdoc keeps segfaulting on 3.13.  Didn't try versions in between.
+
+      - name: Compile and install
+        run: |
+          python -m pip install --upgrade pip
+          pip install hatch
+          hatch build
+          python -m pip install dist/*.whl
+
+      - name: Build documentation
+        # delay pip install pdoc to try to avoid some dependency conflict
+        run: |
+          pip install pdoc
+          pdoc ./pyrandyos --docformat google --output-dir ./docs
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+
+  deploy:
+    needs: build-docs
+    if: startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,56 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "yaml.customTags": ["!reference sequence"],
+		"python.testing.unittestArgs": [
+			"-v",  // verbose
+			"-s",  // discovery start directory
+			"./tests",
+			"-p",  // pattern to match for test files
+			"*test.py"
+		],
+		"python.testing.pytestEnabled": false,
+		"python.testing.unittestEnabled": true,
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/.conda": true,
+		}
+  },
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "PyRandyOS: @log_func_call script",
+				"type": "debugpy",
+				"request": "launch",
+				"module": "pyrandyos",
+				"console": "integratedTerminal",
+				"justMyCode": false,
+				"args": [
+					"log_func_call",
+					"${workspaceFolder:pyrandyos}/pyrandyos/tools/.log_func_call_exclude.jsonc"
+				],
+				"cwd": "${workspaceFolder:pyrandyos}"//,
+				// "guiEventLoop": "qt"
+				// "stopOnEntry": true
+			},
+			{
+				"name": "Python: Current File",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"justMyCode": false
+			}
+		],
+		"compounds": []
+	}
+}

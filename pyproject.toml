@@ -3,8 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pyapp"
-# version = "0.1.0"
+name = "pyrandyos"
 dynamic = ["version"]
 description = "Library of common functions for Python applications"
 readme = "readme.md"
@@ -15,33 +14,38 @@ maintainers = [
   {name = "Randy Eckman", email = "emanspeaks@gmail.com"},
 ]
 dependencies = [
-  "pywin32",
+  "pywin32; sys_platform == 'win32'",
   "tqdm",
   "pyside2",
   "types-pyside2",
+  "pandas",
+  "numpy",
+]
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
 ]
 
 [project.optional-dependencies]
-qdarkstyle = [
-  "qdarkstyle",
-]
-
-# [tool.hatch.build]
-# include = [
-#   "pyapp/gui/icons/assets/**/*.ttf",
-#   "pyapp/gui/icons/assets/**/*.json",
-#   "pyapp/gui/icons/assets/**/LICENSE*",
-#   "pyapp/gui/styles/assets/*.qrc",
-#   "pyapp/gui/styles/assets/*.svg",
-#   "pyapp/gui/styles/assets/*.qss",
-#   "pyapp/gui/styles/assets/*.json",
-# ]
+qdarkstyle = ["qdarkstyle"]
 
 [tool.hatch.version]
-path = "pyapp/version.py"
+path = "pyrandyos/version.py"
+
+[tool.hatch.build]
+include = [
+  "pyrandyos/**/*.py",
+  "pyrandyos/gui/styles/assets",
+  "pyrandyos/gui/icons/assets",
+]
 
 [project.urls]
-Homepage = "https://github.com/emanspeaks/pyapp"
+Homepage = "https://github.com/emanspeaks/pyrandyos"
+Issues = "https://github.com/emanspeaks/pyrandyos/issues"
+documentation = "https://py.randyos.org"
 
 [tool.coverage.report]
 # ignore_errors = true

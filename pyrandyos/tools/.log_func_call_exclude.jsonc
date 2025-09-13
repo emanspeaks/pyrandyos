@@ -1,0 +1,65 @@
+{
+  "exclude_files": [
+    "pyrandyos/tools/add_log_func_call_decorators.py",
+    "pyrandyos/config/defaults.py",
+    "pyrandyos/config/keys.py",
+    "pyrandyos/gui/icons/update_from_spec.py",
+    "pyrandyos/gui/notify.py",
+    "pyrandyos/utils/classproperty.py",
+    "pyrandyos/utils/stack.py",
+    "pyrandyos/utils/casesafe.py",
+    "pyrandyos/utils/cfgdict.py",
+    "pyrandyos/gui/loadstatus.py",
+    "pyrandyos/gui/splash.py",
+    "pyrandyos/gui/icons/browser/gui/utils.py",
+    "pyrandyos/gui/icons/iconfont/icon.py",
+    "pyrandyos/gui/icons/browser/gui/main/iconmodel.py",
+    "pyrandyos/gui/icons/browser/gui/splash.py",
+    "pyrandyos/gui/icons/iconfont/animation.py",
+    "pyrandyos/utils/hash.py",
+    "pyrandyos/utils/signature_wrapper.py",
+    "pyrandyos/logging.py"//,
+  ],
+  "exclude_classes": [
+    "MillisecondFormatter",
+    "LevelFilter",
+    "LogMultiFormatter"//,
+  ],
+  "exclude_methods": {
+    "FileSetTqdm": [
+      "__iter__"
+    ],
+    "MainWindowView": [
+      "register_chip_load_steps"
+    ],
+    "IconLayer": [
+      "paint",
+      "get_draw_size",
+      "draw_text",
+      "get_rawfont",
+      "prep_rawfont_paint",
+      "draw_path",
+      "draw_glyphrun",
+      "draw_image"
+    ],
+    "QtSplashScreen": [
+      "mousePressEvent"//,
+    ]//,
+  },
+  "exclude_dirs": [
+    "__pycache__",
+    "_testing",
+    ".git",
+    ".venv",
+    "venv",
+    "env",
+    ".conda",
+    "tests"//,
+  ],
+  "exclude_functions": {
+    "pyrandyos/gui/utils.py": [
+      "painter_context"
+    ]//,
+  },
+  "base_dir": "C:/scratch/git/pyrandyos"
+}

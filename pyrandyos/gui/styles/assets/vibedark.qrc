@@ -1,0 +1,21 @@
+<RCC>
+  <qresource prefix="/icons">
+    <file>branch-closed.svg</file>
+    <file>branch-open.svg</file>
+    <file>arrow-down.svg</file>
+    <file>arrow-up.svg</file>
+    <file>arrow-left.svg</file>
+    <file>arrow-right.svg</file>
+    <file>vline.svg</file>
+    <file>branch-more.svg</file>
+    <file>branch-end.svg</file>
+    <file>branch-open-more.svg</file>
+    <file>branch-closed-more.svg</file>
+    <file>branch-open-end.svg</file>
+    <file>branch-closed-end.svg</file>
+    <file>radio-checked.svg</file>
+    <file>radio-unchecked.svg</file>
+    <file>checkbox-checked.svg</file>
+    <file>checkbox-unchecked.svg</file>
+  </qresource>
+</RCC>
