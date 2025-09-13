@@ -48,6 +48,7 @@ ispec
 jdumps
 jloads
 jsonify
+jsonlicdir
 klass
 lastc
 levelno
@@ -79,6 +80,8 @@ PYAPP
 PYAPPDIR
 pycache
 pyfile
+pypa
+pypi
 pyqt
 pyrandyos
 PyRandyOS
@@ -129,6 +132,7 @@ toolbtn
 TPAD
 tqdm
 ttffile
+ttflicdir
 ttflicenses
 ttfspec
 txtbox
