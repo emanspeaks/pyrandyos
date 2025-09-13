@@ -79,9 +79,19 @@ class IconFontSpec(GitDependencySpec):
 
     @log_func_call(DEBUGLOW2, trace_only=True)
     def ensure_local_files(self, download_dir: Path = None):
-        ttffile = self.ttf_filespec.get_or_download(download_dir)
-        jsonfile = self.charmap_filespec.get_or_download(download_dir)
-        return ttffile, jsonfile
+        classname = self.classname
+
+        ttfspec = self.ttf_filespec
+        ttffile = ttfspec.get_or_download(download_dir)
+        ttflicdir = download_dir/classname/'ttf'
+        ttflicenses = ttfspec.get_or_download_licenses(ttflicdir)
+
+        jsonspec = self.charmap_filespec
+        jsonfile = jsonspec.get_or_download(download_dir)
+        jsonlicdir = download_dir/classname/'json'
+        jsonlicenses = jsonspec.get_or_download_licenses(jsonlicdir)
+
+        return ttffile, jsonfile, ttflicenses, jsonlicenses
 
     @log_func_call(DEBUGLOW2, trace_only=True)
     def initialize(self, target_relative_class_qualname: str,

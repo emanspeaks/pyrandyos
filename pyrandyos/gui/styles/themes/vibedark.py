@@ -60,35 +60,3 @@ def vibedark(app: QtApp):
     app.setStyle("Fusion")
     app.setPalette(palette)
     app.setStyleSheet(qss)
-
-
-# def _create_icon_for_theme(fontspec_name: str, icon_name: str):
-#     """Create QIcon for themed proxy style."""
-#     ispec = IconSpec.generate_iconspec(fontspec_name, glyph_name=icon_name)
-#     return ispec.icon()
-
-# BEWARE: this does not work because QSS does not reliably support using
-# data URIs for icons.  This approach was abandoned.
-#
-# @log_func_call
-# def merge_qss_icons(qss: str):
-#     icon_json = ASSETS_DIR/"vibedark-icons.json"
-#     icon_map = load_jsonc(icon_json)
-#     size = QSize(16, 16)
-#     for css_selector, icon_data in icon_map.items():
-#         ispec = IconSpec.generate_iconspec(icon_data['fontspec_name'],
-#                                            glyph_name=icon_data['icon_name'])
-#         icon_uri = qicon_to_data_uri(ispec.icon(), size)
-#         if not icon_uri.startswith("data:image/png;base64,"):
-#             raise ValueError("invalid icon URI format, "
-#                              "expected PNG data URI")
-
-#         # # Remove font-based properties that conflict with bitmap images
-#         updates = {"image": f'url("{icon_uri}")'}
-#         # # Remove font-based properties to avoid conflicts
-#         # updates["color"] = None
-#         # updates["font-size"] = None
-
-#         qss = merge_qss_properties(qss, css_selector, updates)
-
-#     return qss

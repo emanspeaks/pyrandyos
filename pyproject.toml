@@ -21,17 +21,30 @@ dependencies = [
   "pandas",
   "numpy",
 ]
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
 
 [project.optional-dependencies]
-qdarkstyle = [
-  "qdarkstyle",
-]
+qdarkstyle = ["qdarkstyle"]
 
 [tool.hatch.version]
 path = "pyrandyos/version.py"
 
+[tool.hatch.build]
+include = [
+  "pyrandyos/**/*.py",
+  "pyrandyos/gui/styles/assets",
+  "pyrandyos/gui/icons/assets",
+]
+
 [project.urls]
 Homepage = "https://github.com/emanspeaks/pyrandyos"
+Issues = "https://github.com/emanspeaks/pyrandyos/issues"
 
 [tool.coverage.report]
 # ignore_errors = true

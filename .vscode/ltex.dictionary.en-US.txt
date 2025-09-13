@@ -51,6 +51,7 @@ jsonify
 klass
 lastc
 levelno
+LICEN
 loadf
 logcfg
 lvwidget
@@ -80,6 +81,7 @@ pycache
 pyfile
 pyqt
 pyrandyos
+PyRandyOS
 pyrcc
 pyscript
 pyside
@@ -127,6 +129,8 @@ toolbtn
 TPAD
 tqdm
 ttffile
+ttflicenses
+ttfspec
 txtbox
 UNC
 UNCs
@@ -142,4 +146,3 @@ VSCode
 vscode-codicons
 waivable
 ymdhms
-PyRandyOS

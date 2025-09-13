@@ -14,6 +14,7 @@ def get_github_download_url(base_url: str, commit: str, relpath: Path):
 
 @log_func_call
 def download_file(url: str, dest: Path, use_tqdm: bool = True,
+                  show_full_path: bool = False,
                   chunk_size: int = 8192):
     if dest.is_dir():
         dest = dest / Path(url).name
@@ -24,7 +25,8 @@ def download_file(url: str, dest: Path, use_tqdm: bool = True,
             raise RuntimeError(f"Failed to download file from {url}: "
                                f"HTTP {response.status}")
 
-        with optional_tqdm(use_tqdm, desc=dest.name, unit='B', unit_scale=True,
+        lbl = dest.as_posix() if show_full_path else dest.name
+        with optional_tqdm(use_tqdm, desc=lbl, unit='B', unit_scale=True,
                            total=int(response.headers.get('Content-Length',
                                                           0))) as t:
             while True:
