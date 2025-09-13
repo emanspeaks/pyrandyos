@@ -1,7 +1,13 @@
 name: CI
 on:
-  - push
-  - pull_request
+  push:
+  pull_request:
+    branches:
+      - main # Or your default branch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:

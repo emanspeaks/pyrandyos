@@ -28,6 +28,7 @@ jobs:
 
   test-pypi-publish:
     name: Publish to Test PyPI
+    if: github.event_name == 'pull_request'
     needs:
       - build-pypi
     runs-on: ubuntu-latest
