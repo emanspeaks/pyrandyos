@@ -91,6 +91,7 @@ pyscript
 pyside
 pywin
 qdarkstyle
+qfixed
 QFontIcon
 qicon
 QIconFont
@@ -123,6 +124,7 @@ sinfo
 Spyder
 STARTBRAK
 str
+tblopt
 tgtdir
 tkbasewidget
 tkroot

@@ -3,11 +3,14 @@ from functools import partial
 
 from ....logging import log_func_call, DEBUG
 from ...widgets import GuiWindowLikeParentType
-from ...qt import Qt, QHeaderView  # , QRect, QFontMetrics
+from ...qt import Qt, QHeaderView  # , QRect  # , QFontMetrics
 from ...gui_app import get_gui_app
-from ...utils import wrap_text_to_width, get_styled_text_bbox
+from ...utils import (
+    wrap_text_to_width, get_table_item_text_bbox, get_table_item_usable_rect,
+    # test_width_calc,  # get_styled_text_bbox,
+)
 from .. import GuiDialog
-from .view import LogDialogView, TABLE_VPAD, TABLE_HPAD
+from .view import LogDialogView, TABLE_VPAD
 
 LOG_DELIM = ' | '
 UserRole = Qt.UserRole
@@ -76,8 +79,8 @@ class LogDialog(GuiDialog[LogDialogView]):
 
     @log_func_call(DEBUG)
     def update_row_heights(self, logical_index: int = None,
-                           old_size: int = None,
-                           new_size: int = None):
+                           old_width: int = None,
+                           new_width: int = None):
         """
         Calculate and set appropriate row heights based on content and
         column widths.
@@ -86,27 +89,39 @@ class LogDialog(GuiDialog[LogDialogView]):
         header = table.horizontalHeader()
         vheader = table.verticalHeader()
         ncols = table.columnCount()
-        widths = [table.columnWidth(col) for col in range(ncols)]
         modes = [header.sectionResizeMode(col) for col in range(ncols)]
         if header.stretchLastSection():
             modes[-1] = Stretch
+
+        # widths = [table.columnWidth(col) for col in range(ncols)]
+        # if logical_index is not None:
+        #     widths[logical_index] = new_size
 
         for row in range(table.rowCount()):
             max_row_height = 0
             for col in range(ncols):
                 item = table.item(row, col)
                 text: str = item.data(UserRole)
-                font = item.font()
+                # font = item.font()
                 # fmetrics = QFontMetrics(font, table)
-                bboxcalc = partial(get_styled_text_bbox, table, font)
-                usable_width = widths[col] - TABLE_HPAD
+                # bboxcalc = partial(get_styled_text_bbox, table, font)
+                bboxcalc = partial(get_table_item_text_bbox, table, item)
+                textrect = get_table_item_usable_rect(table, item)
+                # usable_width = widths[col] - TABLE_HPAD
+                usable_width = textrect.width()
+                if logical_index is not None and col == logical_index:
+                    margin = old_width - usable_width
+                    usable_width = new_width - margin  # - TABLE_HPAD
+
                 if modes[col] != ResizeToContents:
+                    # lineWidth, widthUsed = test_width_calc(table, item,
+                    #                                        widths[col], text)
                     text = wrap_text_to_width(text, bboxcalc, usable_width)
 
                 item.setText(text)
                 # nlines = 1 + text.count('\n')
                 # lineheight = bboxcalc(text).height()
-                # rect = QRect(0, 0, usable_width, lineheight*nlines*2)
+                # box = QRect(0, 0, usable_width, lineheight*nlines)
                 box = bboxcalc(text)
                 row_height = max(vheader.minimumHeight(),
                                  box.height() + TABLE_VPAD)
