@@ -1,20 +1,25 @@
+from pathlib import Path
 from logging import Handler, Formatter, LogRecord
 from collections.abc import Callable
+from functools import partial
 
-from pyrandyos.utils.log import (
-    check_loglevel, MillisecondFormatter,
-    LogMultiFormatter,
-)
-from pyrandyos.logging import get_loglevel_num_name, make_log_record
-from pyrandyos.gui.qt import QLabel
-from pyrandyos.gui.gui_app import get_gui_app
-from pyrandyos.app import PyRandyOSApp
-
+from ...app import PyRandyOSApp
 from ...logging import (
-    INFO, LOGSTDERR, LOGSTDOUT, LOGTQDM, WARNING, ERROR, CRITICAL,
-    DEBUG,
-    log_func_call, get_logger,
+    INFO, LOGSTDERR, LOGSTDOUT, LOGTQDM, WARNING, ERROR, CRITICAL, DEBUG,
+    log_func_call, get_logger, get_loglevel_num_name, make_log_record,
+    log_debuglow2, log_debug,
 )
+from ...utils.log import (
+    check_loglevel, MillisecondFormatter, LogMultiFormatter,
+)
+from ...config.keys import BASE_LOG_PATH_KEY
+from ..qt import (
+    QStatusBar, QLabel, QMainWindow, Qt, QMouseEvent, QPoint, QMenu,
+)
+from ..callback import qt_callback
+from ..gui_app import get_gui_app
+from ..dialogs.log import LogDialog
+from . import QtWidgetWrapper, GuiWindowLikeParentType
 
 StatusMsgStyleDict = dict[str | int, str]
 StatusMsgClearDict = dict[str | int, bool]
@@ -139,91 +144,21 @@ class StatusMsgLogHandler(Handler):
             cb()
 
 
-@log_func_call
-def add_statusmsg_log_handler(
-    lbl: QLabel,
-    level: int | str = INFO,
-    clear_prev_message_callback: Callable = None,
-    fmt: Formatter = DEFAULT_STATUSMSG_FMT,
-    style_dict: StatusMsgStyleDict = DEFAULT_STATUSMSG_STYLES,
-    reset_style_callback: Callable = None,
-    clear_dict: StatusMsgClearDict = DEFAULT_STATUSMSG_CLEAR,
-):
-    check_loglevel(level)
-    lnum, _ = get_loglevel_num_name(level)
-    msglog = StatusMsgLogHandler(lbl, lnum, style_dict,
-                                 clear_prev_message_callback, clear_dict,
-                                 reset_style_callback)
-    msglog.setFormatter(fmt)
-    msglog.addFilter(StatusMsgLogFilter())
-    get_logger().root.addHandler(msglog)
-    return msglog
+class LoggingStatusBarWidget(QtWidgetWrapper[QStatusBar]):
+    @log_func_call
+    def __init__(self, parent: GuiWindowLikeParentType):  # , *qtobj_args):
+        self._log_dialog: LogDialog = None
+        super().__init__(parent)  # , *qtobj_args)
 
-
-def update_status_bar_msg(self, msg: str, level: int | str = INFO,
-                            temp: bool = False, timeout_ms: int = 0):
-    view = self.gui_view
-    if temp:
-        bar = view.status_bar
-        bar.showMessage(msg, timeout_ms)
-    else:
-        view.status_msg_updater(msg, level)
-
-
-def clear_status_message(self):
-    """Clear the status bar message."""
-    view = self.gui_view
-    view.status_bar.clearMessage()
-    view.status_msg_updater()
-    log_debuglow2("Status message cleared")
-
-def copy_status_message(self, msg: str):
-    """Copy the current status message to clipboard."""
-    if msg:
-        get_gui_app().qtobj.clipboard().setText(msg)
-        log_debug(f"Status message copied: {msg}")
-
-def click_status_msg(self, event: QMouseEvent = None):
-    if not event or event.button() == Qt.LeftButton:
-        self.show_log_dialog()
-
-def get_current_status_msg(self):
-    view = self.gui_view
-    return (view.status_bar.currentMessage()
-            or view.status_msg_updater(get_last=True))
-
-def show_log_dialog(self, log_path: Path = None):
-    log_path = log_path or self.get_log_path()
-    if log_path:
-        # Close existing dialog if open
-        dialog: LogDialog = self._log_dialog
-        if dialog:
-            try:
-                dialog.gui_view.qtobj.close()
-            except RuntimeError:
-                # Dialog was already closed/destroyed
-                pass
-
-        # Create and show new dialog
-        dialog = LogDialog(self, log_path)
-        self._log_dialog = dialog
-        dialog.show()
-
-def get_log_path(self):
-    logpath = PyRandyOSApp.get(BASE_LOG_PATH_KEY, None)
-    return Path(logpath) if logpath else None
-
-
-def create_statusbar(self):
-        qtwin = self.qtobj
-        pres = self.gui_pres
+    def create_qtobj(self):  # , *qtobj_args):
+        qtwin: QMainWindow = self.gui_parent.qtobj
 
         statusbar = QStatusBar(qtwin)
         qtwin.setStatusBar(statusbar)
         self.status_bar = statusbar
 
         status_msg_lbl = QLabel(statusbar)
-        status_msg_lbl.mousePressEvent = pres.click_status_msg
+        status_msg_lbl.mousePressEvent = self.click_status_msg
         statusbar.addWidget(status_msg_lbl, 1)
         self.status_msg_lbl = status_msg_lbl
 
@@ -233,16 +168,85 @@ def create_statusbar(self):
         status_context_signal.connect(
             qt_callback(self.show_status_context_menu))
 
-        msglog = add_statusmsg_log_handler(status_msg_lbl,
-                                           PyRandyOSApp.get('statusbar_log_level',
-                                                        INFO),
-                                           statusbar.clearMessage)
+        level = PyRandyOSApp.get('statusbar_log_level', INFO)
+        msglog = self.add_statusmsg_log_handler(level, statusbar.clearMessage)
         updater = msglog.update_label
         self.status_msg_updater = updater
         updater('Ready')
 
+        return statusbar
 
-def show_status_context_menu(self, position: QPoint):
+    @log_func_call
+    def add_statusmsg_log_handler(
+        self,
+        level: int | str = INFO,
+        clear_prev_message_callback: Callable = None,
+        fmt: Formatter = DEFAULT_STATUSMSG_FMT,
+        style_dict: StatusMsgStyleDict = DEFAULT_STATUSMSG_STYLES,
+        reset_style_callback: Callable = None,
+        clear_dict: StatusMsgClearDict = DEFAULT_STATUSMSG_CLEAR,
+    ):
+        lbl = self.status_msg_lbl
+        check_loglevel(level)
+        lnum, _ = get_loglevel_num_name(level)
+        msglog = StatusMsgLogHandler(lbl, lnum, style_dict,
+                                     clear_prev_message_callback, clear_dict,
+                                     reset_style_callback)
+        msglog.setFormatter(fmt)
+        msglog.addFilter(StatusMsgLogFilter())
+        get_logger().root.addHandler(msglog)
+        return msglog
+
+    def update_status_bar_msg(self, msg: str, level: int | str = INFO,
+                              temp: bool = False, timeout_ms: int = 0):
+        if temp:
+            bar = self.status_bar
+            bar.showMessage(msg, timeout_ms)
+        else:
+            self.status_msg_updater(msg, level)
+
+    def clear_status_message(self):
+        """Clear the status bar message."""
+        self.status_bar.clearMessage()
+        self.status_msg_updater()
+        log_debuglow2("Status message cleared")
+
+    def copy_status_message(self, msg: str):
+        """Copy the current status message to clipboard."""
+        if msg:
+            get_gui_app().qtobj.clipboard().setText(msg)
+            log_debug(f"Status message copied: {msg}")
+
+    def click_status_msg(self, event: QMouseEvent = None):
+        if not event or event.button() == Qt.LeftButton:
+            self.show_log_dialog()
+
+    def get_log_path(self):
+        logpath = PyRandyOSApp.get(BASE_LOG_PATH_KEY, None)
+        return Path(logpath) if logpath else None
+
+    def show_log_dialog(self, log_path: Path = None):
+        log_path = log_path or self.get_log_path()
+        if log_path:
+            # Close existing dialog if open
+            dialog = self._log_dialog
+            if dialog:
+                try:
+                    dialog.gui_view.qtobj.close()
+                except RuntimeError:
+                    # Dialog was already closed/destroyed
+                    pass
+
+            # Create and show new dialog
+            dialog = LogDialog(self, log_path)
+            self._log_dialog = dialog
+            dialog.show()
+
+    def get_current_status_msg(self):
+        return (self.status_bar.currentMessage()
+                or self.status_msg_updater(get_last=True))
+
+    def show_status_context_menu(self, position: QPoint):
         """Show context menu for status bar message label."""
         pres = self.gui_pres
         msg = pres.get_current_status_msg()
