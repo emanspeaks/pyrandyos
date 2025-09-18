@@ -46,6 +46,16 @@ def get_stack_frame(level: int = 1):
     return f
 
 
+def is_code_the_given_func(func: Callable, code: CodeType):
+    qualname = getattr(code, 'co_qualname', None)
+    bytecode = code.co_code
+    match_code = False
+    if not qualname:
+        match_code = func.__code__.co_code == bytecode
+
+    return qualname == func.__qualname__ if qualname else match_code
+
+
 @overload
 def get_module_and_name(modname: str = None) -> ModAndName: ...
 @overload

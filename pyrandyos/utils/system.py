@@ -2,7 +2,7 @@
 # the Python interpreter, or conda environments.
 
 import sys
-from os import system as os_sys, environ
+from os import system as os_sys
 from pathlib import Path
 from shutil import chown, copy2
 from importlib.util import spec_from_file_location, module_from_spec
@@ -12,7 +12,7 @@ from ..logging import DEBUGLOW2, log_func_call, log_debug
 from .constants import (
     DEFAULT_GROUP, DEFAULT_DIR_MODE, DEFAULT_FILE_MODE, IS_WIN32,
 )
-from .paths import expand_and_check_var_path
+from .paths import expand_and_check_var_path, expand_and_check_var
 from .string import quote_str
 
 
@@ -152,17 +152,24 @@ def is_dir_conda_env(p: Path):
 
 
 @log_func_call
-def get_conda_base_prefix():
+def get_conda_base_prefix(addl_expand_vars: dict = {},
+                          case_insensitive: bool = IS_WIN32):
     # we don't need to worry about case sensitivity because the Conda source
     # code always uses all caps for these.  It's easy to update later if that
     # ever becomes not the case.
-    shlvl = environ.get('CONDA_SHLVL')
-    assert shlvl, 'Not running in a Conda environment'
-    resolved, base = expand_and_check_var_path('CONDA_ROOT')
-    if not resolved and int(shlvl) > 1:
-        resolved, p = expand_and_check_var_path('CONDA_EXE')
-        if resolved:
-            base = p.parent.parent  # CONDA_EXE defined as base/Scripts/conda
+    resolved, shlvl = expand_and_check_var('CONDA_SHLVL', addl_expand_vars,
+                                           case_insensitive)
+    if resolved:
+        # assert shlvl, 'Not running in a Conda environment'
+        resolved, base = expand_and_check_var_path('CONDA_ROOT',
+                                                   addl_expand_vars,
+                                                   case_insensitive)
+        if not resolved and int(shlvl) > 1:
+            resolved, p = expand_and_check_var_path('CONDA_EXE',
+                                                    addl_expand_vars,
+                                                    case_insensitive)
+            if resolved:
+                base = p.parent.parent  # CONDA_EXE defined base/Scripts/conda
 
     if not resolved:
         base = Path(sys.prefix)
