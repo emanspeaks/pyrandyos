@@ -27,6 +27,7 @@ from .utils.stack import (
     exc_info as _exc_info, log_find_caller as _find_caller,
     format_exc as _format_exc, get_stack_frame as _get_stack_frame,
     ExcInfoType as _ExcInfoType,
+    is_code_the_given_func as _is_code_the_given_func,
 )
 
 _RecFactoryType = _Callable[..., _LogRecord]
@@ -69,7 +70,16 @@ def get_logger(modname: str = None, stacklevel: int = 2) -> Logger:
         return log
     # default stack level here is 2 because we want to pop off both
     # get_stack_frame and get_logger.
-    modname = modname or _get_stack_frame(stacklevel).f_globals['__name__']
+    if not modname:
+        f = _get_stack_frame(stacklevel)
+        if f:
+            modname = f.f_globals['__name__']
+
+        else:
+            # if we exhausted the whole stack, it's probably because the issue
+            # is in the main script, so let's just assume it's '__main__'
+            modname = '__main__'
+
     return _getLogger(modname)
 
 
@@ -247,10 +257,18 @@ def _log_exc_hook(exc_or_type: type | BaseException = None,
     # can know definitively they are being called externally and thus worthy
     # of trapping here even in a debug scenario.
     tbf = traceback.tb_frame
-    is_qt_callback = tbf.f_code.co_qualname == 'QtCallable.__call__'
-    if (not is_debug_enabled() or not f
-            or f.f_code.co_qualname == 'QtApp.notify'
-            or is_qt_callback):
+    code = tbf.f_code
+    from .gui.callback import QtCallable
+    is_qt_callback = _is_code_the_given_func(QtCallable.__call__, code)
+
+    debug = is_debug_enabled()
+    is_qt_notify = False
+    if debug and f:
+        code = f.f_code
+        from .gui.gui_app import QtApp
+        is_qt_notify = _is_code_the_given_func(QtApp.notify, code)
+
+    if (not debug or not f or is_qt_notify or is_qt_callback):
         # stacklevel here needs to pop an additional level from the default 1
         # for the absolute stacklevel of _log_exc_hook itself for get_logger.
         # The secondary use of stacklevel otherwise would be for getting the

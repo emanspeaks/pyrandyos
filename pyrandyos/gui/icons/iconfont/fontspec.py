@@ -19,32 +19,38 @@ class IconFontGitCommit(GitCommitSpec):
 
 class IconFontGitFile(GitFileSpec):
     @log_func_call(DEBUGLOW2, trace_only=True)
-    def __init__(self, git_commit: IconFontGitCommit, repo_relpath: Path,
-                 md5sum: str = None):
+    def __init__(self, filetype: str, git_commit: IconFontGitCommit,
+                 repo_relpath: Path, md5sum: str = None):
         super().__init__(git_commit, repo_relpath, md5sum)
         self.parent: 'IconFontSpec'
+        self.filetype = filetype
 
     @log_func_call(DEBUGLOW2, trace_only=True)
     def get_local_path(self, download_dir: Path | None = None):
         classname = self.parent.classname
-        p = ICON_ASSETS_DIR/classname
+        filetype = self.filetype
+        p = ICON_ASSETS_DIR/classname/filetype
 
         if download_dir is None:
             from ....app import PyRandyOSApp
             download_dir = PyRandyOSApp.mkdir_temp()
 
-        return super().get_local_path(download_dir/classname, p)
+        return super().get_local_path(download_dir/classname/filetype, p)
 
 
 class IconTtfFileSpec(IconFontGitFile):
-    pass
+    @log_func_call(DEBUGLOW2, trace_only=True)
+    def __init__(self, git_commit: IconFontGitCommit, repo_relpath: Path,
+                 md5sum: str = None):
+        super().__init__('ttf', git_commit, repo_relpath, md5sum)
+        self.parent: 'IconFontSpec'
 
 
 class IconCharMapFileSpec(IconFontGitFile):
     @log_func_call(DEBUGLOW2, trace_only=True)
     def __init__(self, git_commit: IconFontGitCommit, repo_relpath: Path,
                  codepoint_base: int = 16, md5sum: str = None):
-        super().__init__(git_commit, repo_relpath, md5sum)
+        super().__init__('charmap', git_commit, repo_relpath, md5sum)
         self.codepoint_base = codepoint_base
 
     @log_func_call
@@ -79,19 +85,15 @@ class IconFontSpec(GitDependencySpec):
 
     @log_func_call(DEBUGLOW2, trace_only=True)
     def ensure_local_files(self, download_dir: Path = None):
-        classname = self.classname
-
         ttfspec = self.ttf_filespec
         ttffile = ttfspec.get_or_download(download_dir)
-        ttflicdir = download_dir/classname/'ttf'
-        ttflicenses = ttfspec.get_or_download_licenses(ttflicdir)
+        ttflicenses = ttfspec.get_or_download_licenses(download_dir)
 
-        jsonspec = self.charmap_filespec
-        jsonfile = jsonspec.get_or_download(download_dir)
-        jsonlicdir = download_dir/classname/'json'
-        jsonlicenses = jsonspec.get_or_download_licenses(jsonlicdir)
+        charmapspec = self.charmap_filespec
+        charmapfile = charmapspec.get_or_download(download_dir)
+        charmaplicenses = charmapspec.get_or_download_licenses(download_dir)
 
-        return ttffile, jsonfile, ttflicenses, jsonlicenses
+        return ttffile, charmapfile, ttflicenses, charmaplicenses
 
     @log_func_call(DEBUGLOW2, trace_only=True)
     def initialize(self, target_relative_class_qualname: str,

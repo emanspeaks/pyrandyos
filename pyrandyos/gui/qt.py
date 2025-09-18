@@ -1,3 +1,5 @@
+from ctypes import c_int, sizeof
+
 from PySide2.QtCore import (  # noqa: F401
     qVersion,
     Qt,
@@ -38,6 +40,8 @@ from PySide2.QtGui import (  # noqa: F401
     QKeySequence,
     QFontMetrics,
     QFontMetricsF,
+    QTextLayout,
+    QTextOption,
 )
 from PySide2.QtWidgets import (  # noqa: F401
     QMainWindow,
@@ -82,6 +86,9 @@ from PySide2.QtWidgets import (  # noqa: F401
     QProgressDialog,
     QActionGroup,
     QStyleOptionViewItem,
+    QStyledItemDelegate,
+    QStyle,
+    QItemDelegate,
 )
 
 # try:
@@ -90,3 +97,9 @@ from PySide2.QtWidgets import (  # noqa: F401
 #     from qtpy.QtGui import QGlyphRun
 # except ImportError:
 QGlyphRun = None
+
+INT_SIZE = sizeof(c_int)
+INT_MAX = 2**(INT_SIZE*8 - 1) - 1
+
+# from src/gui/painting/qfixed_p.h
+QFIXED_MAX = (INT_MAX//256)

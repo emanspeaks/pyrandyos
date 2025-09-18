@@ -9,6 +9,7 @@ cfgdict
 cfgfile
 cfgpkgdir
 chgrp
+clearcb
 clippy
 clscache
 Consolas
@@ -54,6 +55,7 @@ klass
 lastc
 levelno
 LICEN
+lnum
 loadf
 logcfg
 lvwidget
@@ -91,6 +93,7 @@ pyscript
 pyside
 pywin
 qdarkstyle
+qfixed
 QFontIcon
 qicon
 QIconFont
@@ -123,6 +126,7 @@ sinfo
 Spyder
 STARTBRAK
 str
+tblopt
 tgtdir
 tkbasewidget
 tkroot

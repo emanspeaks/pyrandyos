@@ -71,6 +71,8 @@ class GitFileSpec:
     def get_or_download_licenses(self, download_dir: Path = None,
                                  use_tqdm: bool = True,
                                  show_full_path: bool = True):
+        # get the directory of the corresponding main file
+        # also serves as the download dir for get_or_download later here
         p = self.get_local_path(download_dir).parent
         gitcommit = self.git_commit
         license_paths = gitcommit.license_relpath
@@ -80,8 +82,7 @@ class GitFileSpec:
             license_paths = (license_paths,)
 
         return tuple(GitFileSpec(gitcommit, lic,
-                                 local_path=p).get_or_download(download_dir,
-                                                               use_tqdm,
+                                 local_path=p).get_or_download(p, use_tqdm,
                                                                show_full_path)
                      for lic in license_paths)
 

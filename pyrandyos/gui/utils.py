@@ -2,6 +2,7 @@ from pathlib import Path
 from collections.abc import Callable
 from contextlib import contextmanager
 from base64 import b64encode
+from math import ceil
 
 from ..logging import log_func_call  # , log_info
 from .callback import qt_callback
@@ -9,7 +10,9 @@ from .widgets import GuiWidget, GuiWidgetView
 from .qt import (
     QWidget, QToolButton, QSize, QIcon, QAction, QSizePolicy, QPainter,
     QBuffer, QByteArray, QSlider, Qt, QPushButton, QAbstractButton,
-    QFontMetrics, QStyleOptionViewItem, QFont, QRect,
+    QFontMetrics, QStyleOptionViewItem, QFont, QRect, QStyledItemDelegate,
+    QTableWidget, QTableWidgetItem, QStyle, QTextLayout, QFIXED_MAX,
+    QTextOption, QPointF,
 )
 # from .gui_app import get_gui_app
 
@@ -360,3 +363,138 @@ def get_styled_text_bbox(widget: QWidget, font: QFont, text: str):
     rect = style.itemTextRect(style_option.fontMetrics, QRect(), ALIGNLEFT,
                               True, text)
     return rect
+
+
+def get_table_item_text_bbox(table: QTableWidget, item: QTableWidgetItem,
+                             text: str) -> QRect:
+    # adapted from internal Qt C++ source code for resizeColumnToContents()
+    # and all the many other places it calls, consolidated here.
+    table.ensurePolished()
+
+    # collect necessary info from table
+    style = table.style()
+    tblopt = table.viewOptions()
+
+    # get the table index for the item
+    idx = table.indexFromItem(item)
+
+    # get the item delegate from the table, which we need to create a
+    # QStyleOptionViewItem for the item.  We start by copying the table default
+    # styles, and then use initStyleOption() to apply the item-specific
+    # styles to the option.
+    delegate: QStyledItemDelegate = table.itemDelegate(idx)
+    itemopt = QStyleOptionViewItem(tblopt)
+    delegate.initStyleOption(itemopt, idx)
+
+    # get the text width margin for the item
+    text_margin = style.pixelMetric(QStyle.PM_FocusFrameHMargin, itemopt,
+                                    table) + 1
+
+    # create a text layout to measure the text
+    text_layout = QTextLayout(delegate.displayText(text, itemopt.locale),
+                              itemopt.font)
+
+    # set text options
+    text_option = QTextOption()
+    wrap_text = int(itemopt.features & QStyleOptionViewItem.WrapText)
+    text_option.setWrapMode(QTextOption.WordWrap if wrap_text
+                            else QTextOption.ManualWrap)
+    text_option.setTextDirection(itemopt.direction)
+    text_option.setAlignment(QStyle.visualAlignment(itemopt.direction,
+                                                    itemopt.displayAlignment))
+    text_layout.setTextOption(text_option)
+
+    # measure the text
+    height = 0
+    width = 0
+    text_layout.beginLayout()
+    line = text_layout.createLine()
+    while line.isValid():
+        line.setLineWidth(QFIXED_MAX)
+        line.setPosition(QPointF(0, height))
+        height += line.height()
+        width = max(width, line.naturalTextWidth())
+        line = text_layout.createLine()
+
+    text_layout.endLayout()
+    return QRect(0, 0, ceil(width) + 2 * text_margin,
+                 ceil(height) + 2 * text_margin)
+
+    # style.sizeFromContents(QStyle.CT_ItemViewItem, itemopt, QSize(), table)
+    # rect = style.itemTextRect(itemopt.fontMetrics, QRect(), ALIGNLEFT,
+    #                           True, text)
+    # return rect
+
+
+def get_table_item_usable_rect(table: QTableWidget, item: QTableWidgetItem):
+    table.ensurePolished()
+
+    # collect necessary info from table
+    style = table.style()
+    tblopt = table.viewOptions()
+
+    # get the table index for the item
+    idx = table.indexFromItem(item)
+
+    # get the item delegate from the table, which we need to create a
+    # QStyleOptionViewItem for the item.  We start by copying the table default
+    # styles, and then use initStyleOption() to apply the item-specific
+    # styles to the option.
+    itemopt = QStyleOptionViewItem(tblopt)
+    delegate: QStyledItemDelegate = table.itemDelegate(idx)
+    delegate.initStyleOption(itemopt, idx)
+
+    # initialize the rect in the itemopt with the full visual rect of the item
+    visualrect = table.visualItemRect(item)
+    itemopt.rect = visualrect
+
+    # compute the content rect from the style
+    contentrect = style.subElementRect(QStyle.SE_ItemViewItemText, itemopt,
+                                       table)
+    return contentrect
+
+
+# def test_width_calc(table: QTableWidget, item: QTableWidgetItem,
+#                     width: int, text: str):
+#     # based on QItemDelegate::drawDisplay()
+#     rect = QRect(0, 0, width, 200)  # arbitrary large height
+#     tblopt = table.viewOptions()
+#     idx = table.indexFromItem(item)
+#     delegate: QStyledItemDelegate = table.itemDelegate(idx)
+#     option = QStyleOptionViewItem(tblopt)
+#     delegate.initStyleOption(option, idx)
+#     textOption = QTextOption()
+#     textLayout = QTextLayout()
+
+#     opt = QStyleOptionViewItem(option)
+#     widget = table
+#     style = widget.style()
+#     textMargin = style.pixelMetric(QStyle.PM_FocusFrameHMargin, None,
+#                                    widget) + 1
+#     # remove width padding
+#     textRect = rect.adjusted(textMargin, 0, -textMargin, 0)
+#     wrapText = int(opt.features & QStyleOptionViewItem.WrapText)
+#     textOption.setWrapMode(QTextOption.WordWrap if wrapText
+#                            else QTextOption.ManualWrap)
+#     textOption.setTextDirection(option.direction)
+#     textOption.setAlignment(QStyle.visualAlignment(option.direction,
+#                                                    option.displayAlignment))
+#     textLayout.setTextOption(textOption)
+#     textLayout.setFont(option.font)
+#     textLayout.setText(text)
+
+#     lineWidth = textRect.width()
+
+#     height = 0
+#     widthUsed = 0
+#     textLayout.beginLayout()
+#     line = textLayout.createLine()
+#     while line.isValid():
+#         line.setLineWidth(lineWidth)
+#         line.setPosition(QPointF(0, height))
+#         height += line.height()
+#         widthUsed = max(widthUsed, line.naturalTextWidth())
+#         line = textLayout.createLine()
+
+#     textLayout.endLayout()
+#     return lineWidth, widthUsed
