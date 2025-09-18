@@ -6,6 +6,7 @@ from .keys import (
     LOCAL_CONFIG_FILE_KEY, LOG_TRACE_ENABLED_KEY, LOCAL_CFG_KEY,
     CONFIG_PACKAGE_DIR_KEY, CONFIG_PACKAGE_VERSION_KEY,
     SHOW_TRACEBACK_LOCALS_KEY, QRC_FILE_KEY, LOG_FUNC_CALL_ENABLED_KEY,
+    STATUSBAR_LOG_LEVEL_KEY,
 )
 
 # defaults
@@ -17,6 +18,7 @@ DEFAULTS = {
     APPEND_LOG_KEY: False,
     CLI_LOG_LEVEL_KEY: "info",  # can also use the int values
     FILE_LOG_LEVEL_KEY: "info",  # can also use the int values
+    STATUSBAR_LOG_LEVEL_KEY: "info",  # can also use the int values
     LOG_TRACE_ENABLED_KEY: False,
     LOG_FUNC_CALL_ENABLED_KEY: False,
     SHOW_TRACEBACK_LOCALS_KEY: False,
