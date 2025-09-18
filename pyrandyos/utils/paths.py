@@ -1,5 +1,5 @@
 import sys
-from pathlib import Path, PurePosixPath, PureWindowsPath, PurePath
+from pathlib import Path, PurePosixPath, PureWindowsPath, PurePath, WindowsPath
 
 from ..logging import log_func_call, DEBUGLOW2
 from .expandvars import expandvars, is_key_resolved
@@ -51,7 +51,12 @@ def pureposixpath_to_pathobj(ppp: PurePosixPath):
     # the as_posix() here is required to workaround a "feature" where the slash
     # after the drive letter in windows gets dropped otherwise
     if ppp:
-        return Path(ppp.as_posix()).expanduser()
+        pathobj = Path(ppp.as_posix()).expanduser()
+        if (isinstance(pathobj, WindowsPath) and pathobj.drive
+                and not pathobj.root):
+            pathobj = Path(f'{pathobj}/')
+
+        return pathobj
 
 
 @log_func_call(DEBUGLOW2, trace_only=True)
@@ -108,7 +113,8 @@ def get_expanded_pureposixpath(x: str | Path, addl_expand_vars: dict = {},
 
 @log_func_call(DEBUGLOW2, trace_only=True)
 def get_expanded_pathobj(x: str | Path, addl_expand_vars: dict = {},
-                         case_insensitive: bool = IS_WIN32):
+                         case_insensitive: bool = IS_WIN32,
+                         resolve: bool = True):
     """
     Returns an absolute `Path` object on the current system platform
     resolved from the given input path with user directories and all known
@@ -127,9 +133,10 @@ def get_expanded_pathobj(x: str | Path, addl_expand_vars: dict = {},
             or empty
     """
     if x:
-        return pureposixpath_to_resolved_pathobj(
-            get_expanded_pureposixpath(x, addl_expand_vars, case_insensitive)
-        )
+        ppp = get_expanded_pureposixpath(x, addl_expand_vars, case_insensitive)
+        if resolve:
+            return pureposixpath_to_resolved_pathobj(ppp)
+        return pureposixpath_to_pathobj(ppp)
 
 
 DLL_EXTS = ('.dll', '.so', '.dylib')
