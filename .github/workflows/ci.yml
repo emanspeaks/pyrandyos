@@ -79,7 +79,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install hatch
           hatch build
-          python -m pip install dist/*.whl
+          pip install dist/*.whl
 
       - name: Build documentation
         # delay pip install pdoc to try to avoid some dependency conflict

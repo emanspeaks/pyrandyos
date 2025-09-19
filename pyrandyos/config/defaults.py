@@ -41,7 +41,7 @@ def get_defaults(cls: type, app_global_defaults: dict = {},
     cfgpkgdir = top_package_dir_path()
     tmp[CONFIG_PACKAGE_DIR_KEY] = cfgpkgdir
 
-    from .._version import __version__
+    from ..version import __version__
     tmp[CONFIG_PACKAGE_VERSION_KEY] = __version__
 
     tmp.update(app_global_defaults)

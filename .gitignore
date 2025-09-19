@@ -14,3 +14,4 @@ docs/
 logs/
 tmp/
 .hatchenv/
+/pyrandyos/_version.py

@@ -20,6 +20,7 @@ def _get_hatch_version():
         from hatchling.metadata.core import ProjectMetadata
         from hatchling.plugin.manager import PluginManager
         from hatchling.utils.fs import locate_file
+        from hatchling.plugin.exceptions import UnknownPluginError
     except ImportError:
         # Hatchling is not installed, so probably we are not in
         # a development environment.
@@ -32,7 +33,10 @@ def _get_hatch_version():
     root = os.path.dirname(pyproject_toml)
     metadata = ProjectMetadata(root=root, plugin_manager=PluginManager())
     # can be either statically set in pyproject.toml or computed dynamically:
-    return metadata.core.version or metadata.hatch.version.cached
+    try:
+        return metadata.core.version or metadata.hatch.version.cached
+    except UnknownPluginError:
+        return None
 
 
 def _get_importlib_metadata_version():
@@ -49,4 +53,9 @@ def _get_importlib_metadata_version():
     return __version__
 
 
-__version__ = _get_hatch_version() or _get_importlib_metadata_version()
+__dynamic_version__ = _get_hatch_version() or _get_importlib_metadata_version()
+
+try:
+    from ._version import __version__  # pyright: ignore[reportMissingImports]
+except ModuleNotFoundError:
+    __version__ = __dynamic_version__
