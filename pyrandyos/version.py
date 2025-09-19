@@ -57,5 +57,5 @@ __dynamic_version__ = _get_hatch_version() or _get_importlib_metadata_version()
 
 try:
     from ._version import __version__  # pyright: ignore[reportMissingImports]
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ImportError):
     __version__ = __dynamic_version__

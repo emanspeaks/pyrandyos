@@ -38,7 +38,8 @@ source = "vcs"
 
 [tool.hatch.version.raw-options]
 # This removes the local version identifier (+gXXXXXX) that PyPI doesn't accept
-local_scheme = "no-local-version"
+# local_scheme = "no-local-version"
+local_scheme = "dirty-tag"
 
 [tool.hatch.build.hooks.vcs]
 version-file = "pyrandyos/_version.py"
