@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
@@ -33,7 +33,15 @@ classifiers = [
 qdarkstyle = ["qdarkstyle"]
 
 [tool.hatch.version]
-path = "pyrandyos/version.py"
+# path = "pyrandyos/_version.py"
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+# This removes the local version identifier (+gXXXXXX) that PyPI doesn't accept
+local_scheme = "no-local-version"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "pyrandyos/_version.py"
 
 [tool.hatch.build]
 include = [
@@ -45,7 +53,7 @@ include = [
 [project.urls]
 Homepage = "https://github.com/emanspeaks/pyrandyos"
 Issues = "https://github.com/emanspeaks/pyrandyos/issues"
-documentation = "https://py.randyos.org"
+Documentation = "https://py.randyos.org"
 
 [tool.coverage.report]
 # ignore_errors = true
