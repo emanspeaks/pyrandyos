@@ -1,9 +1,11 @@
 name: Upload Python Package to PyPI
 on:
   push:
+    branches:
+      - develop
   pull_request:
     branches:
-      - main # Or your default branch
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,10 +15,13 @@ jobs:
   build-pypi:
     name: Build PyPI distribution
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to push back to repo
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Important: gets full git history for versioning
+          token: ${{ secrets.GITHUB_TOKEN }}  # enables pushing
 
       - uses: actions/setup-python@v5
         with:
@@ -27,7 +32,33 @@ jobs:
           python -m pip install --upgrade pip
           pip install hatch
 
-      - name: Build package
+      - name: Generate version file
+        run: |
+          # This creates the _version.py file
+          hatch build --target wheel
+
+          # Extract just the version
+          VERSION=$(hatch version)
+          echo "Generated version: $VERSION"
+
+          # Create the version file manually if it doesn't exist
+          mkdir -p pyrandyos
+          echo "__version__ = '$VERSION'" > pyrandyos/_version.py
+
+      - name: Commit version file
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          if [ -f pyrandyos/_version.py ]; then
+            git add pyrandyos/_version.py
+            if ! git diff --staged --quiet; then
+              git commit -m "Auto-update version to $(hatch version) [skip ci]"
+              git push
+            fi
+          fi
+
+      - name: Build package (after version commit)
         run: |
           hatch build
 
