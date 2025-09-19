@@ -22,6 +22,12 @@
 			"**/.DS_Store": true,
 			"**/Thumbs.db": true,
 			"**/.conda": true,
+			"**/.hatchenv": true,
+		},
+		"files.watcherExclude": {
+			"**/.git/objects/**": true,
+			"**/.git/subtree-cache/**": true,
+			"**/.hatchenv/**": true
 		}
   },
 	"launch": {

@@ -13,3 +13,4 @@ docs/
 .conda
 logs/
 tmp/
+.hatchenv/
