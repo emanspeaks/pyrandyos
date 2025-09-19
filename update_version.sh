@@ -24,11 +24,11 @@ if ! command -v $HATCH &> /dev/null; then
   fi
 fi
 
-VERSION=$($HATCH version)
-echo "Current version: $VERSION"
+# VERSION=$($HATCH version)
+# echo "Current version: $VERSION"
 mkdir -p pyrandyos
-echo "__version__ = '$VERSION'" > "$version_file"
-echo "Version file updated to $VERSION"
+$HATCH build --target wheel
+# echo "Version file updated to $VERSION"
 
 if git rev-parse --git-dir > /dev/null 2>&1; then
   if git diff --quiet "$version_file" 2>/dev/null; then
