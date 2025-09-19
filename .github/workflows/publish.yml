@@ -1,6 +1,8 @@
 name: Upload Python Package to PyPI
 on:
   push:
+    tags:
+      - 'v*'
     branches:
       - develop
   pull_request:
@@ -37,15 +39,8 @@ jobs:
           # This creates the _version.py file
           hatch build --target wheel
 
-          # Extract just the version
-          VERSION=$(hatch version)
-          echo "Generated version: $VERSION"
-
-          # Create the version file manually if it doesn't exist
-          mkdir -p pyrandyos
-          echo "__version__ = '$VERSION'" > pyrandyos/_version.py
-
       - name: Commit version file
+        if: startsWith(github.ref, 'refs/tags/v')
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -53,13 +48,12 @@ jobs:
           if [ -f pyrandyos/_version.py ]; then
             git add pyrandyos/_version.py
             if ! git diff --staged --quiet; then
-              # Amend the last commit instead of creating a new one
-              git commit --amend --no-edit
-              git push --force-with-lease
+              git commit -m "Auto-update version to $(hatch version) [skip ci]"
+              git push
             fi
           fi
 
-      - name: Build package (after version commit)
+      - name: Build package
         run: |
           hatch build
 
@@ -70,7 +64,7 @@ jobs:
 
   test-pypi-publish:
     name: Publish to Test PyPI
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/v')
     needs:
       - build-pypi
     runs-on: ubuntu-latest
@@ -94,7 +88,7 @@ jobs:
     name: Publish tagged versions to PyPI
     if: startsWith(github.ref, 'refs/tags/v')
     needs:
-      - build-pypi
+      - test-pypi-publish
     runs-on: ubuntu-latest
     environment:
       name: pypi
