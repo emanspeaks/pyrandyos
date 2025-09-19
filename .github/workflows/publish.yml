@@ -53,8 +53,9 @@ jobs:
           if [ -f pyrandyos/_version.py ]; then
             git add pyrandyos/_version.py
             if ! git diff --staged --quiet; then
-              git commit -m "Auto-update version to $(hatch version) [skip ci]"
-              git push
+              # Amend the last commit instead of creating a new one
+              git commit --amend --no-edit
+              git push --force-with-lease
             fi
           fi
 
