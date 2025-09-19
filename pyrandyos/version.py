@@ -49,4 +49,9 @@ def _get_importlib_metadata_version():
     return __version__
 
 
-__version__ = _get_hatch_version() or _get_importlib_metadata_version()
+__dynamic_version__ = _get_hatch_version() or _get_importlib_metadata_version()
+
+try:
+    from ._version import __version__  # pyright: ignore[reportMissingImports]
+except ModuleNotFoundError:
+    __version__ = __dynamic_version__
