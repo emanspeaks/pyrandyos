@@ -8,6 +8,9 @@ Library of common functions for Python applications
 [![PyPI Downloads](https://img.shields.io/pypi/dm/pyrandyos?label=PyPI%20downloads)](https://pypi.org/project/pyrandyos/)
 <!-- [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/pyrandyos?label=Conda%20downloads)](https://anaconda.org/conda-forge/pyrandyos) -->
 
+This library was created to assist with rapid prototyping of Qt GUIs and other
+common functionality Randy needs on a day-to-day basis.
+
 ## Licenses
 
 ### Icons
