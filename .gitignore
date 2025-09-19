@@ -11,6 +11,8 @@ docs/
 .vscode/settings.json
 .coverage
 .conda
+.conda/
+.venv/
 logs/
 tmp/
 .hatchenv/

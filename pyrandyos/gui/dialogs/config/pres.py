@@ -39,6 +39,7 @@ class ConfigTreeDialog(GuiDialog[ConfigTreeDialogView]):
                         **kwargs) -> ConfigTreeDialogView:
         return ConfigTreeDialogView(basetitle, self, *args, **kwargs)
 
+    @log_func_call
     def click_save_config(self):
         qtwin = self.gui_view.qtobj
         workdir: Path = PyRandyOSApp['tmp_dir']
@@ -52,5 +53,6 @@ class ConfigTreeDialog(GuiDialog[ConfigTreeDialogView]):
         if new_fn:
             save_json(Path(new_fn), jsonify(PyRandyOSApp.get_global_config()))
 
+    @log_func_call
     def click_save_local_config(self):
         PyRandyOSApp.save_local_config()

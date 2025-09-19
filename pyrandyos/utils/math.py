@@ -1,7 +1,10 @@
 from pandas import Series
 from numpy import divmod as npdivmod
 
+from ..logging import log_func_call
 
+
+@log_func_call
 def round_half_away(value: float | int | str | Series | None = None,
                     ndigits: int = 0):
     if not isinstance(value, Series):

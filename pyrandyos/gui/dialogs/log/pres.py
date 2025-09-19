@@ -41,6 +41,7 @@ class LogDialog(GuiDialog[LogDialogView]):
                         **kwargs) -> LogDialogView:
         return LogDialogView(basetitle, self, *args, **kwargs)
 
+    @log_func_call
     def parse_log_file(self):
         txt = self.log_path.read_text()
         lines = txt.splitlines()
@@ -67,6 +68,7 @@ class LogDialog(GuiDialog[LogDialogView]):
             return timestamp, level, file, func, msg
         return txt
 
+    @log_func_call
     def row_header_clicked(self, row: int) -> None:
         """
         Called when a row header is clicked. Copies the reconstructed

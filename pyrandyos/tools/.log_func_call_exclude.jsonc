@@ -18,12 +18,18 @@
     "pyrandyos/gui/icons/iconfont/animation.py",
     "pyrandyos/utils/hash.py",
     "pyrandyos/utils/signature_wrapper.py",
-    "pyrandyos/logging.py"//,
+    "pyrandyos/logging.py",
+    "pyrandyos/gui/icons/utils.py",
+    "pyrandyos/version.py",
+    "pyrandyos/gui/callback.py"//,
   ],
   "exclude_classes": [
     "MillisecondFormatter",
     "LevelFilter",
-    "LogMultiFormatter"//,
+    "LogMultiFormatter",
+    "StatusMsgLogFilter",
+    "StatusMsgLogHandler",
+    "QtApp"//,
   ],
   "exclude_methods": {
     "FileSetTqdm": [
@@ -44,6 +50,9 @@
     ],
     "QtSplashScreen": [
       "mousePressEvent"//,
+    ],
+    "GuiApp": [
+      "process_events"//,
     ]//,
   },
   "exclude_dirs": [
@@ -59,6 +68,12 @@
   "exclude_functions": {
     "pyrandyos/gui/utils.py": [
       "painter_context"
+    ],
+    "pyrandyos/gui/styles/themes/qdarkstyle.py": [
+      "load_dark_stylesheet"
+    ],
+    "pyrandyos/gui/callback.py": [
+      "qt_callback"
     ]//,
   },
   "base_dir": "C:/scratch/git/pyrandyos"

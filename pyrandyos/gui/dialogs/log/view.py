@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+from ....logging import log_func_call
 from ...qt import (
     QVBoxLayout, QDialogButtonBox, QTextEdit, QTableWidget,
     QTableWidgetItem, QHeaderView, Qt, QFont,
@@ -31,6 +32,7 @@ TABLE_CELL_STYLE = f"QTableWidget::item {{ padding: {TABLE_TPAD}px {TABLE_LPAD}p
 
 
 class LogDialogView(GuiDialogView['LogDialog']):
+    @log_func_call
     def __init__(self, basetitle: str, presenter: 'LogDialog' = None,
                  *qtobj_args, **qtobj_kwargs):
         GuiDialogView.__init__(self, basetitle, presenter, *qtobj_args,
@@ -40,6 +42,7 @@ class LogDialogView(GuiDialogView['LogDialog']):
         self.layout = QVBoxLayout(qtobj)
         self.create_log_widget()
 
+    @log_func_call
     def create_log_widget(self):
         __traceback_hide_locals__ = 'content'  # noqa: F841
         qtobj = self.qtobj
@@ -75,6 +78,7 @@ class LogDialogView(GuiDialogView['LogDialog']):
         layout.addWidget(dlgbuttons)
         self.dlgbuttons = dlgbuttons
 
+    @log_func_call
     def setup_log_table(self):
         pres = self.gui_pres
         table = self.log_table
@@ -114,11 +118,13 @@ class LogDialogView(GuiDialogView['LogDialog']):
         # don't do this yet because sorting later will trigger it
         # self.connect_column_resize_signal()
 
+    @log_func_call
     def connect_column_resize_signal(self):
         header = self.log_table.horizontalHeader()
         cb = qt_callback(self.gui_pres.update_row_heights)
         header.sectionResized.connect(cb)
 
+    @log_func_call
     def disconnect_column_resize_signal(self, raise_exc: bool = True):
         header = self.log_table.horizontalHeader()
         try:
@@ -127,6 +133,7 @@ class LogDialogView(GuiDialogView['LogDialog']):
             if raise_exc:
                 raise
 
+    @log_func_call
     def populate_log_table(self, content: tuple,
                            update_row_heights: bool = True):
         __traceback_hide_locals__ = ('content', 'col')  # noqa: F841

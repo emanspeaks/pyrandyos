@@ -47,9 +47,13 @@ def _get_importlib_metadata_version():
     a package is installed in editable mode, and a different version is checked
     out, then the version number will not be updated.
     """
-    from importlib.metadata import version
+    from importlib.metadata import version, PackageNotFoundError
 
-    __version__ = version(__package__)
+    try:
+        __version__ = version(__package__)
+    except PackageNotFoundError:
+        # raise
+        __version__ = None
     return __version__
 
 
@@ -57,5 +61,5 @@ __dynamic_version__ = _get_hatch_version() or _get_importlib_metadata_version()
 
 try:
     from ._version import __version__  # pyright: ignore[reportMissingImports]
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ImportError):
     __version__ = __dynamic_version__

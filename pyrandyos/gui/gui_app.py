@@ -14,6 +14,7 @@ from .qt import (
 _GUI_APP_INST: 'GuiApp | None' = None
 
 
+@log_func_call
 def get_gui_app():
     global _GUI_APP_INST
     if not _GUI_APP_INST:
@@ -152,6 +153,7 @@ class GuiApp(GuiQtWrapper):
             qtsplash.finish(delegate)
             self.splash = None
 
+    @log_func_call
     def set_high_dpi_support(self):
         # Attribute Qt::AA_EnableHighDpiScaling must be set before
         # QCoreApplication is created.
@@ -163,8 +165,10 @@ class GuiApp(GuiQtWrapper):
             # on second thought, we don't need a full traceback
             log_info(f"Failed to set high DPI support: {e}")
 
+    @log_func_call
     def get_dpi(self):
         return self.qtobj.primaryScreen().logicalDotsPerInch()
 
+    @log_func_call
     def get_dpi_scale(self):
         return self.get_dpi() / 96.0

@@ -23,12 +23,18 @@
 			"**/Thumbs.db": true,
 			"**/.conda": true,
 			"**/.hatchenv": true,
+			"**/.venv/**": true
 		},
 		"files.watcherExclude": {
 			"**/.git/objects/**": true,
 			"**/.git/subtree-cache/**": true,
-			"**/.hatchenv/**": true
-		}
+			"**/.hatchenv/**": true,
+			"**/.venv/**": true,
+		},
+		"python.useEnvironmentsExtension": true,
+    "qtForPython.qmlls.enabled": false,
+    "qtForPython.rcc.liveExecution.enabled": false,
+    "python.terminal.useEnvFile": true,
   },
 	"launch": {
 		"version": "0.2.0",

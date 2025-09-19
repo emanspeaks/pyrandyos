@@ -48,6 +48,7 @@
 
 from typing import TypeVar, TYPE_CHECKING, Generic
 
+from ..logging import log_func_call
 from .qt import QWidget, QApplication
 
 if TYPE_CHECKING:
@@ -62,6 +63,7 @@ GuiPresType = TypeVar('GuiPresType', bound='GuiPresenter')
 
 
 class GuiQtWrapper(Generic[QtObject]):
+    @log_func_call
     def __init__(self, qtobj: QtObject):
         self._qtobj = qtobj
 
@@ -71,9 +73,11 @@ class GuiQtWrapper(Generic[QtObject]):
 
 
 class CreateQtObjMixin(GuiQtWrapper[QtWidgetType], Generic[QtWidgetType]):
+    @log_func_call
     def __init__(self, *qtobj_args, **qtobj_kwargs):
         super().__init__(self.create_qtobj(*qtobj_args, **qtobj_kwargs))
 
+    @log_func_call
     def create_qtobj(self, *args, **kwargs) -> QtWidgetType:
         raise NotImplementedError('Abstract method not implemented')
 
@@ -100,12 +104,14 @@ class GuiComponent:
 
 
 class GuiPresenter(GuiComponent, Generic[GuiViewType]):
+    @log_func_call
     def __init__(self, gui_parent: 'GuiWidgetParentType | None' = None,
                  *view_args, **view_kwargs):
         GuiComponent.__init__(self)
         self._gui_parent = gui_parent
         self._gui_view = self.create_gui_view(*view_args, **view_kwargs)
 
+    @log_func_call
     def create_gui_view(self, *args, **kwargs) -> GuiViewType:
         raise NotImplementedError('Abstract method not implemented')
 
@@ -123,6 +129,7 @@ class GuiPresenter(GuiComponent, Generic[GuiViewType]):
 
 
 class GuiView(GuiComponent, Generic[GuiPresType]):
+    @log_func_call
     def __init__(self, presenter: GuiPresType = None):
         GuiComponent.__init__(self)
         self._gui_pres = presenter
@@ -138,6 +145,7 @@ class GuiView(GuiComponent, Generic[GuiPresType]):
 
 class GuiQtView(GuiView[GuiPresType], CreateQtObjMixin[QtWidgetType],
                 Generic[GuiPresType, QtWidgetType]):
+    @log_func_call
     def __init__(self, presenter: GuiPresType = None, *qtobj_args,
                  **qtobj_kwargs):
         GuiView.__init__(self, presenter)

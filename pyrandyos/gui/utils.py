@@ -21,6 +21,7 @@ TEXTWORDWRAP = Qt.TextWordWrap
 ALIGNLEFT = Qt.AlignLeft
 
 
+@log_func_call
 def get_widget_parent_qtobj(parent: GuiWidgetParent) -> QWidget:
     """Get the Qt object of the parent widget."""
     if isinstance(parent, QWidget):
@@ -174,6 +175,7 @@ def create_toolbar_expanding_spacer():
 
 @contextmanager
 def painter_context(painter: QPainter):
+
     painter.save()
     try:
         yield painter
@@ -181,6 +183,7 @@ def painter_context(painter: QPainter):
         painter.restore()
 
 
+@log_func_call
 def qicon_to_data_uri(icon: QIcon, size: QSize) -> str:
     """Convert QIcon to data URI"""
     # Get pixmap from icon
@@ -246,6 +249,7 @@ def create_icon_button(parent: GuiWidgetParent, size: QSize,
     return button
 
 
+@log_func_call
 def calculate_min_height(button: QAbstractButton, icon_size: QSize):
     """Calculate the minimum height for a button to accommodate its icon."""
     # Ensure the button is tall enough to vertically center the icon.
@@ -256,6 +260,7 @@ def calculate_min_height(button: QAbstractButton, icon_size: QSize):
     return max(button.sizeHint().height(), icon_size.height() + 6)
 
 
+@log_func_call
 def _debug_dump_icon(icon: QIcon, size: QSize, name: str = None) -> None:
     from ..app import PyRandyOSApp
     if PyRandyOSApp.get('debug_dump_icons', False):
@@ -265,6 +270,7 @@ def _debug_dump_icon(icon: QIcon, size: QSize, name: str = None) -> None:
         pix.save(str(tmpdir/fname), "PNG")
 
 
+@log_func_call
 def wrap_text_to_width(text: str, bbox_callback: Callable[[str], QRect],
                        width: int):
     "Wrap text to fit within a specified width using the given font metrics."
@@ -277,6 +283,7 @@ def wrap_text_to_width(text: str, bbox_callback: Callable[[str], QRect],
     if not text or width <= 0:
         return text
 
+    @log_func_call
     def calc_width(s: str) -> int:
         return bbox_callback(s).width()
 
@@ -305,6 +312,7 @@ def wrap_text_to_width(text: str, bbox_callback: Callable[[str], QRect],
         curline = ""
         words = origline.split()
 
+        @log_func_call
         def popword():
             return words.pop(0) if words else None
 
@@ -350,10 +358,12 @@ def wrap_text_to_width(text: str, bbox_callback: Callable[[str], QRect],
     return "\n".join(wrapped)
 
 
+@log_func_call
 def calc_fontmetrics_bbox(font_metrics: QFontMetrics, s: str) -> QRect:
     return font_metrics.boundingRect(s)
 
 
+@log_func_call
 def get_styled_text_bbox(widget: QWidget, font: QFont, text: str):
     style_option = QStyleOptionViewItem()
     style_option.font = font
@@ -365,6 +375,7 @@ def get_styled_text_bbox(widget: QWidget, font: QFont, text: str):
     return rect
 
 
+@log_func_call
 def get_table_item_text_bbox(table: QTableWidget, item: QTableWidgetItem,
                              text: str) -> QRect:
     # adapted from internal Qt C++ source code for resizeColumnToContents()
@@ -426,6 +437,7 @@ def get_table_item_text_bbox(table: QTableWidget, item: QTableWidgetItem,
     # return rect
 
 
+@log_func_call
 def get_table_item_usable_rect(table: QTableWidget, item: QTableWidgetItem):
     table.ensurePolished()
 

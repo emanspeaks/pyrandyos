@@ -19,6 +19,7 @@ def get_ipython_if_running():
         return None
 
 
+@log_func_call
 def get_interpreter():
     # adapted from: https://stackoverflow.com/a/39662359/13230486
     ipy = get_ipython_if_running()
