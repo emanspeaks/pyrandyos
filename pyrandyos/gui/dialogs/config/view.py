@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 
 class ConfigTreeDialogView(GuiDialogView['ConfigTreeDialog']):
+    @log_func_call
     def __init__(self, basetitle: str, presenter: 'ConfigTreeDialog' = None,
                  *qtobj_args, **qtobj_kwargs):
         GuiDialogView.__init__(self, basetitle, presenter, *qtobj_args,
@@ -25,6 +26,7 @@ class ConfigTreeDialogView(GuiDialogView['ConfigTreeDialog']):
         self.layout = QVBoxLayout(qtobj)
         self.create_tree()
 
+    @log_func_call
     def create_tree(self):
         qtobj = self.qtobj
         layout = self.layout

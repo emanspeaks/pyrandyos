@@ -17,7 +17,6 @@ dependencies = [
   "pywin32; sys_platform == 'win32'",
   "tqdm",
   "pyside2",
-  "types-pyside2",
   "pandas",
   "numpy",
 ]
@@ -31,6 +30,11 @@ classifiers = [
 
 [project.optional-dependencies]
 qdarkstyle = ["qdarkstyle"]
+dev = [
+  "hatch-vcs",
+  "types-pyside2",
+  "pdoc",
+]
 
 [tool.hatch.version]
 # path = "pyrandyos/_version.py"

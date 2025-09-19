@@ -66,11 +66,13 @@ def execute_select(db: Connection, table_name: str,
     return db.execute(query, expansions)
 
 
+@log_func_call
 def sql_timestamp_to_datetime(ts: str):
     return datetime.fromisoformat(ts.replace('Z', '+00:00')) if ts else None
 
 
 @contextmanager
+@log_func_call
 def sqlite_context(cxn: Connection):
     try:
         yield cxn
