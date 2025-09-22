@@ -2,11 +2,13 @@ from pathlib import Path
 
 from ....app import PyRandyOSApp
 from ....config.keys import BASE_LOG_PATH_KEY
+from ....logging import log_func_call
 
 from .pres import LogDialog
 
 
 class LogDialogMainWindowMixin:
+    @log_func_call
     def show_log_dialog(self, log_path: Path = None):
         log_path = log_path or self.get_log_path()
         if log_path:
@@ -24,6 +26,7 @@ class LogDialogMainWindowMixin:
             self._log_dialog = dialog
             dialog.show()
 
+    @log_func_call
     def get_log_path(self):
         logpath = PyRandyOSApp.get(BASE_LOG_PATH_KEY, None)
         return Path(logpath) if logpath else None

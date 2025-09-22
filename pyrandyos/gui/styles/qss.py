@@ -1,12 +1,16 @@
 from re import sub, DOTALL, MULTILINE, compile
 from collections import OrderedDict
 
+from ...logging import log_func_call
 
+
+@log_func_call
 def strip_qss_comments(qss: str) -> str:
     """Remove /* ... */ comments from QSS string."""
     return sub(r'/\*.*?\*/', '', qss, flags=DOTALL)
 
 
+@log_func_call
 def parse_qss_blocks(qss_text: str) -> OrderedDict:
     """Parse QSS into an OrderedDict: selector -> OrderedDict of properties."""
     blocks = OrderedDict()
@@ -26,6 +30,7 @@ def parse_qss_blocks(qss_text: str) -> OrderedDict:
     return blocks
 
 
+@log_func_call
 def update_qss_block(blocks: OrderedDict, selector: str,
                      updates: dict[str, str]) -> None:
     """Update or add properties for a selector in the QSS blocks.
@@ -43,6 +48,7 @@ def update_qss_block(blocks: OrderedDict, selector: str,
             blocks[selector][k] = v
 
 
+@log_func_call
 def qss_blocks_to_text(blocks: OrderedDict) -> str:
     """Convert QSS blocks back to a QSS string."""
     out = []
@@ -54,6 +60,7 @@ def qss_blocks_to_text(blocks: OrderedDict) -> str:
     return "\n".join(out)
 
 
+@log_func_call
 def merge_qss_properties(qss: str, selector: str, updates: dict[str, str]):
     """
     Load QSS, strip comments, parse, update properties for selector, and return

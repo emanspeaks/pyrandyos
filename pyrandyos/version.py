@@ -27,16 +27,18 @@ def _get_hatch_version():
         return None
 
     pyproject_toml = locate_file(__file__, "pyproject.toml")
-    if pyproject_toml is None:
-        raise RuntimeError("pyproject.toml not found although hatchling "
-                           "is installed")
-    root = os.path.dirname(pyproject_toml)
-    metadata = ProjectMetadata(root=root, plugin_manager=PluginManager())
-    # can be either statically set in pyproject.toml or computed dynamically:
-    try:
-        return metadata.core.version or metadata.hatch.version.cached
-    except UnknownPluginError:
-        return None
+    if pyproject_toml:
+        root = os.path.dirname(pyproject_toml)
+        metadata = ProjectMetadata(root=root, plugin_manager=PluginManager())
+        # can be either statically set in pyproject.toml
+        # or computed dynamically:
+        try:
+            return metadata.core.version or metadata.hatch.version.cached
+        except UnknownPluginError:
+            return None
+
+    # pyproject.toml not found although hatchling is installed
+    return None
 
 
 def _get_importlib_metadata_version():
@@ -47,9 +49,13 @@ def _get_importlib_metadata_version():
     a package is installed in editable mode, and a different version is checked
     out, then the version number will not be updated.
     """
-    from importlib.metadata import version
+    from importlib.metadata import version, PackageNotFoundError
 
-    __version__ = version(__package__)
+    try:
+        __version__ = version(__package__)
+    except PackageNotFoundError:
+        # raise
+        __version__ = None
     return __version__
 
 
@@ -57,5 +63,5 @@ __dynamic_version__ = _get_hatch_version() or _get_importlib_metadata_version()
 
 try:
     from ._version import __version__  # pyright: ignore[reportMissingImports]
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ImportError):
     __version__ = __dynamic_version__

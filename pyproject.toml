@@ -17,7 +17,6 @@ dependencies = [
   "pywin32; sys_platform == 'win32'",
   "tqdm",
   "pyside2",
-  "types-pyside2",
   "pandas",
   "numpy",
 ]
@@ -31,6 +30,12 @@ classifiers = [
 
 [project.optional-dependencies]
 qdarkstyle = ["qdarkstyle"]
+dev = [
+  "hatch-vcs",
+  "types-pyside2",
+  "pdoc",
+  "hatchling",
+]
 
 [tool.hatch.version]
 # path = "pyrandyos/_version.py"
@@ -38,7 +43,8 @@ source = "vcs"
 
 [tool.hatch.version.raw-options]
 # This removes the local version identifier (+gXXXXXX) that PyPI doesn't accept
-local_scheme = "no-local-version"
+# local_scheme = "no-local-version"
+local_scheme = "dirty-tag"
 
 [tool.hatch.build.hooks.vcs]
 version-file = "pyrandyos/_version.py"

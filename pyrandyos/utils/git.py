@@ -68,6 +68,7 @@ class GitFileSpec:
             raise ValueError(f"MD5 checksum does not match for {p}")
         return p
 
+    @log_func_call
     def get_or_download_licenses(self, download_dir: Path = None,
                                  use_tqdm: bool = True,
                                  show_full_path: bool = True):

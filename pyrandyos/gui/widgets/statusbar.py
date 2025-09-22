@@ -150,6 +150,7 @@ class LoggingStatusBarWidget(QtWidgetWrapper[QStatusBar]):
         self._log_dialog: LogDialog = None
         super().__init__(parent)  # , *qtobj_args)
 
+    @log_func_call
     def create_qtobj(self):  # , *qtobj_args):
         qtwin: QMainWindow = self.gui_parent.qtobj
 
@@ -197,6 +198,7 @@ class LoggingStatusBarWidget(QtWidgetWrapper[QStatusBar]):
         get_logger().root.addHandler(msglog)
         return msglog
 
+    @log_func_call
     def update_status_bar_msg(self, msg: str, level: int | str = INFO,
                               temp: bool = False, timeout_ms: int = 0):
         if temp:
@@ -205,26 +207,31 @@ class LoggingStatusBarWidget(QtWidgetWrapper[QStatusBar]):
         else:
             self.status_msg_updater(msg, level)
 
+    @log_func_call
     def clear_status_message(self):
         """Clear the status bar message."""
         self.status_bar.clearMessage()
         self.status_msg_updater()
         log_debuglow2("Status message cleared")
 
+    @log_func_call
     def copy_status_message(self, msg: str):
         """Copy the current status message to clipboard."""
         if msg:
             get_gui_app().qtobj.clipboard().setText(msg)
             log_debug(f"Status message copied: {msg}")
 
+    @log_func_call
     def click_status_msg(self, event: QMouseEvent = None):
         if not event or event.button() == Qt.LeftButton:
             self.show_log_dialog()
 
+    @log_func_call
     def get_log_path(self):
         logpath = PyRandyOSApp.get(BASE_LOG_PATH_KEY, None)
         return Path(logpath) if logpath else None
 
+    @log_func_call
     def show_log_dialog(self, log_path: Path = None):
         log_path = log_path or self.get_log_path()
         if log_path:
@@ -242,10 +249,12 @@ class LoggingStatusBarWidget(QtWidgetWrapper[QStatusBar]):
             self._log_dialog = dialog
             dialog.show()
 
+    @log_func_call
     def get_current_status_msg(self):
         return (self.status_bar.currentMessage()
                 or self.status_msg_updater(get_last=True))
 
+    @log_func_call
     def show_status_context_menu(self, position: QPoint):
         """Show context menu for status bar message label."""
         pres = self.gui_pres
