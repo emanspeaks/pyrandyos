@@ -28,15 +28,17 @@ def _get_hatch_version():
 
     pyproject_toml = locate_file(__file__, "pyproject.toml")
     if pyproject_toml is None:
-        raise RuntimeError("pyproject.toml not found although hatchling "
-                           "is installed")
-    root = os.path.dirname(pyproject_toml)
-    metadata = ProjectMetadata(root=root, plugin_manager=PluginManager())
-    # can be either statically set in pyproject.toml or computed dynamically:
-    try:
-        return metadata.core.version or metadata.hatch.version.cached
-    except UnknownPluginError:
-        return None
+        root = os.path.dirname(pyproject_toml)
+        metadata = ProjectMetadata(root=root, plugin_manager=PluginManager())
+        # can be either statically set in pyproject.toml
+        # or computed dynamically:
+        try:
+            return metadata.core.version or metadata.hatch.version.cached
+        except UnknownPluginError:
+            return None
+
+    # pyproject.toml not found although hatchling is installed
+    return None
 
 
 def _get_importlib_metadata_version():
