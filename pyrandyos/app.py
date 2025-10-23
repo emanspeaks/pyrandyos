@@ -80,7 +80,7 @@ class PyRandyOSApp(AppConfig):
         if assets_dir:
             cls.set(APP_ASSETS_DIR_KEY, assets_dir)
 
-        appname = cls.APP_NAME
+        appname = getattr(cls, 'APP_NAME', 'PyRandyOSApp')
         cls.set(APP_NAME_KEY, appname)
         log_info(f"Starting {appname}")
         cls.process_config()
