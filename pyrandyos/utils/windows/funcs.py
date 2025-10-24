@@ -88,7 +88,7 @@ def get_mapped_drives():
         items = True
         while items:
             items = WNetEnumResource(handle, MAX_PREFERRED_LENGTH)
-            drives += [(Path(it.lpLocalName), Path(it.lpRemoteName))
+            drives += [(Path(f'{it.lpLocalName}/'), Path(it.lpRemoteName))
                        for it in items]
             # for it in items:
             #     print(it.dwScope)

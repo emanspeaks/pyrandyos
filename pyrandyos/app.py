@@ -53,23 +53,22 @@ class PyRandyOSApp(AppConfig):
         cls.init_parse_config(config, kwargs)
 
         # setup logging first if necessary:
+        (
+            logdir,
+            ts_name,
+            append,
+            cli_log_level,
+            file_log_level,
+            log_trace_enabled,
+            tb_locals_enabled,
+            log_func_call_enabled,
+        ) = cls.expand_log_config()
+        set_trace_logging(log_trace_enabled)
+        set_func_call_logging(log_func_call_enabled)
+        set_show_traceback_locals(tb_locals_enabled)
         if setup_log:
-            (
-                logdir,
-                ts_name,
-                append,
-                cli_log_level,
-                file_log_level,
-                log_trace_enabled,
-                tb_locals_enabled,
-                log_func_call_enabled,
-            ) = cls.expand_log_config()
             logfile = logfile or create_log_file(logdir, ts_name, append,
                                                  cls.APP_LOG_PREFIX)
-
-            set_trace_logging(log_trace_enabled)
-            set_func_call_logging(log_func_call_enabled)
-            set_show_traceback_locals(tb_locals_enabled)
             setup_logging(logfile, cli_log_level, file_log_level)
 
         # start logging and process the rest of the configuration data
@@ -81,7 +80,7 @@ class PyRandyOSApp(AppConfig):
         if assets_dir:
             cls.set(APP_ASSETS_DIR_KEY, assets_dir)
 
-        appname = cls.APP_NAME
+        appname = getattr(cls, 'APP_NAME', 'PyRandyOSApp')
         cls.set(APP_NAME_KEY, appname)
         log_info(f"Starting {appname}")
         cls.process_config()
