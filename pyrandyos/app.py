@@ -99,12 +99,17 @@ class PyRandyOSApp(AppConfig):
     @classmethod
     @log_func_call
     def init_parse_config(cls, indata: dict | str | Path = None,
-                          overrides: dict = None, defaults: dict = None):
+                          overrides: dict = None, defaults: dict = None,
+                          app_global_defaults: dict = {},
+                          app_local_defaults: dict = {},
+                          case_insensitive: bool = None):
         global_defaults = dict()
-        global_defaults.update(cls.APP_GLOBAL_DEFAULTS)
+        global_defaults.update(app_global_defaults or cls.APP_GLOBAL_DEFAULTS)
+        app_local_defaults = app_local_defaults or cls.APP_LOCAL_DEFAULTS
         return super().init_parse_config(indata, overrides, defaults,
                                          global_defaults,
-                                         cls.APP_LOCAL_DEFAULTS)
+                                         app_local_defaults,
+                                         case_insensitive)
 
     @classmethod
     @log_func_call
