@@ -191,20 +191,20 @@ QTreeView::branch:open:hover, QTreeView::branch:closed:hover {
 /* Fallback: ensure every branch gets a vertical line by default */
 /* QTreeView::branch {
     border-image: none;
-    image: url(:/icons/vline.svg);
+    image: url(":/vibedark/icons/vline.svg");
 } */
 /* Branch lines - using background images for proper tree structure */
 QTreeView::branch:has-siblings:!adjoins-item {
     border-image: none;         /* --zero-border */
-    image: url(:/icons/vline.svg);
+    image: url(":/vibedark/icons/vline.svg");
 }
 QTreeView::branch:has-siblings:adjoins-item {
     border-image: none;         /* --zero-border */
-    image: url(:/icons/branch-more.svg);
+    image: url(":/vibedark/icons/branch-more.svg");
 }
 QTreeView::branch:!has-children:!has-siblings:adjoins-item {
     border-image: none;         /* --zero-border */
-    image: url(:/icons/branch-end.svg);
+    image: url(":/vibedark/icons/branch-end.svg");
 }
 
 /* Composite cases: a node that has children AND participates in sibling/adjoin layout
@@ -212,19 +212,19 @@ QTreeView::branch:!has-children:!has-siblings:adjoins-item {
    and point to composite placeholder images you can later replace with final artwork. */
 QTreeView::branch:open:has-children:has-siblings:adjoins-item {
     border-image: none;
-    image: url(:/icons/branch-open-more.svg);
+    image: url(":/vibedark/icons/branch-open-more.svg");
 }
 QTreeView::branch:closed:has-children:has-siblings:adjoins-item {
     border-image: none;
-    image: url(:/icons/branch-closed-more.svg);
+    image: url(":/vibedark/icons/branch-closed-more.svg");
 }
 QTreeView::branch:open:has-children:!has-siblings:adjoins-item {
     border-image: none;
-    image: url(:/icons/branch-open-end.svg);
+    image: url(":/vibedark/icons/branch-open-end.svg");
 }
 QTreeView::branch:closed:has-children:!has-siblings:adjoins-item {
     border-image: none;
-    image: url(:/icons/branch-closed-end.svg);
+    image: url(":/vibedark/icons/branch-closed-end.svg");
 }
 
 /* Branch icons with background cleared */
@@ -236,11 +236,11 @@ QTreeView::branch:closed {
 }
 QTreeView::branch:closed:has-children {
     border-image: none;         /* --zero-border */
-    image: url(:/icons/branch-closed.svg);
+    image: url(":/vibedark/icons/branch-closed.svg");
 }
 QTreeView::branch:open:has-children {
     border-image: none;         /* --zero-border */
-    image: url(:/icons/branch-open.svg);
+    image: url(":/vibedark/icons/branch-open.svg");
 }
 QTreeView::item:selected {
     background: #1d61a5;        /* --accent-blue */
@@ -342,7 +342,7 @@ QComboBox::drop-down {
     width: 24px;                /* --dropdown-width */
 }
 QComboBox::down-arrow {
-    image: url(:/icons/arrow-down.svg); /* icon reference - not commented */
+    image: url(":/vibedark/icons/arrow-down.svg"); /* icon reference - not commented */
     width: 16px;                /* --icon-medium */
     height: 16px;               /* --icon-medium */
 }
@@ -521,26 +521,26 @@ QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
     background: #1d61a5;        /* --accent-blue */
 }
 QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
-    image: url(:/icons/arrow-up.svg); /* icon reference - not commented */
+    image: url(":/vibedark/icons/arrow-up.svg"); /* icon reference - not commented */
     width: 12px;                /* --icon-small */
     height: 12px;               /* --icon-small */
 }
 QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
-    image: url(:/icons/arrow-down.svg);
+    image: url(":/vibedark/icons/arrow-down.svg");
 }
 
 /* Menu indicators */
 QMenu::indicator:non-exclusive:unchecked {
-    image: url(:/icons/checkbox-unchecked.svg);
+    image: url(":/vibedark/icons/checkbox-unchecked.svg");
 }
 QMenu::indicator:non-exclusive:checked {
-    image: url(:/icons/checkbox-checked.svg);
+    image: url(":/vibedark/icons/checkbox-checked.svg");
 }
 QMenu::indicator:exclusive:unchecked {
-    image: url(:/icons/radio-unchecked.svg);
+    image: url(":/vibedark/icons/radio-unchecked.svg");
 }
 QMenu::indicator:exclusive:checked {
-    image: url(:/icons/radio-checked.svg);
+    image: url(":/vibedark/icons/radio-checked.svg");
 }
 
 /* QCheckBox, QRadioButton */

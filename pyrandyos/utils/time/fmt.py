@@ -74,10 +74,8 @@ def sec_as_fmt(t: float, fmt: TimeFormat, digits: int = None):
 
 
 class TimeFormatter:
-    def __init__(self, hidden: bool = False, time_format: TimeFormat = None,
-                 digits: int = 0, zeropad: int = 0):
-
-        self.hidden = hidden
+    def __init__(self, time_format: TimeFormat = None, digits: int = 0,
+                 zeropad: int = 0):
         self.digits = digits
         self.zeropad = zeropad
         self.time_format = time_format
