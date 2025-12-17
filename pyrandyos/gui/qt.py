@@ -19,6 +19,7 @@ from PySide2.QtCore import (  # noqa: F401
     QSortFilterProxyModel,
     QItemSelection,
     QModelIndex,
+    QRegularExpression,
 )
 from PySide2.QtGui import (  # noqa: F401
     QPixmap,
@@ -42,6 +43,8 @@ from PySide2.QtGui import (  # noqa: F401
     QFontMetricsF,
     QTextLayout,
     QTextOption,
+    QSyntaxHighlighter,
+    QTextCharFormat,
 )
 from PySide2.QtWidgets import (  # noqa: F401
     QMainWindow,
@@ -89,6 +92,8 @@ from PySide2.QtWidgets import (  # noqa: F401
     QStyledItemDelegate,
     QStyle,
     QItemDelegate,
+    QPlainTextEdit,
+    QTextBrowser,
 )
 
 # try:
