@@ -36,6 +36,11 @@ def set_show_traceback_locals(enabled: bool = True):
     SHOW_TRACEBACK_LOCALS = bool(enabled)
 
 
+def get_show_traceback_locals():
+    global SHOW_TRACEBACK_LOCALS
+    return SHOW_TRACEBACK_LOCALS
+
+
 def get_stack_frame(level: int = 1):
     __traceback_hide__ = True  # noqa: F841
     f = currentframe()

@@ -28,6 +28,7 @@ from .utils.stack import (
     format_exc as _format_exc, get_stack_frame as _get_stack_frame,
     ExcInfoType as _ExcInfoType,
     is_code_the_given_func as _is_code_the_given_func,
+    get_show_traceback_locals,
 )
 
 _RecFactoryType = _Callable[..., _LogRecord]
@@ -232,6 +233,9 @@ def log_exc(exc_or_type: type | BaseException = None,
 def _log_exc_hook(exc_or_type: type | BaseException = None,
                   exc: BaseException = None,
                   traceback: _TracebackType = None):
+    if get_show_traceback_locals() is None:
+        _sys.__excepthook__(exc_or_type, exc, traceback)
+
     f = _get_stack_frame(2)  # excludes _log_exc_hook and get_stack_frame
     # if we are in debug, usually we want to have the debugger handle
     # exceptions so that we can break on them.  If we log the exception with
