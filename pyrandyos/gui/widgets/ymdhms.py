@@ -3,9 +3,9 @@ from enum import Enum, auto
 from ...logging import log_func_call
 from ...utils.time.gregorian import DAYSINMONTH, is_leap_year
 from ..qt import (
-    QGroupBox, QHBoxLayout, QFrame, Qt, QObject,
-    QEvent, QKeyEvent, QPainter, QFont, QPaintEvent,
-    QMouseEvent, QFocusEvent, QLineEdit, QPalette, QFontMetrics, QColor
+    QGroupBox, QHBoxLayout, QFrame, Qt, QObject, QEvent, QKeyEvent, QPainter,
+    QPaintEvent, QMouseEvent, QFocusEvent, QLineEdit, QPalette, QFontMetrics,
+    QColor,
 )
 from . import QtWidgetWrapper, GuiWidgetParentType
 
@@ -33,7 +33,7 @@ class YmdhmsDisplayWidget(QtWidgetWrapper[QFrame]):
         qtobj = QFrame(parent_qtobj)
         qtobj.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
         qtobj.setFocusPolicy(Qt.StrongFocus)
-        qtobj.setMinimumWidth(200)
+        qtobj.setMinimumWidth(170)
         qtobj.setMinimumHeight(25)
 
         # Use QLineEdit palette colors for consistent theming
@@ -159,7 +159,8 @@ class YmdhmsDisplayWidget(QtWidgetWrapper[QFrame]):
         display_str = self.get_display_string()
 
         # Set up font
-        font = QFont("Courier New", 10)
+        font = self.gui_app.get_monofont()
+        font.setPointSize(10)
         painter.setFont(font)
 
         # Calculate character width for monospace font
@@ -232,7 +233,8 @@ class YmdhmsDisplayWidget(QtWidgetWrapper[QFrame]):
 
         # Calculate which character was clicked
         # Use same font as painting to get accurate metrics
-        font = QFont("Courier New", 10)
+        font = self.gui_app.get_monofont()
+        font.setPointSize(10)
         fm = QFontMetrics(font)
         char_width = fm.horizontalAdvance('0')
 
@@ -660,7 +662,7 @@ class YmdhmsWidget(QtWidgetWrapper[QGroupBox]):
 
         frame = QGroupBox(parent_qtobj)
         frame.setTitle('YMDHMS')
-        frame.setMaximumWidth(220)
+        frame.setFixedWidth(195)
         frame.setMaximumHeight(60)
         self.frame = frame
 

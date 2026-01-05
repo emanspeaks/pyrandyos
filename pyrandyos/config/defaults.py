@@ -9,6 +9,7 @@ from .keys import (
     CONFIG_PACKAGE_DIR_KEY, CONFIG_PACKAGE_VERSION_KEY,
     SHOW_TRACEBACK_LOCALS_KEY, QRC_FILE_KEY, LOG_FUNC_CALL_ENABLED_KEY,
     STATUSBAR_LOG_LEVEL_KEY, PYTHON_VERSION_KEY, PYTHON_EXE_PATH_KEY,
+    MONOFONT_KEY,
 )
 
 # defaults
@@ -27,6 +28,7 @@ DEFAULTS = {
     QRC_FILE_KEY: f'${{{CONFIG_PACKAGE_DIR_KEY}}}/gui/styles/assets/vibedark.qrc',  # noqa: E501
     PYTHON_VERSION_KEY: sys.version,
     PYTHON_EXE_PATH_KEY: sys.executable,
+    MONOFONT_KEY: "Consolas, Monaco, monospace",
 
     LOCAL_CFG_KEY: {
         "theme": "vibedark",

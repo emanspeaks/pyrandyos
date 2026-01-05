@@ -1,8 +1,7 @@
 from ...logging import log_func_call
 from ..qt import (
-    QGroupBox, QHBoxLayout, QFrame, Qt, QObject,
-    QEvent, QKeyEvent, QPainter, QFont, QPaintEvent,
-    QMouseEvent, QFocusEvent, QLineEdit, QPalette, QFontMetrics
+    QGroupBox, QHBoxLayout, QFrame, Qt, QObject, QEvent, QKeyEvent, QPainter,
+    QPaintEvent, QMouseEvent, QFocusEvent, QLineEdit, QPalette, QFontMetrics,
 )
 from . import QtWidgetWrapper, GuiWidgetParentType
 
@@ -94,7 +93,8 @@ class TimeFieldDisplayWidget(QtWidgetWrapper[QFrame]):
         display_str = self.get_display_string()
 
         # Set up font
-        font = QFont("Courier New", 10)
+        font = self.gui_app.get_monofont()
+        font.setPointSize(10)
         painter.setFont(font)
 
         # Calculate character width for monospace font
@@ -154,7 +154,8 @@ class TimeFieldDisplayWidget(QtWidgetWrapper[QFrame]):
 
         # Calculate which character was clicked
         # Use same font as painting to get accurate metrics
-        font = QFont("Courier New", 10)
+        font = self.gui_app.get_monofont()
+        font.setPointSize(10)
         fm = QFontMetrics(font)
         char_width = fm.horizontalAdvance('0')
 

@@ -6,10 +6,6 @@ from ..qt import (
 from . import QtWidgetWrapper, GuiWidgetParentType
 
 
-MONO_FONT = QFont("Consolas, Monaco, monospace")
-MONO_FONT.setStyleHint(QFont.Monospace)
-
-
 class JsonHighlighter(QSyntaxHighlighter):
     @log_func_call(DEBUGLOW2)
     def __init__(self, parent=None):
@@ -55,7 +51,9 @@ class JsonEditorWidget(QtWidgetWrapper[QPlainTextEdit]):
         parent_qtobj: GuiWidgetParentType = self.gui_parent.qtobj
 
         editor = QPlainTextEdit(parent_qtobj)
-        editor.setFont(MONO_FONT)
+        font = self.gui_app.get_monofont()
+        font.setPointSize(10)
+        editor.setFont(font)
         self.editor = editor
 
         highlighter = JsonHighlighter(editor.document())

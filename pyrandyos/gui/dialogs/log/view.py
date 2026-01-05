@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from ....logging import log_func_call
 from ...qt import (
     QVBoxLayout, QDialogButtonBox, QTextEdit, QTableWidget,
-    QTableWidgetItem, QHeaderView, Qt, QFont,
+    QTableWidgetItem, QHeaderView, Qt,
 )
 from .. import GuiDialogView
 from ...callback import qt_callback
@@ -22,8 +22,6 @@ LOG_COLS = [
 
 UserRole = Qt.UserRole
 
-MONO_FONT = QFont("Consolas, Monaco, monospace")
-MONO_FONT.setStyleHint(QFont.Monospace)
 TABLE_TPAD = 2  # one sided
 TABLE_LPAD = 4  # one sided
 TABLE_VPAD = TABLE_TPAD*2  # two sided
@@ -145,6 +143,7 @@ class LogDialogView(GuiDialogView['LogDialog']):
 
         rowcount = len(content[0])
         table.setRowCount(rowcount)
+        monofont = self.gui_app.get_monofont()
         for row in range(rowcount):
             # Create regular table items and store original text as user data
             for i, col in enumerate(content):
@@ -153,7 +152,7 @@ class LogDialogView(GuiDialogView['LogDialog']):
                 item.setData(UserRole, x)
                 # Apply monospace font to the message column (last column)
                 if i == len(LOG_COLS) - 1:  # Message column
-                    item.setFont(MONO_FONT)
+                    item.setFont(monofont)
 
                 table.setItem(row, i, item)
 

@@ -33,6 +33,7 @@ CONFIG_PACKAGE_DIR_KEY = 'config_package_dir'
 CONFIG_PACKAGE_VERSION_KEY = 'config_package_version'
 PYTHON_VERSION_KEY = 'python_version'
 PYTHON_EXE_PATH_KEY = 'python_exe_path'
+MONOFONT_KEY = 'monofont'
 
 PATH_KEYS = (
     BASE_LOG_DIR_KEY,
