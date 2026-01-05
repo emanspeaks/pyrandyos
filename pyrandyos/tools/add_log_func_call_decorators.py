@@ -49,7 +49,8 @@ def should_skip_dir(path: Path, exclude_dirs, base_path: Path) -> bool:
         if pattern.startswith('/'):
             # Explicit path pattern - match from base_path
             explicit_pattern = pattern[1:]  # Remove leading /
-            if rel_path_str == explicit_pattern or rel_path_str.startswith(explicit_pattern + '/'):
+            if (rel_path_str == explicit_pattern
+                    or rel_path_str.startswith(explicit_pattern + '/')):
                 return True
         else:
             # Simple name pattern - match any directory with this name
@@ -68,8 +69,9 @@ def is_property_decorator(line):
     )
 
 
-def file_needs_decorator_legacy(filepath: Path, exclude_file_paths, exclude_classes,
-                         exclude_methods, exclude_dirs, should_skip_dir):
+def file_needs_decorator_legacy(filepath: Path, exclude_file_paths,
+                                exclude_classes, exclude_methods, exclude_dirs,
+                                should_skip_dir):
     """Legacy version - not used anymore"""
     content = filepath.read_text(encoding='utf-8')
     lines = content.splitlines()
