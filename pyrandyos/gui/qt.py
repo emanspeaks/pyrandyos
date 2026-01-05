@@ -49,6 +49,9 @@ from PySide2.QtGui import (  # noqa: F401
     QIntValidator,
     QDoubleValidator,
     QRegExpValidator,
+    QKeyEvent,
+    QPaintEvent,
+    QFocusEvent,
 )
 from PySide2.QtWidgets import (  # noqa: F401
     QMainWindow,

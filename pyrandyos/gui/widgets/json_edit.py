@@ -1,4 +1,4 @@
-from ...logging import log_func_call
+from ...logging import log_func_call, DEBUGLOW2
 from ..qt import (
     QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QRegularExpression,
     QPlainTextEdit,
@@ -11,6 +11,7 @@ MONO_FONT.setStyleHint(QFont.Monospace)
 
 
 class JsonHighlighter(QSyntaxHighlighter):
+    @log_func_call(DEBUGLOW2)
     def __init__(self, parent=None):
         super().__init__(parent)
         self.rules: list[tuple[QRegularExpression, QTextCharFormat]] = list()
@@ -38,6 +39,7 @@ class JsonHighlighter(QSyntaxHighlighter):
         self.rules.append((number_regex, number_format))
         self.rules.append((boolean_regex, boolean_format))
 
+    @log_func_call(DEBUGLOW2)
     def highlightBlock(self, text):
         for pattern, format in self.rules:
             match_iterator = pattern.globalMatch(text)

@@ -31,6 +31,8 @@ APP_PKG_VERSION_KEY = 'package_version'
 APP_ASSETS_DIR_KEY = 'assets_dir'
 CONFIG_PACKAGE_DIR_KEY = 'config_package_dir'
 CONFIG_PACKAGE_VERSION_KEY = 'config_package_version'
+PYTHON_VERSION_KEY = 'python_version'
+PYTHON_EXE_PATH_KEY = 'python_exe_path'
 
 PATH_KEYS = (
     BASE_LOG_DIR_KEY,
@@ -39,6 +41,7 @@ PATH_KEYS = (
     APP_ASSETS_DIR_KEY,
     QRC_PYFILE_KEY,
     QRC_FILE_KEY,
+    PYTHON_EXE_PATH_KEY,
 
     # "local.delivery_config_dir",
     LOCAL_CONFIG_FILE_KEY,

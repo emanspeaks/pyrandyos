@@ -1,5 +1,7 @@
+import sys
 # from __future__ import annotations
 from typing import TYPE_CHECKING
+from pathlib import Path
 
 from ....logging import log_func_call, DEBUGLOW2
 from ....app import PyRandyOSApp
@@ -69,6 +71,12 @@ class ConfigTreeDialogView(GuiDialogView['ConfigTreeDialog']):
         self.dlgbuttons = dlgbuttons
 
         self.populate_tree(itemmodel, pres.get_config())
+
+        not_in_cfg_item = QStandardItem("(Not in Config dict)")
+        itemmodel.appendRow([not_in_cfg_item, QStandardItem("")])
+        syspath = {'Python sys.path': [Path(p) for p in sys.path]}
+        self.populate_tree(not_in_cfg_item, syspath)
+
         tree.expandAll()
         tree.resizeColumnToContents(0)
 
