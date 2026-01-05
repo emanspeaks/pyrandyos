@@ -20,6 +20,7 @@ from PySide2.QtCore import (  # noqa: F401
     QItemSelection,
     QModelIndex,
     QRegularExpression,
+    QRegExp,
 )
 from PySide2.QtGui import (  # noqa: F401
     QPixmap,
@@ -45,6 +46,9 @@ from PySide2.QtGui import (  # noqa: F401
     QTextOption,
     QSyntaxHighlighter,
     QTextCharFormat,
+    QIntValidator,
+    QDoubleValidator,
+    QRegExpValidator,
 )
 from PySide2.QtWidgets import (  # noqa: F401
     QMainWindow,
@@ -94,6 +98,7 @@ from PySide2.QtWidgets import (  # noqa: F401
     QItemDelegate,
     QPlainTextEdit,
     QTextBrowser,
+    QGroupBox,
 )
 
 # try:
