@@ -815,13 +815,16 @@ class DhmsWidget(QtWidgetWrapper[QGroupBox]):
         self.display = display
 
         # Set tooltip with keyboard shortcuts
-        tooltip = ("Overtype mode except spaces before/after days\n"
-                   "PgUp/Right — move cursor right\n"
-                   "PgDn/Left — move cursor left\n"
-                   "/ or . — advance from days to time\n"
-                   "Up/Down — increment/decrement field\n"
-                   "Ctrl+Up/Down — increment/decrement digit\n"
-                   "+/- — set sign")
+        tooltip = (
+            "Overtype mode except spaces before/after days.\n"
+            "Days: cursor in blank spaces insert/append more digits.\n"
+            "/ or . — advance from days to time\n"
+            "+ or - — set sign\n"
+            "PgDn or Left — move cursor left\n"
+            "PgUp or Right — move cursor right\n"
+            "Up or Down — increment/decrement field\n"
+            "Ctrl+Up or Ctrl+Down — increment/decrement digit"
+        )
         display.qtobj.setToolTip(tooltip)
 
         return frame

@@ -643,12 +643,14 @@ class YDoyHmsWidget(QtWidgetWrapper[QGroupBox]):
         self.display = display
 
         # Set tooltip with keyboard shortcuts
-        tooltip = ("Overtype mode for all fields\n"
-                   "PgUp/Right — move cursor right\n"
-                   "PgDn/Left — move cursor left\n"
-                   "Up/Down — increment/decrement field\n"
-                   "Ctrl+Up/Down — increment/decrement digit\n"
-                   "Red highlighting — invalid day of year")
+        tooltip = (
+            "Overtype mode for all fields\n"
+            "Red highlighting — invalid day of year\n"
+            "PgDn or Left — move cursor left\n"
+            "PgUp or Right — move cursor right\n"
+            "Up or Down — increment/decrement field\n"
+            "Ctrl+Up or Ctrl+Down — increment/decrement digit"
+        )
         display.qtobj.setToolTip(tooltip)
 
         return frame
