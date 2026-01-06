@@ -32,7 +32,7 @@ classifiers = [
 qdarkstyle = ["qdarkstyle"]
 dev = [
   "hatch-vcs",
-  "types-pyside2",
+  "types-pyside2",  # pip only
   "pdoc",
   "hatchling",
 ]

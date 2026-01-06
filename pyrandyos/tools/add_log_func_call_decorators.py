@@ -26,8 +26,38 @@ def load_exclude_config(config_path):
         return parse_jsonc(f.read())
 
 
-def should_skip_dir(path: Path, exclude_dirs) -> bool:
-    return any(part in exclude_dirs for part in path.parts)
+def should_skip_dir(path: Path, exclude_dirs, base_path: Path) -> bool:
+    """
+    Check if a directory should be skipped based on exclude patterns.
+
+    Patterns starting with '/' are treated as explicit paths from base_path.
+    Patterns without '/' match any directory with that name.
+
+    Examples:
+        'cache' -> matches any directory named 'cache' at any level
+        '/cache' -> matches only base_path/cache
+        '/pyrandyos/utils/time' -> matches only base_path/pyrandyos/utils/time
+    """
+    try:
+        rel_path = path.resolve().relative_to(base_path.resolve())
+        rel_path_str = str(rel_path).replace('\\', '/')
+    except ValueError:
+        # path is not relative to base_path
+        return False
+
+    for pattern in exclude_dirs:
+        if pattern.startswith('/'):
+            # Explicit path pattern - match from base_path
+            explicit_pattern = pattern[1:]  # Remove leading /
+            if (rel_path_str == explicit_pattern
+                    or rel_path_str.startswith(explicit_pattern + '/')):
+                return True
+        else:
+            # Simple name pattern - match any directory with this name
+            if pattern in path.parts:
+                return True
+
+    return False
 
 
 def is_property_decorator(line):
@@ -39,8 +69,10 @@ def is_property_decorator(line):
     )
 
 
-def file_needs_decorator(filepath: Path, exclude_file_paths, exclude_classes,
-                         exclude_methods, exclude_dirs, should_skip_dir):
+def file_needs_decorator_legacy(filepath: Path, exclude_file_paths,
+                                exclude_classes, exclude_methods, exclude_dirs,
+                                should_skip_dir):
+    """Legacy version - not used anymore"""
     content = filepath.read_text(encoding='utf-8')
     lines = content.splitlines()
     new_lines = []
@@ -173,8 +205,8 @@ def main(root_dirs, config_path=None):
             path_obj = (base_path / path_obj).resolve()
         exclude_file_paths.add(str(path_obj))
 
-    def should_skip_dir(path: Path) -> bool:
-        return any(part in exclude_dirs for part in path.parts)
+    def should_skip_dir_closure(path: Path) -> bool:
+        return should_skip_dir(path, exclude_dirs, base_path)
 
     def file_needs_decorator(filepath: Path):
         content = filepath.read_text(encoding='utf-8')
@@ -284,7 +316,7 @@ def main(root_dirs, config_path=None):
             ):
                 continue
 
-            if should_skip_dir(pyfile):
+            if should_skip_dir_closure(pyfile):
                 continue
 
             file_needs_decorator(pyfile)

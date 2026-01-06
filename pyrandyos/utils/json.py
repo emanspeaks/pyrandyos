@@ -88,7 +88,7 @@ def save_json(fn: str | Path, data: dict | list):
         fn (str | Path): file path to save
         data (dict | list): structured data to convert to JSON.
     """
-    fn.write_text(jdumps(data, indent=2))
+    Path(fn).write_text(jdumps(data, indent=2))
 
 
 @log_func_call

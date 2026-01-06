@@ -23,6 +23,7 @@ dbpaths
 debugfmtstr
 dhms
 dleap
+dlen
 dlgbuttons
 dllerrs
 drivelist
@@ -60,6 +61,7 @@ jsonify
 jsonlicdir
 klass
 lastc
+lastf
 levelno
 LICEN
 lnum
@@ -182,6 +184,7 @@ VSCode
 vscode-codicons
 waivable
 Wimberly
+ydoy
 ymdhms
 YMDHMSKEYS
 ymdhmsms

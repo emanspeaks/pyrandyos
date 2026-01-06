@@ -5,11 +5,12 @@ It should be imported before any Qt widgets are created.
 """
 from subprocess import run, CalledProcessError
 from pathlib import Path
+from os import environ, pathsep
 
 from ..logging import log_func_call
 from ..config.keys import QRC_PYFILE_KEY, QRC_FILE_KEY
 from ..utils.constants import IS_WIN32
-from ..utils.system import import_python_file
+from ..utils.system import import_python_file, get_conda_base_prefix
 from ..app import PyRandyOSApp
 
 HERE = Path(__file__).parent
@@ -39,6 +40,11 @@ def compile_qrc(qrcfile: Path = None):
         return  # Up to date
 
     # Try to find pyside2-rcc or pyrcc5
+    conda_path = get_conda_base_prefix()
+    script_dir = conda_path/('Scripts' if IS_WIN32 else 'bin')
+    bin_dir = conda_path/('Library/bin' if IS_WIN32 else 'bin')
+    env = environ.copy()
+    env['PATH'] = f"{bin_dir}{pathsep}{script_dir}{pathsep}{env['PATH']}"
     rcc_cmds = [
         ["pyside2-rcc", str(qrcfile)],
         ["pyrcc5", str(qrcfile)],
@@ -46,7 +52,8 @@ def compile_qrc(qrcfile: Path = None):
     for cmd in rcc_cmds:
         try:
             # On Windows, need to add shell=True for .bat/.cmd
-            result = run(cmd, capture_output=True, check=True, shell=IS_WIN32)
+            result = run(cmd, capture_output=True, check=True, shell=IS_WIN32,
+                         env=env)
             if result.returncode == 0:
                 py_file.write_bytes(result.stdout)
                 return
@@ -54,7 +61,8 @@ def compile_qrc(qrcfile: Path = None):
             continue
     raise RuntimeError(
         "Could not compile Qt resources. "
-        "Please ensure 'pyside2-rcc' or 'pyrcc5' is installed and on PATH."
+        "Please ensure 'pyside2-rcc' or 'pyrcc5' and 'rcc' "
+        "are installed and on PATH."
     )
 
 

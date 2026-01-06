@@ -56,14 +56,15 @@
     ]//,
   },
   "exclude_dirs": [
-    "__pycache__",
+    "__pycache__",  // matches any __pycache__ directory at any level
     "_testing",
     ".git",
     ".venv",
     "venv",
     "env",
     ".conda",
-    "tests"//,
+    "tests",
+    "/pyrandyos/utils/time"  // explicit path from base_dir - only matches this specific directory
   ],
   "exclude_functions": {
     "pyrandyos/gui/utils.py": [

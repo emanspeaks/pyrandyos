@@ -1,4 +1,4 @@
-from ..config.keys import LOCAL_CFG_KEY
+from ..config.keys import LOCAL_CFG_KEY, MONOFONT_KEY
 from ..logging import log_exc, log_func_call, DEBUGLOW2, log_debug, log_info
 from ..app import PyRandyOSApp
 from . import GuiQtWrapper
@@ -8,7 +8,7 @@ from .splash import GuiSplashScreen
 from .loadstatus import load_status_step, splash_message
 from .qrc import compile_qrc, import_qrc
 from .qt import (
-    QWidget, QApplication, qVersion, QObject, QEvent, QPixmap, Qt,
+    QWidget, QApplication, qVersion, QObject, QEvent, QPixmap, Qt, QFont,
 )
 
 _GUI_APP_INST: 'GuiApp | None' = None
@@ -172,3 +172,9 @@ class GuiApp(GuiQtWrapper):
     @log_func_call
     def get_dpi_scale(self):
         return self.get_dpi() / 96.0
+
+    @log_func_call
+    def get_monofont(self):
+        font = QFont(PyRandyOSApp[MONOFONT_KEY])
+        font.setStyleHint(QFont.Monospace)
+        return font
