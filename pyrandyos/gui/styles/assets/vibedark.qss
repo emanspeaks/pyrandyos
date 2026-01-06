@@ -449,7 +449,7 @@ QGroupBox::title {
     subcontrol-origin: margin;  /* --subcontrol-margin */
     subcontrol-position: top left; /* --subcontrol-top-left */
     padding: 0 8px;             /* vertical zero, horizontal --padding-standard */
-    color: #1d61a5;             /* --accent-blue */
+    color: #ffffff;             /* --text-white */
 }
 
 /* QSlider - layout and special handle styling */
