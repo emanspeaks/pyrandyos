@@ -11,15 +11,20 @@ def ymdhms_to_iso(y: int, mo: int, d: int, h: int, m: int,
     ystr = '{:04d}'.format(y)
     mostr = '{:02d}'.format(mo)
     dstr = '{:02d}'.format(d)
-    hstr = '{:02d}'.format(h)
-    mstr = '{:02d}'.format(m)
-    # sstr = f'{{:0{sec_digits + 2 + (sec_digits > 0)}.{sec_digits}f}}'.format(s)  # noqa: E501
-    sstr = format_number(s, sec_digits, 2)
     tstr = 'T' if use_T else ' '
-    return (
-        ystr + '-' + mostr + '-' + dstr + tstr
-        + hstr + ":" + mstr + ':' + sstr + zone
-    )
+    hmsstr = hms_to_str(h, m, s, sec_digits)
+    return f'{ystr}-{mostr}-{dstr}{tstr}{hmsstr}{zone}'
+
+
+def y_doy_hms_to_str(y: int, doy: int, h: int, m: int, s: float,
+                     sec_digits: int = 0):
+    if sec_digits is None:
+        sec_digits = 0
+
+    ystr = '{:04d}'.format(y)
+    dhmsstr = dhms_to_met_str(doy, h, m, s, sec_digits=sec_digits,
+                              day_digits=3, daysep=':')
+    return f'{ystr}:{dhmsstr}'
 
 
 def format_number(x: float | int, digits: int = None, zeropad: int = 0):
@@ -51,6 +56,14 @@ def format_number(x: float | int, digits: int = None, zeropad: int = 0):
     return f'{{:{pad}{print_chars}.{digits*pos_dig}f}}'.format(y)
 
 
+def hms_to_str(h: int, m: int, s: float, sec_digits: int = 3):
+    hstr = '{:02d}'.format(h)
+    mstr = '{:02d}'.format(m)
+    # sstr = f'{{:0{sec_digits + 2 + (sec_digits > 0)}.{sec_digits}f}}'.format(s)  # noqa: E501
+    sstr = format_number(s, sec_digits, 2)
+    return f'{hstr}:{mstr}:{sstr}'
+
+
 def dhms_to_met_str(d: int, h: int, m: int, s: float, sign: int = 1,
                     sec_digits: int = 3, day_digits: int = 2,
                     daysep: str = '/'):
@@ -59,11 +72,7 @@ def dhms_to_met_str(d: int, h: int, m: int, s: float, sign: int = 1,
 
     signstr = '-' if sign < 0 else ''
     dstr = f'{{:0{day_digits}d}}'.format(d)
-    hstr = '{:02d}'.format(h)
-    mstr = '{:02d}'.format(m)
-    # sstr = f'{{:0{sec_digits + 2 + (sec_digits > 0)}.{sec_digits}f}}'.format(s)  # noqa: E501
-    sstr = format_number(s, sec_digits, 2)
-    return signstr + dstr + daysep + hstr + ':' + mstr + ':' + sstr
+    return f'{signstr}{dstr}{daysep}{hms_to_str(h, m, s, sec_digits)}'
 
 
 def sec_to_dhms_str(sec: float, sec_digits: int = 3):
@@ -77,6 +86,4 @@ def sec_to_ymdhms_str(sec: float, sec_digits: int = 0):
 
 def sec_to_y_doy_hms_str(sec: float, sec_digits: int = 0):
     y_doy_hms = sec_to_y_doy_hms(sec, sec_digits)
-    ystr = '{:04d}'.format(y_doy_hms[0])
-    return ystr + ':' + dhms_to_met_str(*y_doy_hms[1:], sec_digits=sec_digits,
-                                        day_digits=3, daysep=':')
+    return y_doy_hms_to_str(*y_doy_hms, sec_digits=sec_digits)

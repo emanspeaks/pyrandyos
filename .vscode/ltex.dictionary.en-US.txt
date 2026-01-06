@@ -23,6 +23,7 @@ dbpaths
 debugfmtstr
 dhms
 dleap
+dlen
 dlgbuttons
 dllerrs
 drivelist
@@ -60,6 +61,7 @@ jsonify
 jsonlicdir
 klass
 lastc
+lastf
 levelno
 LICEN
 lnum
