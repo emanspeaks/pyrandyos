@@ -7,10 +7,13 @@ from . import QtWidgetWrapper, GuiWidgetParentType
 
 
 class JsonHighlighter(QSyntaxHighlighter):
+    rules: list[tuple[QRegularExpression, QTextCharFormat]]
+
     @log_func_call(DEBUGLOW2)
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.rules: list[tuple[QRegularExpression, QTextCharFormat]] = list()
+        # self.rules = list()  # this causes Qt to crash
+        self.__dict__['rules'] = list()
 
         # Define styles
         key_format = QTextCharFormat()
