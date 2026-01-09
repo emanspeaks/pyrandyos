@@ -20,6 +20,7 @@ from .utils.system import mkdir_chgrp
 from .utils.stack import (
     top_package_dir_path, top_module_and_name, set_show_traceback_locals
 )
+from .utils.windows.funcs import set_windows_process_app_id
 
 
 class PyRandyOSApp(AppConfig):
@@ -83,6 +84,7 @@ class PyRandyOSApp(AppConfig):
         appname = getattr(cls, 'APP_NAME', 'PyRandyOSApp')
         cls.set(APP_NAME_KEY, appname)
         log_info(f"Starting {appname}")
+        set_windows_process_app_id(appname)
         cls.process_config()
 
         use_local_config = process_local_config(app_path_keys=cls.APP_PATH_KEYS)  # noqa: E501

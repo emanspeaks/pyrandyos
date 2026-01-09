@@ -6,13 +6,14 @@ provided at this time.  Use at your own discretion.
 # code adapted from https://github.com/Drekin/win-unicode-console/
 from logging import Logger
 from pathlib import Path
-from ctypes import c_ulong, byref, create_string_buffer
+from ctypes import c_ulong, byref, create_string_buffer, cast
 
 from ...logging import log_func_call
+from ..string import ensure_bytes
 from ..constants import IS_WIN32
 from ..constants.windows import (
     ErrCodeLookup, DllErrMsgDict, DriveList, ERROR_INVALID_HANDLE,
-    PROCESS_SYSTEM_DPI_AWARE, MAX_PREFERRED_LENGTH,
+    PROCESS_SYSTEM_DPI_AWARE, MAX_PREFERRED_LENGTH, WIN_WCHAR_ENCODING
 )
 from .ctypes import IS_WIN_CTYPES
 
@@ -20,7 +21,8 @@ if IS_WIN_CTYPES:
     from .ctypes import (
         WriteConsoleW, GetConsoleMode, get_last_error, WNetOpenEnum,
         WNetCloseEnum, WNetEnumResource, WinError, SetProcessDpiAwareness,
-        RESOURCETYPE_DISK, RESOURCE_CONNECTED,
+        RESOURCETYPE_DISK, RESOURCE_CONNECTED, LPCWSTR,
+        SetCurrentProcessExplicitAppUserModelID,
     )
 
 
@@ -104,3 +106,10 @@ def get_mapped_drives():
         return drives
     finally:
         WNetCloseEnum(handle)
+
+
+@log_func_call
+def set_windows_process_app_id(appid: str):
+    if IS_WIN32:
+        buffer = create_string_buffer(ensure_bytes(appid, WIN_WCHAR_ENCODING))
+        SetCurrentProcessExplicitAppUserModelID(cast(byref(buffer), LPCWSTR))
