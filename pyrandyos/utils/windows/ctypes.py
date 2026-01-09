@@ -7,7 +7,7 @@ from ctypes import c_uint
 try:  # pragma: no cover
     from ctypes import WinDLL, WinError, get_last_error, OleDLL  # noqa: F401
     from ctypes.wintypes import (
-        DWORD, HANDLE, LPDWORD, LPVOID,
+        DWORD, HANDLE, LPDWORD, LPVOID, LPCWSTR,
         # LPCWSTR, ULONG, PHANDLE, PULONG,
     )
     from win32wnet import WNetOpenEnum, WNetCloseEnum, WNetEnumResource  # noqa: F401, E501
@@ -31,6 +31,10 @@ else:  # pragma: no cover
     shcore = OleDLL('shcore', use_last_error=True)
     SetProcessDpiAwareness = shcore.SetProcessDpiAwareness
     SetProcessDpiAwareness.argtypes = (c_uint,)
+
+    shell32 = WinDLL("shell32", use_last_error=True)
+    SetCurrentProcessExplicitAppUserModelID = shell32.SetCurrentProcessExplicitAppUserModelID  # noqa: E501
+    SetCurrentProcessExplicitAppUserModelID.argtypes = (LPCWSTR,)
 
     RESOURCEDISPLAYTYPES = {
         # The resource is a network provider.
