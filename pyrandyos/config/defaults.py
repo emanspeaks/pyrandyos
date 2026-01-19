@@ -31,7 +31,7 @@ DEFAULTS = {
     MONOFONT_KEY: "Consolas, Monaco, monospace",
 
     LOCAL_CFG_KEY: {
-        "theme": "vibedark",
+        "theme": "vibedark2",
         "default_width": 1080,
         "default_height": 720,
     },

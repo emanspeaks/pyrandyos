@@ -1,10 +1,11 @@
 name: Upload Python Package to PyPI
 on:
   push:
-    tags:
-      - 'v*'
     branches:
       - develop
+      - main
+    tags-ignore:
+      - 'v*'
   pull_request:
     branches:
       - main
@@ -17,8 +18,10 @@ jobs:
   build-pypi:
     name: Build PyPI distribution
     runs-on: ubuntu-latest
-    # permissions:
-    #   contents: write  # Required to push back to repo
+    permissions:
+      contents: write  # Required to push back to repo
+    outputs:
+      new_tag: ${{ steps.create_tag.outputs.new_tag }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -34,28 +37,116 @@ jobs:
           python -m pip install --upgrade pip
           pip install hatch
 
-      # - name: Generate version file
-      #   run: |
-      #     # This creates the _version.py file
-      #     hatch build --target wheel
+      - name: Get latest tag and determine next version
+        if: github.ref == 'refs/heads/main'
+        id: create_tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Fetch all tags
+          git fetch --tags
 
-      # - name: Commit version file
-      #   if: startsWith(github.ref, 'refs/tags/v')
-      #   run: |
-      #     git config --local user.email "action@github.com"
-      #     git config --local user.name "GitHub Action"
+          # Get the latest tag (sorted by version using Git's version-aware sort)
+          LATEST_TAG=$(git tag -l "v*" --sort=-version:refname | head -n 1)
 
-      #     if [ -f pyrandyos/_version.py ]; then
-      #       git add pyrandyos/_version.py
-      #       if ! git diff --staged --quiet; then
-      #         git commit -m "Auto-update version to $(hatch version) [skip ci]"
-      #         git push
-      #       fi
-      #     fi
+          # If no tags exist, start with v0.1.0
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="v0.1.0"
+            echo "No existing tags found. Starting with $LATEST_TAG"
+          else
+            echo "Latest tag: $LATEST_TAG"
+          fi
+
+          # Extract version components (remove 'v' prefix)
+          VERSION=${LATEST_TAG#v}
+
+          # Validate that VERSION matches MAJOR.MINOR.PATCH with numeric components
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Latest tag '$LATEST_TAG' does not follow the required format vMAJOR.MINOR.PATCH (numeric components only)."
+            exit 1
+          fi
+
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+
+          # Determine version bump type based on PR labels
+          # Get the PR number associated with the current commit using the GitHub API
+          PR_NUMBER=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls" --jq '.[0].number' 2>/dev/null || true)
+
+          BUMP_TYPE="patch"  # Default to patch
+
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Merge commit from PR #$PR_NUMBER"
+            # Check for labels
+            # Capture labels and handle failures explicitly so we can distinguish
+            # between "no labels" and "failed to fetch labels".
+            if LABELS=$(gh pr view "$PR_NUMBER" --json labels --jq '.labels[].name' 2>&1); then
+              echo "PR Labels: $LABELS"
+            else
+              echo "Warning: Failed to retrieve labels for PR #$PR_NUMBER. Defaulting to patch bump."
+              echo "gh pr view error output:"
+              echo "$LABELS"
+              LABELS=""
+            fi
+
+            if echo "$LABELS" | grep -qi "release:major"; then
+              BUMP_TYPE="major"
+            elif echo "$LABELS" | grep -qi "release:minor"; then
+              BUMP_TYPE="minor"
+            fi
+          else
+            echo "No PR found for this commit. This may occur for:"
+            echo "  - Direct pushes to master (not through a PR)"
+            echo "  - Commits not yet indexed by the GitHub API"
+            echo "Defaulting to patch bump"
+          fi
+
+          echo "Bump type: $BUMP_TYPE"
+
+          # Calculate new version
+          if [ "$BUMP_TYPE" = "major" ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "$BUMP_TYPE" = "minor" ]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+
+          NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "New tag: $NEW_TAG"
+
+          # Check if tag already exists locally or remotely
+          if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
+            echo "Error: Tag $NEW_TAG already exists locally!"
+            exit 1
+          fi
+
+          # Check if tag exists on remote to prevent race conditions
+          if git ls-remote --tags origin | grep -q "refs/tags/$NEW_TAG$"; then
+            echo "Error: Tag $NEW_TAG already exists on remote!"
+            exit 1
+          fi
+
+          # Create the new tag locally (don't push yet)
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$NEW_TAG" -m "Release $NEW_TAG"
+
+          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          echo "Successfully created local tag: $NEW_TAG"
 
       - name: Build package
         run: |
           hatch build
+
+      - name: Push tag to remote
+        if: github.ref == 'refs/heads/main'
+        run: |
+          NEW_TAG="${{ steps.create_tag.outputs.new_tag }}"
+          git push origin "$NEW_TAG"
+          echo "Successfully pushed tag: $NEW_TAG"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -64,7 +155,7 @@ jobs:
 
   test-pypi-publish:
     name: Publish to Test PyPI
-    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     needs:
       - build-pypi
     runs-on: ubuntu-latest
@@ -84,9 +175,76 @@ jobs:
         with:
           repository-url: https://test.pypi.org/legacy/
 
+  # Job to create a GitHub Release for the new tag
+  create-release:
+    name: Create GitHub Release
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - build-pypi
+      - test-pypi-publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to create releases
+    steps:
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          NEW_TAG="${{ needs.build-pypi.outputs.new_tag }}"
+
+          # Check if release already exists
+          if gh release view "$NEW_TAG" >/dev/null 2>&1; then
+            echo "::warning::Release $NEW_TAG already exists, skipping creation"
+          else
+            # Create the release
+            gh release create "$NEW_TAG" \
+              --title "Release $NEW_TAG" \
+              --notes "Automated release for $NEW_TAG" \
+              --target master
+
+            echo "Successfully created release: $NEW_TAG"
+          fi
+
+  # Job to upload built distributions as GitHub Release assets
+  # Runs after the release is created
+  upload-release-assets:
+    name: Upload distributions to GitHub Release
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - build-pypi
+      - create-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to upload release assets
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          NEW_TAG="${{ needs.build-pypi.outputs.new_tag }}"
+
+          # Verify files exist before uploading
+          shopt -s nullglob
+          files=(dist/*.whl dist/*.tar.gz)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "Error: No distribution files found in dist/"
+            exit 1
+          fi
+
+          echo "Uploading ${#files[@]} file(s) to release $NEW_TAG"
+          # Upload all wheels and source distributions to the release
+          gh release upload "$NEW_TAG" "${files[@]}" --clobber
+
   pypi-publish:
     name: Publish tagged versions to PyPI
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/main'
     needs:
       - test-pypi-publish
     runs-on: ubuntu-latest

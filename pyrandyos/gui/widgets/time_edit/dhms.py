@@ -1,6 +1,7 @@
+from ....utils.time.dhms import sec_to_dhms, dhms_to_sec
 from ...qt import Qt, QKeyEvent
 from .. import GuiWidgetParentType
-from .base_edit import BaseTimeEditorWidget
+from .base_edit import BaseTimeEditorWidget, EditCallbackType
 from .fields import DaysField, SignField, make_time_fields
 
 
@@ -9,8 +10,10 @@ class DhmsWidget(BaseTimeEditorWidget):
 
     def __init__(self, gui_parent: GuiWidgetParentType = None,
                  d: int = 0, h: int = 0, m: int = 0, s: int = 0,
-                 sign: int = 1, *qtobj_args, **qtobj_kwargs):
-        super().__init__(gui_parent, *qtobj_args, **qtobj_kwargs)
+                 sign: int = 1, edit_callback: EditCallbackType = None,
+                 *qtobj_args, **qtobj_kwargs):
+        super().__init__(gui_parent, edit_callback, *qtobj_args,
+                         **qtobj_kwargs)
         self.set_fields(SignField(), DaysField(), '/ ',
                         *make_time_fields(False))
         (self.sign, self.d, _,
@@ -36,6 +39,12 @@ class DhmsWidget(BaseTimeEditorWidget):
         self.s.set_value(int(s_int))
         self.ms.set_value(int(ms*1000))
         self.sign.set_value(sign)
+
+    def get_sec(self) -> float:
+        return dhms_to_sec(*self.get_dhms())
+
+    def set_from_sec(self, sec: float):
+        self.set_dhms(*sec_to_dhms(sec))
 
     def set_sign(self, minus: bool):
         """Set sign (True for negative, False for positive)"""
@@ -69,6 +78,7 @@ class DhmsWidget(BaseTimeEditorWidget):
             else:
                 self.set_sign(False)
 
+            self.trigger_edit_callback()
             return True
         elif key == Qt.Key_Minus:
             f = self.get_current_field()
@@ -77,6 +87,8 @@ class DhmsWidget(BaseTimeEditorWidget):
 
             else:
                 self.set_sign(True)
+
+            self.trigger_edit_callback()
             return True
         return False
 

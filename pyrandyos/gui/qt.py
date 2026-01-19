@@ -21,6 +21,7 @@ from PySide2.QtCore import (  # noqa: F401
     QModelIndex,
     QRegularExpression,
     QRegExp,
+    QIODevice,
 )
 from PySide2.QtGui import (  # noqa: F401
     QPixmap,
@@ -52,6 +53,7 @@ from PySide2.QtGui import (  # noqa: F401
     QKeyEvent,
     QPaintEvent,
     QFocusEvent,
+    QTextCursor,
 )
 from PySide2.QtWidgets import (  # noqa: F401
     QMainWindow,
@@ -102,7 +104,19 @@ from PySide2.QtWidgets import (  # noqa: F401
     QPlainTextEdit,
     QTextBrowser,
     QGroupBox,
+    QInputDialog,
+    QCheckBox,
+    QSpinBox,
+    QListWidget,
+    QColorDialog,
+    QRadioButton,
 )
+from PySide2.QtMultimedia import (  # noqa: F401
+    QAudioOutput,
+    QAudioFormat,
+    QAudio,
+)
+
 
 # try:
 #     # Needed since `QGlyphRun` is not available for PySide2
