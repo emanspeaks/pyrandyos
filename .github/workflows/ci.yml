@@ -81,6 +81,9 @@ jobs:
           hatch build
           pip install dist/*.whl
 
+      - name: Install system dependencies for Qt
+        run: sudo apt-get install -y libpulse-mainloop-glib0
+
       - name: Build documentation
         # delay pip install pdoc to try to avoid some dependency conflict
         run: |
