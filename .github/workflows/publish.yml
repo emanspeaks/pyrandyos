@@ -25,6 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
+          lfs: true
           fetch-depth: 0  # Important: gets full git history for versioning
           token: ${{ secrets.GITHUB_TOKEN }}  # enables pushing
 
