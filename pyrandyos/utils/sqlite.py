@@ -36,12 +36,12 @@ def get_table_fields(db: Connection, table_name: str):
     return tuple(row[1] for row in db.execute(query).fetchall())
 
 
-@log_func_call
-def execute_select(db: Connection, table_name: str,
-                   fields: str | list[str] = None, conditions: str = None,
-                   expansions: tuple[str] = ()):
+def validate_table(db: Connection, table_name: str,
+                   fields: str | list[str] = None,
+                   ignore_fields: str | list[str] = None):
     """
-    Execute select for specified fields from a table in the database.
+    Validate that a table exists in the database and optionally that it
+    contains the specified fields.
     """
     if not check_table_exists(db, table_name):
         raise ValueError(f"Table '{table_name}' does not exist in "
@@ -51,14 +51,27 @@ def execute_select(db: Connection, table_name: str,
         if isinstance(fields, str):
             fields = (fields,)
 
+        if isinstance(ignore_fields, str):
+            ignore_fields = (ignore_fields,)
+
         valid_fields = get_table_fields(db, table_name)
-        if not all(f in valid_fields for f in fields):
+        check_fields = ([f for f in fields if f not in ignore_fields]
+                        if ignore_fields else fields)
+        if not all(f in valid_fields for f in check_fields):
             raise ValueError("One or more fields do not exist in "
                              f"table '{table_name}'.")
-        field_list = ', '.join(fields)
-    else:
-        field_list = '*'
+        return ', '.join(fields)
+    return '*'
 
+
+@log_func_call
+def execute_select(db: Connection, table_name: str,
+                   fields: str | list[str] = None, conditions: str = None,
+                   expansions: tuple[str] = ()):
+    """
+    Execute select for specified fields from a table in the database.
+    """
+    field_list = validate_table(db, table_name, fields)
     query = (f"select {field_list} from {table_name!r} "
              f"{' ' + conditions if conditions else ''}")
     # log_debug(f"Executing query: {query} with expansions: {expansions}")
