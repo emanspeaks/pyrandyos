@@ -90,19 +90,15 @@ jobs:
 
       - name: Build documentation
         # _typeshed is a stub-only module used by type checkers; it is not
-        # importable at runtime.  Create a minimal fake package so that pdoc
-        # can resolve TYPE_CHECKING imports (e.g. ReadableBuffer) without
-        # warnings or errors.
+        # importable at runtime.  Create a minimal shim package in the CWD
+        # (which Python includes in sys.path) so that pdoc can resolve
+        # TYPE_CHECKING imports (e.g. ReadableBuffer) without warnings.
+        # ReadableBuffer is defined in real typeshed as Buffer from
+        # typing_extensions, which is already installed as a pdoc dependency.
         run: |
           pip install pdoc
-          python -c "
-import site, os
-sp = site.getsitepackages()[0]
-d = os.path.join(sp, '_typeshed')
-os.makedirs(d, exist_ok=True)
-with open(os.path.join(d, '__init__.py'), 'w') as f:
-    f.write('ReadableBuffer = bytes\n')
-"
+          mkdir -p _typeshed
+          printf 'from typing_extensions import Buffer\nReadableBuffer = Buffer\n' > _typeshed/__init__.py
           pdoc ./pyrandyos --docformat google --output-dir ./docs
 
       - uses: actions/upload-artifact@v4
