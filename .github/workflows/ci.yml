@@ -89,10 +89,15 @@ jobs:
           pip install dist/*.whl
 
       - name: Build documentation
-        # delay pip install pdoc to try to avoid some dependency conflict
-        # mypy is installed to make _typeshed importable for pdoc annotation resolution
+        # _typeshed is a stub-only module used by type checkers; it is not
+        # importable at runtime.  Create a minimal shim module in the CWD
+        # (which Python includes in sys.path) so that pdoc can resolve
+        # TYPE_CHECKING imports (e.g. ReadableBuffer) without warnings.
+        # ReadableBuffer is defined in real typeshed as Buffer from
+        # typing_extensions, which is already installed as a pdoc dependency.
         run: |
-          pip install mypy pdoc
+          pip install pdoc
+          printf 'from typing_extensions import Buffer\nReadableBuffer = Buffer\n' > _typeshed.py
           pdoc ./pyrandyos --docformat google --output-dir ./docs
 
       - uses: actions/upload-artifact@v4
