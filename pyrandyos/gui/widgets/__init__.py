@@ -11,9 +11,6 @@ GuiWindowLikePresType = TypeVar('GuiWindowLikeType', bound='GuiWindowLike')
 GuiWindowLikeViewType = TypeVar('GuiWindowLikeViewType',
                                 bound='GuiWindowLikeView')
 
-GuiWidgetParentType: TypeAlias = 'GuiWidget | GuiWidgetView | QtWidgetWrapper'
-GuiWindowLikeParentType: TypeAlias = 'GuiWindowLike | GuiWindowLikeView'
-
 
 class GuiWidget(GuiPresenter[GuiWidgetViewType], Generic[GuiWidgetViewType]):
     @log_func_call
@@ -132,3 +129,7 @@ class GuiWindowLikeView(GuiWidgetView[GuiWindowLikePresType, QtWidgetType],
     @log_func_call
     def get_dpi(self):
         return self.qtobj.devicePixelRatio()
+
+
+GuiWidgetParentType: TypeAlias = GuiWidget | GuiWidgetView | QtWidgetWrapper
+GuiWindowLikeParentType: TypeAlias = GuiWindowLike | GuiWindowLikeView
