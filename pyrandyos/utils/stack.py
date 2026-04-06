@@ -1,6 +1,6 @@
 import sys
 from types import TracebackType, FrameType, ModuleType, CodeType, CellType
-from typing import overload, TYPE_CHECKING, Any
+from typing import overload, Any, TYPE_CHECKING
 from collections.abc import Callable, Mapping
 from pathlib import Path
 from inspect import getfile, getmodule, currentframe

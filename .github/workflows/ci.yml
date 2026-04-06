@@ -90,8 +90,9 @@ jobs:
 
       - name: Build documentation
         # delay pip install pdoc to try to avoid some dependency conflict
+        # mypy is installed to make _typeshed importable for pdoc annotation resolution
         run: |
-          pip install pdoc
+          pip install mypy pdoc
           pdoc ./pyrandyos --docformat google --output-dir ./docs
 
       - uses: actions/upload-artifact@v4
@@ -101,7 +102,7 @@ jobs:
 
   deploy-docs:
     needs: build-docs
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
