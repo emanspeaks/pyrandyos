@@ -1,21 +1,29 @@
+from collections.abc import Callable
+
 from ....logging import log_func_call
 from ...qt import (
-    QGroupBox, QHBoxLayout, QFrame, Qt, QObject, QEvent, QKeyEvent, QPainter,
-    QPaintEvent, QMouseEvent, QFocusEvent, QLineEdit, QPalette, QFontMetrics,
-    QColor,
+    QFrame, Qt, QObject, QEvent, QKeyEvent, QPainter, QPaintEvent, QMouseEvent,
+    QFocusEvent, QLineEdit, QPalette, QFontMetrics, QColor,
 )
 from .. import QtWidgetWrapper, GuiWidgetParentType
 from .fields import TimeField, LabelField
 
+EditCallbackType = Callable[['BaseTimeEditorWidget', float], None]
 
-class BaseTimeEditorWidget(QtWidgetWrapper[QGroupBox]):
+
+class BaseTimeEditorWidget(QtWidgetWrapper[QFrame]):
     """Base class for time/date field widgets"""
 
     def get_title(self) -> str:
-        """Return the title for the group box"""
         raise NotImplementedError
 
-    def get_tooltip(self):
+    def get_tooltip(self) -> str:
+        raise NotImplementedError
+
+    def get_sec(self) -> float:
+        raise NotImplementedError
+
+    def set_from_sec(self, sec: float):
         raise NotImplementedError
 
     def handle_sign_keys(self, event: QKeyEvent):
@@ -30,38 +38,23 @@ class BaseTimeEditorWidget(QtWidgetWrapper[QGroupBox]):
         return 5
 
     def __init__(self, gui_parent: GuiWidgetParentType,
+                 edit_callback: EditCallbackType = None,
                  *qtobj_args, **qtobj_kwargs):
+
         # Initialize cursor position (character index in display string)
         self.cursor_pos = 0
         self.fields: list[TimeField] = []
+        self.edit_callback = edit_callback
         super().__init__(gui_parent, *qtobj_args, **qtobj_kwargs)
 
     @log_func_call
     def create_qtobj(self, *args, **kwargs):
         parent_qtobj: GuiWidgetParentType = self.gui_parent.qtobj
 
-        frame = QGroupBox(parent_qtobj)
-        frame.setTitle(self.get_title())
-        frame.setFixedWidth(195)
-        frame.setMaximumHeight(60)
-        self.frame = frame
-
-        layout = QHBoxLayout()
-        frame.setLayout(layout)
-        self.layout = layout
-
-        self.create_display_widget()
-        return frame
-
-    def create_display_widget(self):
-        """Create the appropriate display widget"""
-        parent = self.frame
-        layout = self.layout
-
         # Use QLineEdit palette colors for consistent theming
         line_edit_palette = QLineEdit().palette()
 
-        display = QFrame(parent)
+        display = QFrame(parent_qtobj)
         display.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
         display.setFocusPolicy(Qt.StrongFocus)
         display.setMinimumWidth(170)
@@ -69,7 +62,6 @@ class BaseTimeEditorWidget(QtWidgetWrapper[QGroupBox]):
         display.setAutoFillBackground(True)
         display.setPalette(line_edit_palette)
         display.setToolTip(self.get_tooltip())
-        layout.addWidget(display)
         self.display = display
 
         key_callback = self.handle_key_press
@@ -100,6 +92,8 @@ class BaseTimeEditorWidget(QtWidgetWrapper[QGroupBox]):
         event_filter = TimeEditorEventFilter()
         display.installEventFilter(event_filter)
         self.event_filter = event_filter
+
+        return display
 
     def get_display_string(self):
         """Build the display string from parent's values"""
@@ -306,6 +300,10 @@ class BaseTimeEditorWidget(QtWidgetWrapper[QGroupBox]):
 
             return True
 
+        # Don't handle enter key
+        if key in (Qt.Key_Return, Qt.Key_Enter):
+            return False
+
         # Handle digit input
         if text and text.isdigit():
             self.write_text(text)
@@ -334,9 +332,11 @@ class BaseTimeEditorWidget(QtWidgetWrapper[QGroupBox]):
         key = event.key()
         if key == Qt.Key_Backspace:
             self.get_current_field().handle_backspace()
+            self.trigger_edit_callback()
             return True
         if key == Qt.Key_Delete:
             self.get_current_field().handle_delete()
+            self.trigger_edit_callback()
             return True
         return False
 
@@ -397,22 +397,27 @@ class BaseTimeEditorWidget(QtWidgetWrapper[QGroupBox]):
     def increment_field(self):
         """Increment the entire field under the cursor"""
         self.get_current_field().incr()
+        self.trigger_edit_callback()
 
     def decrement_field(self):
         """Decrement the entire field under the cursor"""
         self.get_current_field().decr()
+        self.trigger_edit_callback()
 
     def increment_single_digit(self):
         """Increment only the single digit under the cursor"""
         self.get_current_field().incr_digit()
+        self.trigger_edit_callback()
 
     def decrement_single_digit(self):
         """Decrement only the single digit under the cursor"""
         self.get_current_field().decr_digit()
+        self.trigger_edit_callback()
 
     def write_text(self, text: str):
         """Insert a digit at the cursor position (overtype mode)"""
         self.get_current_field().write(text)
+        self.trigger_edit_callback()
 
     def set_fields(self, *args: TimeField):
         fields = self.fields
@@ -428,3 +433,9 @@ class BaseTimeEditorWidget(QtWidgetWrapper[QGroupBox]):
                 lastf.nxt = f
 
             lastf = f
+
+    def trigger_edit_callback(self):
+        cb = self.edit_callback
+        if cb:
+            sec = self.get_sec() if self.all_valid_inputs() else None
+            cb(self, sec)

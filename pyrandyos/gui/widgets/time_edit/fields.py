@@ -10,10 +10,13 @@ if TYPE_CHECKING:
 
 class TimeField:
     def __init__(self, value: int | str = None):
-        self.value = self.minval() if value is None else value
+        self._init_value(value)
         self.parent: 'BaseTimeEditorWidget' = None
         self.prev: 'TimeField' = None
         self.nxt: 'TimeField' = None
+
+    def _init_value(self, value: int | str = None):
+        self.value = self.minval() if value is None else value
 
     def start_rel_char(self):
         return 0
@@ -74,7 +77,7 @@ class TimeField:
         return 1
 
     def set_value(self, value: int | str):
-        self.value = value
+        self._init_value(value)
         self.parent.display.update()
 
     def incr(self):
@@ -317,7 +320,14 @@ class DayOfYearField(TimeField):
 class DaysField(TimeField):
     def __init__(self, value: int | str = None):
         super().__init__(value)
-        self._width = len(self.format_value(self.value, 3))
+        self._set_width_for_value(self.value)
+
+    def _set_width_for_value(self, value):
+        self._width = len(self.format_value(value, 3))
+
+    def set_value(self, value: int | str):
+        self._set_width_for_value(value)
+        super().set_value(value)
 
     def width(self):
         return self._width
@@ -408,6 +418,12 @@ class DaysField(TimeField):
         oldtext = str(self)
         newtextlist = list(oldtext)
         if not pos or pos == len(oldtext) - 1:
+            if not self.value and char == '0' and pos:
+                # if we are all zeroes and type another zero in the space,
+                # treat this as an advance
+                parent.move_cursor_right()
+                return
+
             # insert the char rather than overtype
             newtextlist.insert(-1 if pos else 1, char)
             self._width = len(newtextlist)
@@ -420,7 +436,7 @@ class DaysField(TimeField):
 
         # if cursor was at front, need to doubly advance due to the insert
         if not pos:
-            self.parent.move_cursor_right()
+            parent.move_cursor_right()
 
         parent.move_cursor_right()
 

@@ -12,7 +12,8 @@ from .view import ConfigTreeDialogView
 class ConfigTreeDialog(GuiDialog[ConfigTreeDialogView]):
     @log_func_call
     def __init__(self, gui_parent: GuiWindowLikeParentType):
-        super().__init__("Current Configuration", gui_parent)
+        super().__init__("Current Configuration", gui_parent,
+                         gui_parent.gui_view.qtobj)
 
     @log_func_call
     def get_config(self):

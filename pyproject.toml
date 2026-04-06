@@ -52,8 +52,8 @@ version-file = "pyrandyos/_version.py"
 [tool.hatch.build]
 include = [
   "pyrandyos/**/*.py",
-  "pyrandyos/gui/styles/assets",
-  "pyrandyos/gui/icons/assets",
+  "pyrandyos/gui/styles/assets/*",
+  "pyrandyos/gui/icons/assets/*",
 ]
 
 [project.urls]

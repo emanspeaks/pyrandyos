@@ -41,7 +41,7 @@ from ...qt import QPalette, QColor
 if TYPE_CHECKING:
     from ...gui_app import QtApp
 
-from .vibedark import vibedark
+from .vibedark2 import vibedark2
 
 
 @log_func_call
@@ -54,8 +54,8 @@ def qdarkstyle(app: QtApp):
     """
 
     if not HAS_QDARKSTYLE:
-        log_warning("QDarkStyle is not installed. Downmoding to VibeDark")
-        return vibedark(app)
+        log_warning("QDarkStyle is not installed. Downmoding to VibeDark2")
+        return vibedark2(app)
 
     dark_palette = QPalette()
 

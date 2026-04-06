@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ..logging import log_func_call, DEBUGLOW2, WARNING
+from ..logging import log_func_call, DEBUGLOW2, WARNING, log_warning
 from .net import download_file, get_github_download_url
 from .filemeta import filehash
 
@@ -36,14 +36,20 @@ class GitFileSpec:
             p /= name
 
         if p.exists():
-            return p
+            if self.md5sum and self.md5sum == filehash(p, algorithm='md5'):
+                return p
 
         if download_dir is None:
             from ..app import PyRandyOSApp
             download_dir = PyRandyOSApp.mkdir_temp()
 
         download_dir.mkdir(parents=True, exist_ok=True)
-        return download_dir/name
+        p = download_dir/name
+        if (p.exists() and self.md5sum
+                and self.md5sum != filehash(p, algorithm='md5')):
+            log_warning(f"MD5 checksum does not match for {p}")
+
+        return p
 
     @log_func_call(WARNING)
     def download(self, dest: Path, use_tqdm: bool = True,
@@ -64,8 +70,19 @@ class GitFileSpec:
             if not p.exists():
                 raise FileNotFoundError(f"Failed to find or download {p}")
 
-        if self.md5sum and self.md5sum != filehash(p, algorithm='md5'):
-            raise ValueError(f"MD5 checksum does not match for {p}")
+        md5sum = self.md5sum
+        hash_ok = md5sum and md5sum == filehash(p, algorithm='md5')
+        if md5sum and not hash_ok:
+            if p.parent == download_dir and p.exists():
+                p.unlink()
+                p = self.download(p, use_tqdm, show_full_path)
+                if not p.exists():
+                    raise FileNotFoundError(f"Failed to find or download {p}")
+
+                hash_ok = (md5sum and md5sum == filehash(p, algorithm='md5'))
+
+            if not hash_ok:
+                raise ValueError(f"MD5 checksum does not match for {p}")
         return p
 
     @log_func_call

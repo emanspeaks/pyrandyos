@@ -152,8 +152,12 @@ def get_framesummary_for_frame(f: FrameType, tb: TracebackType = None,
     lazylinecache(filename, f.f_globals)
     checklinecache(filename)
     fixed_lineno = lineno
+    end_lineno = None
+    colno = None
+    end_colno = None
     if not lineno:
-        lineno = None if lasti < 0 else (tb.tb_lineno if tb else f.f_lineno)
+        lineno = (None if not isinstance(lasti, int) or lasti < 0
+                  else (tb.tb_lineno if tb else f.f_lineno))
 
     posgen: Callable = (getattr(code, 'co_positions', None)
                         if fixed_lineno is None else None)
@@ -164,10 +168,12 @@ def get_framesummary_for_frame(f: FrameType, tb: TracebackType = None,
         if lineno2 is not None:
             lineno = lineno2
 
-    line = ((src.splitlines()[lineno - 1] if src else '<unknown source>')
-            if filename == '<string>' else
-            getcachedline(filename, lineno))
-    if underlines:
+    line = None if lineno is None else (
+        (src.splitlines()[lineno - 1] if src else '<unknown source>')
+        if filename == '<string>' else
+        getcachedline(filename, lineno)
+    )
+    if line and underlines:
         # I like seeing the underlines in the tracebacks, but if the issue is
         # the entire line, it doesn't print them.  As a hack, just lop off the
         # last character of the line.

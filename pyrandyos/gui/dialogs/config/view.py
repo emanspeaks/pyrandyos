@@ -1,4 +1,5 @@
 import sys
+from os import environ
 # from __future__ import annotations
 from typing import TYPE_CHECKING
 from pathlib import Path
@@ -12,7 +13,6 @@ from ...qt import (
 from ...utils import create_icon_button
 from .. import GuiDialogView
 from .icons import SaveLocalConfigIcon, SaveConfigIcon
-
 if TYPE_CHECKING:
     from .pres import ConfigTreeDialog
 
@@ -72,10 +72,16 @@ class ConfigTreeDialogView(GuiDialogView['ConfigTreeDialog']):
 
         self.populate_tree(itemmodel, pres.get_config())
 
+        blank_item = QStandardItem("---")
+        itemmodel.appendRow([blank_item, QStandardItem("")])
+
         not_in_cfg_item = QStandardItem("(Not in Config dict)")
         itemmodel.appendRow([not_in_cfg_item, QStandardItem("")])
-        syspath = {'Python sys.path': [Path(p) for p in sys.path]}
-        self.populate_tree(not_in_cfg_item, syspath)
+        extras = {
+            'Python sys.path': [Path(p) for p in sys.path],
+            'OS environment variables': dict(environ)
+        }
+        self.populate_tree(not_in_cfg_item, extras)
 
         tree.expandAll()
         tree.resizeColumnToContents(0)

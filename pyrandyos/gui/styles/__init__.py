@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from collections.abc import Callable
 
 from ...logging import log_func_call
-from .themes import qdarkstyle, light, vibedark, HAS_QDARKSTYLE
+from .themes import qdarkstyle, light, vibedark, vibedark2, HAS_QDARKSTYLE
 if TYPE_CHECKING:
     from ..gui_app import QtApp
 
@@ -30,6 +30,7 @@ class ThemeMap:
         self.create_theme('light', light)
         self.create_theme('qdarkstyle', qdarkstyle)
         self.create_theme('vibedark', vibedark)
+        self.create_theme('vibedark2', vibedark2)
 
     @log_func_call
     def apply_theme(self, name: str = None):

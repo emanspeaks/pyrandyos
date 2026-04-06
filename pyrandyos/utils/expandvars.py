@@ -86,6 +86,7 @@ def substitute_callback(key: str, subst: str, case_insensitive: bool,
         data['i'] = len(x)
         data['x'] = x + tail
         return False
+    data['i'] = data['j']
     return True
 
 
