@@ -1,6 +1,6 @@
 import sys
 from types import TracebackType, FrameType, ModuleType, CodeType, CellType
-from typing import overload, Any
+from typing import overload, Any, TYPE_CHECKING
 from collections.abc import Callable, Mapping
 from pathlib import Path
 from inspect import getfile, getmodule, currentframe
@@ -13,6 +13,8 @@ from linecache import (
     getline as getcachedline
 )
 from textwrap import indent
+if TYPE_CHECKING:
+    from _typeshed import ReadableBuffer
 
 
 SCRIPTPATH = Path(__file__)
@@ -483,7 +485,7 @@ def exc_info(exc_or_type: type | BaseException | ExcInfoType = None,
     return exc_or_type, exc, traceback
 
 
-def safe_exec(source: str | bytes | CodeType,
+def safe_exec(source: 'str | ReadableBuffer | CodeType',
               globals_: dict[str, Any] | None = None,
               locals_: Mapping[str, object] | None = None,
               /, *,
