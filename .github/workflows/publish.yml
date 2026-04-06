@@ -202,7 +202,7 @@ jobs:
             gh release create "$NEW_TAG" \
               --title "Release $NEW_TAG" \
               --notes "Automated release for $NEW_TAG" \
-              --target master
+              --target main
 
             echo "Successfully created release: $NEW_TAG"
           fi
